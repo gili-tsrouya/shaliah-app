@@ -4,6 +4,11 @@
   "lng": -74.1724,
   "rangeMiles": 10,
   "maxPrice": 10,
-  "topics": ["food", "out", "sale", "jewish"],
+  "topics": [
+    "food",
+    "out",
+    "sale",
+    "jewish"
+  ],
   "extra": ""
 }

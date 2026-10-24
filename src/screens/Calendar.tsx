@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useAllEvents, useCategory, useStore, newId } from '../lib/store'
 import { colorOf, eventsOn } from '../lib/derive'
-import { DAY_LETTERS, addDays, formatDay, formatLongDay, fromISO, todayISO, weekStart } from '../lib/dates'
+import { DAY_LETTERS, MONTHS, addDays, formatDay, formatLongDay, fromISO, toISO, todayISO, weekStart } from '../lib/dates'
 import { COLORS, type CalCategory, type CalEvent, type EventKind, type Work } from '../lib/types'
 import * as G from '../lib/google'
 import { Fab, Sheet } from '../components/ui'
@@ -23,8 +23,35 @@ export function Calendar() {
   const [sync, setSync] = useState<SyncState>(settings.googleClientId ? 'idle' : 'off')
   const [error, setError] = useState('')
   const visible = Object.fromEntries(calCategories.map((c) => [c.id, !hidden[c.id]]))
-  const start = weekStart(day)
-  const days = Array.from({ length: 7 }, (_, i) => addDays(start, i))
+  const [view, setView] = useState<'week' | 'month'>(() => {
+    try {
+      return localStorage.getItem('shaliach:calView') === 'month' ? 'month' : 'week'
+    } catch {
+      return 'week'
+    }
+  })
+  const pickView = (v: 'week' | 'month') => {
+    setView(v)
+    try {
+      localStorage.setItem('shaliach:calView', v)
+    } catch {
+      // remembered for this visit only
+    }
+  }
+  const d0 = fromISO(day)
+  const monthFirst = toISO(new Date(d0.getFullYear(), d0.getMonth(), 1))
+  const monthLast = toISO(new Date(d0.getFullYear(), d0.getMonth() + 1, 0))
+  // Week: Sunday–Saturday around the selected day. Month: whole weeks covering the month.
+  const start = view === 'week' ? weekStart(day) : weekStart(monthFirst)
+  const end = view === 'week' ? addDays(start, 6) : addDays(weekStart(monthLast), 6)
+  const days: string[] = []
+  for (let d = start; d <= end; d = addDays(d, 1)) days.push(d)
+  const moveMonth = (n: number) => {
+    const target = new Date(d0.getFullYear(), d0.getMonth() + n, 1)
+    const t = fromISO(today)
+    setDay(t.getFullYear() === target.getFullYear() && t.getMonth() === target.getMonth() ? today : toISO(target))
+  }
+  const move = (n: number) => (view === 'week' ? setDay(addDays(day, 7 * n)) : moveMonth(n))
   const dayEvents = eventsOn(all, day, visible)
   const vacations = all.filter((e) => e.kind === 'vacation' && (e.endDate ?? e.date) >= today).sort((a, b) => a.date.localeCompare(b.date))
   const linked = calCategories.filter((c) => c.googleCalendarId)
@@ -37,7 +64,7 @@ export function Calendar() {
     setSync('syncing')
     try {
       const from = addDays(today < start ? today : start, -30)
-      const to = addDays(addDays(start, 6) > today ? addDays(start, 6) : today, 120)
+      const to = addDays(end > today ? end : today, 120)
       // One fetch per Google calendar, even if two categories point at it by mistake
       const byCalendar = new Map(linked.map((c) => [c.googleCalendarId!, c.id]))
       const lists = await Promise.all([...byCalendar].map(([cal, work]) => G.fetchEvents(tok, cal, work, from, to)))
@@ -50,7 +77,7 @@ export function Calendar() {
       setError('הסנכרון נכשל. לחצו "סנכרן" כדי להתחבר מחדש.')
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [linked.map((c) => c.googleCalendarId + c.id).join(), start, today, setGoogleEvents])
+  }, [linked.map((c) => c.googleCalendarId + c.id).join(), start, end, today, setGoogleEvents])
 
   // Pull on open and when moving between weeks, if we still hold a valid token
   useEffect(() => {
@@ -135,21 +162,34 @@ export function Calendar() {
         <button className="chip" style={{ border: 'none', background: 'none', color: 'var(--muted)' }} onClick={() => setShowSync(true)}>עריכה</button>
       </div>
 
-      <div className="between">
-        <button className="icon-btn" aria-label="שבוע קודם" onClick={() => setDay(addDays(day, -7))}><Icon name="chevronR" /></button>
-        <button className="chip" style={{ border: 'none', background: 'none', fontWeight: 700, fontSize: 16 }} onClick={() => setDay(today)}>
-          {formatDay(days[0])} – {formatDay(days[6])}
-        </button>
-        <button className="icon-btn" aria-label="שבוע הבא" onClick={() => setDay(addDays(day, 7))}><Icon name="chevronL" /></button>
+      <div className="segmented" role="group" aria-label="תצוגה">
+        {(['week', 'month'] as const).map((v) => (
+          <a key={v} href="#/calendar" className={view === v ? 'on' : ''} aria-pressed={view === v}
+            onClick={(e) => { e.preventDefault(); pickView(v) }}>{v === 'week' ? 'שבוע' : 'חודש'}</a>
+        ))}
       </div>
 
-      <div className="week">
+      <div className="between">
+        <button className="icon-btn" aria-label={view === 'week' ? 'שבוע קודם' : 'חודש קודם'} onClick={() => move(-1)}><Icon name="chevronR" /></button>
+        <button className="chip" style={{ border: 'none', background: 'none', fontWeight: 700, fontSize: 16 }} onClick={() => setDay(today)}>
+          {view === 'week' ? `${formatDay(days[0])} – ${formatDay(days[6])}` : `${MONTHS[d0.getMonth()]} ${d0.getFullYear()}`}
+        </button>
+        <button className="icon-btn" aria-label={view === 'week' ? 'שבוע הבא' : 'חודש הבא'} onClick={() => move(1)}><Icon name="chevronL" /></button>
+      </div>
+
+      {view === 'month' && (
+        <div className="week" aria-hidden="true" style={{ marginBottom: -8 }}>
+          {DAY_LETTERS.map((l) => <span key={l} className="small muted" style={{ textAlign: 'center' }}>{l}</span>)}
+        </div>
+      )}
+      <div className={`week ${view === 'month' ? 'month' : ''}`}>
         {days.map((d, i) => {
           const on = eventsOn(all, d, visible)
+          const outside = view === 'month' && (d < monthFirst || d > monthLast)
           return (
             <button key={d} className={`${d === day ? 'on' : ''} ${d === today ? 'today' : ''}`} onClick={() => setDay(d)}
-              aria-label={formatLongDay(d)} aria-pressed={d === day}>
-              <span className="small">{DAY_LETTERS[i]}</span>
+              aria-label={formatLongDay(d)} aria-pressed={d === day} style={outside ? { opacity: 0.4 } : undefined}>
+              {view === 'week' && <span className="small">{DAY_LETTERS[i]}</span>}
               <span className="num">{fromISO(d).getDate()}</span>
               <span className="dots">
                 {calCategories.filter((c) => on.some((e) => e.work === c.id)).map((c) => <span key={c.id} style={{ background: colorOf(c.color).dot }} />)}

@@ -168,3 +168,7 @@ a { color: var(--primary); }
   display: flex; align-items: center; justify-content: center; box-shadow: 0 0 0 6px rgba(15, 27, 45, 0.15);
 }
 .leaflet-container { font-family: Heebo, sans-serif; z-index: 0; }
+
+/* Calendar month grid: smaller cells than the week strip */
+.week.month button { min-height: 48px; border-radius: 10px; }
+.week.month .num { font-size: 15px; }

@@ -146,14 +146,15 @@ function AgentSettingsPanel({ onDone }: { onDone: () => void }) {
   )
 
   const save = async () => {
-    setAgentSettings(draft)
+    const next = { ...draft, updatedAt: new Date().toISOString() }
+    setAgentSettings(next)
     if (!settings.githubToken) {
       setStatus('נשמר בטלפון. כדי שהסוכן יקבל את ההגדרות, הוסיפו למטה טוקן של GitHub.')
       return
     }
     setStatus('שומר…')
     try {
-      await saveAgentSettings(settings.githubToken, draft)
+      await saveAgentSettings(settings.githubToken, next)
       setStatus('')
       onDone()
     } catch (e) {

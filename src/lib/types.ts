@@ -112,6 +112,7 @@ export interface AgentSettings {
   maxPrice: number // 0 = free only, 999 = any
   topics: string[]
   extra: string
+  updatedAt?: string // when it was last saved from the app
 }
 
 export const DEAL_TOPICS: { id: string; label: string }[] = [

@@ -1,7 +1,7 @@
 {
-  "home": "New Jersey",
-  "lat": 40.7357,
-  "lng": -74.1724,
+  "home": "Fair Lawn, NJ",
+  "lat": 40.9404,
+  "lng": -74.1318,
   "rangeMiles": 10,
   "maxPrice": 10,
   "topics": [
@@ -10,5 +10,6 @@
     "sale",
     "jewish"
   ],
-  "extra": ""
+  "extra": "",
+  "updatedAt": "2026-10-24T19:59:39.000Z"
 }

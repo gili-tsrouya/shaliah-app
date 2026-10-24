@@ -34,7 +34,7 @@ export function Home() {
     <main className="screen">
       <header className="between" style={{ alignItems: 'flex-start' }}>
         <div className="col" style={{ gap: 4 }}>
-          <p className="muted">{formatLongDay(today)} · ניו ג׳רזי</p>
+          <p className="muted">{formatLongDay(today)} · {agentSettings.home}</p>
           <h1>{greeting()}, {settings.name}</h1>
         </div>
         <a href="#/settings" className="icon-btn" aria-label="הגדרות וגיבוי"><Icon name="gear" size={20} /></a>

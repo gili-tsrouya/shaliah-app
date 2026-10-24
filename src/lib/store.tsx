@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from '
 import type { AgentSettings, CalCategory, CalEvent, Category, Expense, Owed, Person, Settings, Task } from './types'
 import { DEFAULT_CATEGORIES } from './types'
 import { addDays, todayISO } from './dates'
+import { loadAgentSettings } from './github'
 
 const PREFIX = 'shaliach:'
 
@@ -42,9 +43,9 @@ const defaultPeople = (): Person[] => [
 ]
 
 export const DEFAULT_AGENT_SETTINGS: AgentSettings = {
-  home: 'New Jersey',
-  lat: 40.7357,
-  lng: -74.1724,
+  home: 'Fair Lawn, NJ',
+  lat: 40.9404,
+  lng: -74.1318,
   rangeMiles: 10,
   maxPrice: 10,
   topics: ['food', 'out', 'sale', 'jewish'],
@@ -68,6 +69,11 @@ function useAppState() {
   const [people, setPeople] = usePersistent<Person[]>('people', defaultPeople)
   const [savedDeals, setSavedDeals] = usePersistent<string[]>('savedDeals', () => [])
   const [agentSettings, setAgentSettings] = usePersistent<AgentSettings>('agentSettings', () => DEFAULT_AGENT_SETTINGS)
+
+  // The repo copy is what the agents use, so it wins over the phone's copy (home, weather, map, filters)
+  useEffect(() => {
+    loadAgentSettings().then((s) => s && setAgentSettings((cur) => ((s.updatedAt ?? '') >= (cur.updatedAt ?? '') ? { ...cur, ...s } : cur)))
+  }, [setAgentSettings])
 
   return {
     settings, setSettings,

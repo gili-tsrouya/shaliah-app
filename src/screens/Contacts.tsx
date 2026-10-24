@@ -101,7 +101,7 @@ export function Contacts() {
               <div className="grid3" style={{ gap: 6 }}>
                 <a className="btn light row" style={{ justifyContent: 'center', gap: 5, minHeight: 38, fontSize: 13, background: '#DCF8E6', color: '#0B5B2E', border: 'none', textDecoration: 'none', fontWeight: 700 }}
                   href={`https://wa.me/${tel.replace('+', '')}`} target="_blank" rel="noreferrer" onClick={() => talked(p.id)}>
-                  <Icon name="phone" size={15} /> וואטסאפ
+                  <Icon name="phone" size={15} /> צ׳אט וואטסאפ
                 </a>
                 <a className="btn light row" style={{ justifyContent: 'center', gap: 5, minHeight: 38, fontSize: 13, background: '#E3EDFD', color: '#1E3A8A', border: 'none', textDecoration: 'none', fontWeight: 700 }}
                   href={`facetime:${tel}`} onClick={() => talked(p.id)}>

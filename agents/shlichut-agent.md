@@ -26,6 +26,12 @@ Sefaria (for parsha texts), Jewish Agency and Young Judaea / Tzofim public pages
 - Write in Hebrew. Names of organisations and places may stay in English.
 - 6–12 items in total.
 
+## If a site will not open
+Some sites block automated access. That is normal: skip it and try the next source. Try at least 10 different
+sources (official venue/organization pages, Eventbrite, Meetup, library and town calendars, news sites) before
+concluding there is nothing. Only if every page fails, keep yesterday's still-valid items, update nothing else,
+and say in your final message which hosts were blocked.
+
 ## 3. Write `public/feeds/shlichut.json`
 Exactly this shape (UTF-8, 2-space indent):
 

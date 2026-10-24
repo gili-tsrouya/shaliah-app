@@ -4,11 +4,19 @@ import { updatedText, useFeed } from '../lib/feeds'
 import { Icon } from '../components/Icon'
 import type { FeedItem } from '../lib/types'
 
+// Opens ChatGPT with the request already typed in; Gili only presses send
+const chatGptUrl = (i: FeedItem) =>
+  'https://chatgpt.com/?q=' + encodeURIComponent(
+    `כתוב לי פעילות לנוער יהודי בתפוצות (גילאי 13–18) בנושא: ${i.title}.` +
+    (i.idea ? ` כיוון אפשרי: ${i.idea}.` : '') +
+    ' כלול מטרות, פתיחה, משחק או דיון, שאלות לשיחה, סיכום, משך כולל של כשעה ורשימת ציוד.',
+  )
+
 const FILTERS = ['הכל', 'פרשת השבוע', 'חגים ומועדים', 'ישראל', 'העולם היהודי']
 
 export function Shlichut() {
   const { feed, error } = useFeed('shlichut')
-  const { setTasks } = useStore()
+  const { setTasks, calCategories } = useStore()
   const [filter, setFilter] = useState('הכל')
   const [made, setMade] = useState<string[]>([])
 
@@ -17,7 +25,7 @@ export function Shlichut() {
   const items = all.filter((i) => i !== featured && (filter === 'הכל' || i.category === filter))
 
   const makeTask = (i: FeedItem) => {
-    setTasks((ts) => [...ts, { id: newId(), title: `הכנת פעילות: ${i.title}`, work: 'tzofim', status: 'todo', note: i.idea }])
+    setTasks((ts) => [...ts, { id: newId(), title: `הכנת פעילות: ${i.title}`, work: calCategories[0]?.id ?? 'personal', status: 'todo', note: i.idea }])
     setMade((m) => [...m, i.id])
   }
 
@@ -42,9 +50,15 @@ export function Shlichut() {
           <span className="small bold" style={{ color: '#DBE6FD' }}>{featured.category}{featured.when ? ` · ${featured.when}` : ''}</span>
           <h2 style={{ fontSize: 21, lineHeight: 1.3 }}>{featured.title}</h2>
           {featured.idea && <p style={{ fontSize: 14, lineHeight: 1.5, color: '#EEF3FE' }}>{featured.idea}</p>}
-          <button className="btn white" disabled={made.includes(featured.id)} onClick={() => makeTask(featured)}>
-            {made.includes(featured.id) ? 'נוספה משימה' : 'צור משימה להכנת פעילות'}
-          </button>
+          <div className="row">
+            <a className="btn white row" style={{ flex: 1, justifyContent: 'center', textDecoration: 'none', gap: 6 }} href={chatGptUrl(featured)} target="_blank" rel="noreferrer">
+              <Icon name="sparkle" size={16} /> בנה פעילות ב-ChatGPT
+            </a>
+            <button className="icon-btn" style={{ borderRadius: 12, background: 'transparent', color: '#fff', borderColor: '#6F95E8' }}
+              aria-label={made.includes(featured.id) ? 'נוספה משימה' : 'צור משימה להכנת פעילות'} disabled={made.includes(featured.id)} onClick={() => makeTask(featured)}>
+              <Icon name={made.includes(featured.id) ? 'check' : 'board'} size={18} />
+            </button>
+          </div>
         </article>
       )}
 
@@ -55,7 +69,10 @@ export function Shlichut() {
           {i.summary && <span style={{ fontSize: 14, color: '#3D4757', lineHeight: 1.45 }}>{i.summary}</span>}
           {i.idea && <span style={{ fontSize: 14, lineHeight: 1.45 }}><b>רעיון לשיחה: </b>{i.idea}</span>}
           <div className="row">
-            <button className="btn light" style={{ flex: 1 }} disabled={made.includes(i.id)} onClick={() => makeTask(i)}>
+            <a className="btn light row" style={{ flex: 1, justifyContent: 'center', textDecoration: 'none', gap: 6, color: 'var(--primary)', fontWeight: 700 }} href={chatGptUrl(i)} target="_blank" rel="noreferrer">
+              <Icon name="sparkle" size={16} /> בנה פעילות ב-ChatGPT
+            </a>
+            <button className="btn light" disabled={made.includes(i.id)} onClick={() => makeTask(i)}>
               {made.includes(i.id) ? 'נוספה משימה' : 'צור משימה'}
             </button>
             {i.url && <a className="icon-btn" style={{ borderRadius: 10 }} href={i.url} target="_blank" rel="noreferrer" aria-label="למקור"><Icon name="link" size={18} /></a>}

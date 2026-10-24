@@ -1,8 +1,9 @@
-import { useStore } from '../lib/store'
+import { useAllEvents, useCategory, useStore } from '../lib/store'
+import { SKY_TEXT, skyOf, toF, useWeather, whatToWear } from '../lib/weather'
 import { useFeed } from '../lib/feeds'
-import { budgetSummary, daysUntilDue, eventsOn } from '../lib/derive'
+import { budgetSummary, colorOf, daysUntilDue, eventsOn } from '../lib/derive'
 import { addDays, formatLongDay, todayISO } from '../lib/dates'
-import { STATUSES, WORKS, type TaskStatus } from '../lib/types'
+import { STATUSES, type TaskStatus } from '../lib/types'
 import { Bar, money } from '../components/ui'
 import { Icon } from '../components/Icon'
 
@@ -14,7 +15,12 @@ const greeting = () => {
 }
 
 export function Home() {
-  const { settings, expenses, events, tasks, people } = useStore()
+  const { settings, expenses, tasks, people, agentSettings } = useStore()
+  const events = useAllEvents()
+  const cat = useCategory()
+  const weather = useWeather(agentSettings.lat, agentSettings.lng)
+  const wear = weather && whatToWear(weather)
+  const sky = weather && skyOf(weather.code)
   const deals = useFeed('deals').feed?.items.slice(0, 2) ?? []
   const topic = useFeed('shlichut').feed?.items[0]
   const today = todayISO()
@@ -29,6 +35,28 @@ export function Home() {
         <p className="muted">{formatLongDay(today)} · ניו ג׳רזי</p>
         <h1>{greeting()}, {settings.name}</h1>
       </header>
+
+      {weather && wear && sky && (
+        <div className="card" style={{ flexDirection: 'row', alignItems: 'center', gap: 12, padding: '10px 14px' }}>
+          <span className="avatar" style={{ borderRadius: 12, background: sky === 'sun' ? '#FEF3C7' : '#E8EEF7', color: sky === 'sun' ? '#B45309' : '#3D5A80' }}>
+            <Icon name={sky} size={26} stroke={1.8} />
+          </span>
+          <span className="col" style={{ gap: 0, flex: 1, minWidth: 0 }}>
+            <span className="row" style={{ alignItems: 'baseline', gap: 6 }}>
+              <span className="big-num ltr" style={{ fontSize: 22 }}>{Math.round(weather.temp)}°C</span>
+              <span style={{ fontSize: 14 }}>{SKY_TEXT[sky]}{weather.rainChance >= 30 ? ` · ${weather.rainChance}% גשם` : ''}</span>
+            </span>
+            <span className="muted small ltr" style={{ textAlign: 'end' }}>{Math.round(weather.max)}° / {Math.round(weather.min)}° · {toF(weather.temp)}°F</span>
+          </span>
+          <span className="row" style={{ background: 'var(--ground)', borderRadius: 12, padding: '6px 10px 6px 8px', gap: 8 }}>
+            <Icon name={wear.wear} size={26} stroke={1.8} />
+            <span className="col" style={{ gap: 0 }}>
+              <span className="muted" style={{ fontSize: 11 }}>מה ללבוש</span>
+              <span className="bold" style={{ fontSize: 13 }}>{wear.text}</span>
+            </span>
+          </span>
+        </div>
+      )}
 
       <a href="#/self/budget" className="card dark link-card" style={{ gap: 12 }}>
         <div className="between"><span className="muted">נשאר לך החודש</span><span className="muted small">{b.daysLeft} ימים לסוף החודש</span></div>
@@ -51,10 +79,10 @@ export function Home() {
         <div className="between"><h2>היום ומחר ביומן</h2><a href="#/calendar" className="small bold" style={{ textDecoration: 'none' }}>לכל היומן</a></div>
         {upcoming.length === 0 && <p className="empty">אין אירועים היום ומחר</p>}
         {upcoming.slice(0, 4).map((e) => (
-          <div key={e.id + e.day} className={`event w-${e.work}`}>
+          <div key={e.id + e.day} className="event" style={{ background: colorOf(cat(e.work).color).bg, color: colorOf(cat(e.work).color).fg }}>
             <span className="time ltr">{e.kind === 'vacation' ? '—' : e.start ?? 'כל היום'}</span>
             <span className="title" style={{ flex: 1 }}>{e.title}{e.day !== today ? ' (מחר)' : ''}</span>
-            <span className="small bold">{WORKS[e.work].label}</span>
+            <span className="small bold">{cat(e.work).label}</span>
           </div>
         ))}
       </section>
@@ -76,7 +104,7 @@ export function Home() {
 
       {topic && (
         <a href="#/shlichut" className="card link-card" style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}>
-          <span className="avatar w-tzofim" style={{ borderRadius: 12 }}><Icon name="star" /></span>
+          <span className="avatar" style={{ borderRadius: 12, background: 'var(--tzofim-bg)', color: 'var(--primary)' }}><Icon name="star" /></span>
           <span className="col" style={{ gap: 2 }}>
             <span className="small bold" style={{ color: 'var(--primary)' }}>{topic.category}</span>
             <span>{topic.title}</span>

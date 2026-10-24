@@ -13,14 +13,14 @@ Two workplaces: **צופים** (blue) and **Young Judaea** (orange), plus **אי
 The approved design is a Claude Design canvas: https://claude.ai/artifact/RQ2ygpVUiZ8viiNRd7VEsP
 Match its colors, spacing and copy.
 
-## Built so far
-Home, cheap finds (feed list), budget (expenses, editable categories and stipend), stay in touch (people, frequency, "we talked"), shlichut feed (create task from item), calendar (3 toggleable categories, events/deadlines/vacations), task board (todo/doing/blocked/done).
+## Built
+- Home: weather (Open-Meteo, location from agent settings) + what-to-wear icon, budget card, who to call, today/tomorrow events, agent picks, task counts.
+- Cheap finds: agent settings panel (distance, max price, topics, free text; saved to `public/agent-settings.json` through the GitHub API with a token the user pastes once), list/map toggle (Leaflet + OpenStreetMap, pins need `lat`/`lng`).
+- Budget: one "+ הוצאה" sheet with optional "someone owes me" split and a refund mode; "חייבים לי" list; refunds reduce net spending.
+- Stay in touch: photo, ring color by on-time score, last-8 history dots, priority sort, optional phone with WhatsApp (wa.me) and FaceTime video/audio links.
+- Calendar: user-defined categories with colors; each category can be linked to a Google calendar for two-way sync (`src/lib/google.ts`, Google Identity Services token in the browser; Client ID pasted in the app).
+- Shlichut: feed + "בנה פעילות ב-ChatGPT" link + create task.
+- Tasks board.
 
-## In the design but not built yet
-1. Home: weather card + what-to-wear icon (t-shirt / light jacket / coat / umbrella) from a real forecast (e.g. Open-Meteo, no API key).
-2. Cheap finds: agent settings (distance 5/10/25 mi/incl. NYC, max price, topics, free text) and a list/map toggle with price pins around home.
-3. Budget: one "+ הוצאה" button opening a sheet with an optional "someone owes me part of this" split, and a refund mode ("קיבלתי כסף בחזרה"); "חייבים לי" list with "קיבלתי"; refunds reduce net spending; recent movements show refunds in green.
-4. Stay in touch: profile photo, ring color by on-time score, last-8 history dots (green on time / yellow a bit late / red very late), priority sort by overdue ratio, optional phone with WhatsApp (opens chat via wa.me), WhatsApp video and FaceTime (`facetime:` / `facetime-audio:`) buttons.
-5. Calendar: user-defined extra categories with a color picker; two-way Google Calendar sync (needs a Google Cloud OAuth client).
-6. Shlichut: "בנה פעילות ב-ChatGPT" button per item → `https://chatgpt.com/?q=` + encoded Hebrew prompt asking for a youth activity on that topic.
-7. Daily agents (deals + shlichut) that update the feed JSON files.
+## Agents
+Prompts in `agents/deals-agent.md` and `agents/shlichut-agent.md`. Run daily (e.g. a Claude Code scheduled routine on the repo): follow the prompt, write the feed JSON, commit and push to `main` (which redeploys).

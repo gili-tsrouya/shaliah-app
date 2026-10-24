@@ -104,12 +104,6 @@ a { color: var(--primary); }
 .tag.free { background: var(--personal-bg); color: var(--personal-fg); }
 .tag.paid { background: var(--yj-bg); color: var(--yj-fg); }
 
-.w-tzofim { background: var(--tzofim-bg); color: var(--tzofim-fg); }
-.w-yj { background: var(--yj-bg); color: var(--yj-fg); }
-.w-personal { background: var(--personal-bg); color: var(--personal-fg); }
-.d-tzofim { background: var(--tzofim-dot); }
-.d-yj { background: var(--yj-dot); }
-.d-personal { background: var(--personal-dot); }
 
 .event { display: flex; gap: 12px; align-items: center; border-radius: 14px; padding: 10px 14px; }
 .event .time { font-size: 14px; font-weight: 700; min-width: 48px; }
@@ -160,3 +154,17 @@ a { color: var(--primary); }
   background: #fff; font-size: 16px; /* 16px stops iOS zooming on focus */
 }
 .ltr { direction: ltr; unicode-bidi: isolate; }
+
+/* Deals map pins (rendered by Leaflet as raw HTML) */
+.pin {
+  transform: translate(-50%, -50%); white-space: nowrap; min-height: 30px; padding: 0 10px; border-radius: 15px;
+  font: 700 13px Heebo, sans-serif; background: #fff; box-shadow: 0 3px 8px rgba(15, 27, 45, 0.25); cursor: pointer;
+}
+.pin.free { color: var(--personal-fg); border: 2px solid var(--personal-dot); }
+.pin.paid { color: var(--yj-fg); border: 2px solid var(--yj-dot); }
+.pin.sel { background: var(--primary); color: #fff; border: 2px solid #fff; }
+.pin-home {
+  width: 34px; height: 34px; border-radius: 17px; background: var(--ink); color: #fff; font-size: 18px;
+  display: flex; align-items: center; justify-content: center; box-shadow: 0 0 0 6px rgba(15, 27, 45, 0.15);
+}
+.leaflet-container { font-family: Heebo, sans-serif; z-index: 0; }

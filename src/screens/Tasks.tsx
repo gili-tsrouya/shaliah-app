@@ -1,7 +1,8 @@
 import { useState } from 'react'
-import { useStore, newId } from '../lib/store'
+import { useCategory, useStore, newId } from '../lib/store'
+import { colorOf } from '../lib/derive'
 import { daysBetween, formatDay, todayISO } from '../lib/dates'
-import { STATUSES, WORKS, type Task, type TaskStatus, type Work } from '../lib/types'
+import { STATUSES, type Task, type TaskStatus } from '../lib/types'
 import { Fab, Sheet } from '../components/ui'
 
 const FLOW: TaskStatus[] = ['todo', 'doing', 'blocked', 'done']
@@ -9,7 +10,8 @@ const NEXT: Partial<Record<TaskStatus, [TaskStatus, string]>> = { todo: ['doing'
 const BACK: Partial<Record<TaskStatus, [TaskStatus, string]>> = { doing: ['blocked', 'סמן כחסום'], blocked: ['todo', 'החזר לרשימה'], done: ['doing', 'פתח מחדש'] }
 
 export function Tasks() {
-  const { tasks, setTasks } = useStore()
+  const { tasks, setTasks, calCategories } = useStore()
+  const cat = useCategory()
   const [col, setCol] = useState<TaskStatus>('todo')
   const [editing, setEditing] = useState<Task | null>(null)
   const today = todayISO()
@@ -41,7 +43,7 @@ export function Tasks() {
         return (
           <article key={t.id} className="card" style={{ gap: 10 }}>
             <div className="between">
-              <span className={`tag w-${t.work}`}>{WORKS[t.work].label}</span>
+              <span className="tag" style={{ background: colorOf(cat(t.work).color).bg, color: colorOf(cat(t.work).color).fg }}>{cat(t.work).label}</span>
               {t.due && <span className="small" style={{ color: late !== null && late <= 1 ? 'var(--danger)' : 'var(--muted)' }}>
                 {late !== null && late < 0 ? 'באיחור · ' : ''}{late === 0 ? 'היום' : late === 1 ? 'מחר' : formatDay(t.due)}
               </span>}
@@ -56,7 +58,7 @@ export function Tasks() {
         )
       })}
 
-      <Fab label="משימה" onClick={() => setEditing({ id: '', title: '', work: 'tzofim', status: col })} />
+      <Fab label="משימה" onClick={() => setEditing({ id: '', title: '', work: calCategories[0]?.id ?? 'personal', status: col })} />
 
       {editing && (
         <Sheet title={editing.id ? 'עריכת משימה' : 'משימה חדשה'} onClose={() => setEditing(null)}>
@@ -64,7 +66,7 @@ export function Tasks() {
             ev.preventDefault()
             const f = new FormData(ev.currentTarget)
             const next: Task = {
-              id: editing.id || newId(), title: String(f.get('title')), work: f.get('work') as Work,
+              id: editing.id || newId(), title: String(f.get('title')), work: String(f.get('work')),
               status: f.get('status') as TaskStatus, due: String(f.get('due') || '') || undefined, note: String(f.get('note') || '') || undefined,
             }
             setTasks((ts) => (editing.id ? ts.map((t) => (t.id === editing.id ? next : t)) : [...ts, next]))
@@ -73,7 +75,7 @@ export function Tasks() {
             <label className="field">מה צריך לעשות?<input name="title" defaultValue={editing.title} required autoFocus={!editing.id} /></label>
             <div className="grid2">
               <label className="field">שייך ל
-                <select name="work" defaultValue={editing.work}>{(Object.keys(WORKS) as Work[]).map((w) => <option key={w} value={w}>{WORKS[w].label}</option>)}</select>
+                <select name="work" defaultValue={editing.work}>{calCategories.map((c) => <option key={c.id} value={c.id}>{c.label}</option>)}</select>
               </label>
               <label className="field">סטטוס
                 <select name="status" defaultValue={editing.status}>{FLOW.map((s) => <option key={s} value={s}>{STATUSES[s]}</option>)}</select>

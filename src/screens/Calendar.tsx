@@ -106,6 +106,11 @@ export function Calendar() {
         </button>
       </div>
       {error && <p className="small" style={{ color: 'var(--danger)' }}>{error}</p>}
+      {token && linked.length === 0 && (
+        <button className="card" style={{ textAlign: 'start', borderColor: 'var(--warn)', color: 'var(--warn)' }} onClick={() => setShowSync(true)}>
+          מחובר ל-Google, אבל אף קטגוריה לא מקושרת ליומן Google — לחצו כאן ובחרו יומן לכל קטגוריה.
+        </button>
+      )}
 
       <div className="chips">
         {calCategories.map((c) => {
@@ -275,8 +280,16 @@ function SyncSheet({ token, onClose, onConnected, onDisconnect, onEditCategory }
   const [msg, setMsg] = useState('')
 
   useEffect(() => {
-    if (token) G.listCalendars(token).then(setCalendars).catch(() => setMsg('לא הצלחתי לקרוא את רשימת היומנים.'))
-  }, [token])
+    if (!token) return
+    G.listCalendars(token).then((list) => {
+      setCalendars(list)
+      // First connection: link "personal" to the main Google calendar so syncing starts right away
+      const primary = list.find((g) => g.primary)
+      setCalCategories((cs) => (primary && !cs.some((c) => c.googleCalendarId)
+        ? cs.map((c) => (c.id === 'personal' ? { ...c, googleCalendarId: primary.id } : c))
+        : cs))
+    }).catch(() => setMsg('לא הצלחתי לקרוא את רשימת היומנים.'))
+  }, [token, setCalCategories])
 
   const connect = async () => {
     if (!settings.googleClientId) return setMsg('קודם הדביקו את ה-Client ID.')

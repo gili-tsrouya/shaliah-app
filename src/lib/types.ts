@@ -108,7 +108,8 @@ export interface AgentSettings {
   home: string // town / address the agent measures distance from
   lat: number
   lng: number
-  rangeMiles: number // 99 = including NYC
+  rangeMiles: number // older saves may hold 99, which meant "anywhere, including NYC"
+  includeNyc?: boolean // also look in New York City, whatever its distance
   maxPrice: number // 0 = free only, 999 = any
   topics: string[]
   extra: string

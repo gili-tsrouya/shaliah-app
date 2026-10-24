@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useStore, newId } from '../lib/store'
 import { updatedText, useFeed } from '../lib/feeds'
-import { milesBetween } from '../lib/derive'
+import { inNyc, milesBetween, rangeOf } from '../lib/derive'
 import { loadAgentSettings, saveAgentSettings } from '../lib/github'
 import { SelfTabs } from '../components/ui'
 import { Icon } from '../components/Icon'
@@ -9,7 +9,7 @@ import { DealsMap } from '../components/DealsMap'
 import { DEAL_TOPICS, type AgentSettings, type FeedItem } from '../lib/types'
 
 const FILTERS = ['הכל', 'חינם', 'אוכל', 'יציאות', 'מבצעים', 'שמורים']
-const RANGES: [number, string][] = [[5, '5 מייל'], [10, '10 מייל'], [25, '25 מייל'], [99, 'כולל ניו יורק']]
+const RANGES: [number, string][] = [[5, '5 מייל'], [10, '10 מייל'], [25, '25 מייל']]
 const PRICES: [number, string][] = [[0, 'רק חינם'], [10, 'עד $10'], [25, 'עד $25'], [999, 'לא משנה']]
 
 const isFree = (d: FeedItem) => d.priceValue === 0 || d.price === 'חינם'
@@ -24,10 +24,14 @@ export function Deals() {
   const [showSettings, setShowSettings] = useState(false)
   const a = agentSettings
 
+  const range = rangeOf(a)
   const items = (feed?.items ?? []).filter((d) => {
     // The agent already searches by these settings; this hides older finds that no longer fit them
     if (a.maxPrice < 999 && d.priceValue != null && d.priceValue > a.maxPrice) return false
-    if (a.rangeMiles < 99 && d.lat != null && d.lng != null && milesBetween(a, { lat: d.lat, lng: d.lng }) > a.rangeMiles) return false
+    if (d.lat != null && d.lng != null) {
+      const p = { lat: d.lat, lng: d.lng }
+      if (milesBetween(a, p) > range.miles && !(range.nyc && inNyc(p))) return false
+    }
     if (filter === 'הכל') return true
     if (filter === 'שמורים') return savedDeals.includes(d.id)
     if (filter === 'חינם') return isFree(d)
@@ -46,7 +50,7 @@ export function Deals() {
     setAdded((x) => [...x, d.id])
   }
 
-  const rangeLabel = RANGES.find((r) => r[0] === a.rangeMiles)?.[1] ?? `${a.rangeMiles} מייל`
+  const rangeLabel = `${range.miles} מייל${range.nyc ? ' + ניו יורק' : ''}`
   const priceLabel = PRICES.find((p) => p[0] === a.maxPrice)?.[1] ?? `עד $${a.maxPrice}`
 
   const card = (d: FeedItem) => (
@@ -119,7 +123,7 @@ export function Deals() {
 
       {view === 'map' ? (
         <>
-          <DealsMap home={a} rangeMiles={a.rangeMiles} items={items} selected={sel?.id ?? null} onSelect={onSelect} />
+          <DealsMap home={a} rangeMiles={range.miles} items={items} selected={sel?.id ?? null} onSelect={onSelect} />
           {items.some((d) => d.lat == null) && <p className="muted small">לחלק מהגילויים אין מיקום, הם מופיעים רק ברשימה.</p>}
           {sel && card(sel)}
         </>
@@ -178,7 +182,13 @@ function AgentSettingsPanel({ onDone }: { onDone: () => void }) {
           <button className="chip small" onClick={locate}>המיקום שלי</button>
         </div>
       </div>
-      <div className="field">מרחק מהבית{pills(RANGES, draft.rangeMiles, (v) => set({ rangeMiles: v }))}</div>
+      <div className="field">מרחק מהבית
+        {pills(RANGES, rangeOf(draft).miles, (v) => set({ rangeMiles: v, includeNyc: rangeOf(draft).nyc }))}
+        <button className={`chip small ${rangeOf(draft).nyc ? 'on' : ''}`} style={{ alignSelf: 'flex-start' }} aria-pressed={rangeOf(draft).nyc}
+          onClick={() => set({ rangeMiles: rangeOf(draft).miles, includeNyc: !rangeOf(draft).nyc })}>
+          {rangeOf(draft).nyc ? '✓ ' : '+ '}גם בניו יורק
+        </button>
+      </div>
       <div className="field">מחיר מקסימלי{pills(PRICES, draft.maxPrice, (v) => set({ maxPrice: v }))}</div>
       <div className="field">מה לחפש
         <div className="chips" style={{ gap: 6 }}>

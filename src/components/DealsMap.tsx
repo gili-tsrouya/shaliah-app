@@ -37,7 +37,7 @@ export function DealsMap({ home, rangeMiles, items, selected, onSelect }: {
       icon: L.divIcon({ className: '', html: '<div class="pin-home">⌂</div>', iconSize: [34, 34], iconAnchor: [17, 17] }),
       keyboard: false,
     }).addTo(g)
-    const radius = rangeMiles >= 99 ? 25 : rangeMiles
+    const radius = rangeMiles
     const circle = L.circle([home.lat, home.lng], { radius: radius * 1609, color: '#8A96A8', weight: 2, dashArray: '6 6', fill: false }).addTo(g)
     for (const it of items) {
       if (it.lat == null || it.lng == null) continue

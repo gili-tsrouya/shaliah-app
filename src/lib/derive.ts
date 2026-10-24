@@ -58,6 +58,15 @@ export const FREQUENCIES = [
 
 export const freqLabel = (days: number) => FREQUENCIES.find((f) => f.days === days)?.label ?? `כל ${days} ימים`
 
+// Rough outline of the five boroughs: east of the Hudson, plus Staten Island (keeps Jersey City/Newark out)
+export const inNyc = (p: { lat: number; lng: number }) =>
+  (p.lat >= 40.49 && p.lat <= 40.92 && p.lng >= -74.02 && p.lng <= -73.7) ||
+  (p.lat >= 40.49 && p.lat <= 40.65 && p.lng >= -74.26 && p.lng <= -74.05)
+
+// Reads older saves where rangeMiles 99 meant "including NYC"
+export const rangeOf = (a: { rangeMiles: number; includeNyc?: boolean }) =>
+  a.rangeMiles >= 99 ? { miles: 25, nyc: true } : { miles: a.rangeMiles, nyc: !!a.includeNyc }
+
 // Miles between two coordinates
 export const milesBetween = (a: { lat: number; lng: number }, b: { lat: number; lng: number }) => {
   const r = (d: number) => (d * Math.PI) / 180

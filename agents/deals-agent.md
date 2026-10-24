@@ -6,7 +6,9 @@ fellow) living alone in New Jersey on about $2,000 a month. The goal: a full, fu
 ## 1. Read the settings
 Read `public/agent-settings.json`:
 - `home`, `lat`, `lng` — where to measure distance from.
-- `rangeMiles` — maximum distance. `99` means "anywhere in the area, including New York City".
+- `rangeMiles` — maximum distance from home in miles. (In older files `99` means 25 miles plus New York City.)
+- `includeNyc` — when `true`, ALSO include things anywhere in New York City (all five boroughs, mostly Manhattan and
+  Brooklyn), even beyond `rangeMiles`. Gili gets there by bus/train, so mention the easiest way to get there in `where`.
 - `maxPrice` — maximum cost per person in USD. `0` = free only, `999` = no limit (still prefer cheap).
 - `topics` — any of: `food` (free/cheap meals, happy hours, food deals), `out` (concerts, parties, bars, music,
   meetups), `sale` (big sales and coupons on things a person setting up a first apartment needs), `culture`
@@ -16,13 +18,13 @@ Read `public/agent-settings.json`:
 
 ## 2. Search
 Use web search for the next 14 days. Good sources: Eventbrite, Meetup, city and town event calendars,
-NJ.com, Time Out New York (when range is 99), Hoboken/Jersey City/Montclair local sites, public library
+NJ.com, Time Out New York and NYC event sites (when `includeNyc` is true), Hoboken/Jersey City/Montclair local sites, public library
 event pages, museum "free day" pages, Hillel/Chabad/Moishe House/JCC/Federation calendars, Reddit city subs,
 Instagram/Facebook posts that are quoted on public pages, retailer sale pages (IKEA, Target, Walmart, HomeGoods).
 
 Keep only items that:
 - happen (or are valid) in the next 14 days and have not passed,
-- are within `rangeMiles` of home (estimate from the venue address),
+- are within `rangeMiles` of home (estimate from the venue address), or in New York City when `includeNyc` is true,
 - cost at most `maxPrice` (happy hours: use the cheapest typical item price),
 - match at least one topic or the `extra` wish,
 - have a real source page you actually opened. Never invent events, prices, addresses or dates.

@@ -9,6 +9,15 @@ Two workplaces: **צופים** (blue) and **Young Judaea** (orange), plus **אי
 - Agent feeds: `public/feeds/deals.json` and `public/feeds/shlichut.json` (`{ updatedAt, items: FeedItem[] }`, see `src/lib/types.ts`). A daily scheduled agent is meant to search the web and commit new items there.
 - All UI copy is Hebrew. Money is USD. Show Israel time next to local time where calls are involved.
 
+## Rule: never lose Gili's saved data
+All personal data lives in the phone's `localStorage` under keys starting with `shaliach:` (see `src/lib/store.tsx`).
+Code updates must keep it readable:
+- Never rename or remove a storage key or an existing field, and never change what a field means. Add new fields as optional.
+- If a format really must change, add a migration that converts the old data on load, and keep reading the old shape.
+- Keep existing ids (e.g. category ids `tzofim`, `yj`, `personal`) so saved tasks and events stay linked.
+- Keep the backup format (`src/lib/backup.ts`) restorable: a backup made by an older version must still import.
+- Never change the app's address (repo name / `base` in `vite.config.ts`) without a plan to move the data first; storage is per address.
+
 ## Design source
 The approved design is a Claude Design canvas: https://claude.ai/artifact/RQ2ygpVUiZ8viiNRd7VEsP
 Match its colors, spacing and copy.

@@ -8,6 +8,7 @@ import { Contacts } from './screens/Contacts'
 import { Shlichut } from './screens/Shlichut'
 import { Calendar } from './screens/Calendar'
 import { Tasks } from './screens/Tasks'
+import { Settings } from './screens/Settings'
 
 const routes: Record<string, () => React.JSX.Element> = {
   home: Home,
@@ -17,6 +18,7 @@ const routes: Record<string, () => React.JSX.Element> = {
   shlichut: Shlichut,
   calendar: Calendar,
   tasks: Tasks,
+  settings: Settings,
 }
 
 const currentRoute = () => {

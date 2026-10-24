@@ -2,8 +2,9 @@ import { useAllEvents, useCategory, useStore } from '../lib/store'
 import { SKY_TEXT, skyOf, toF, useWeather, whatToWear } from '../lib/weather'
 import { useFeed } from '../lib/feeds'
 import { budgetSummary, colorOf, daysUntilDue, eventsOn } from '../lib/derive'
-import { addDays, formatLongDay, todayISO } from '../lib/dates'
+import { addDays, daysBetween, formatLongDay, todayISO } from '../lib/dates'
 import { STATUSES, type TaskStatus } from '../lib/types'
+import { lastBackup } from '../lib/backup'
 import { Bar, money } from '../components/ui'
 import { Icon } from '../components/Icon'
 
@@ -31,10 +32,22 @@ export function Home() {
 
   return (
     <main className="screen">
-      <header className="col" style={{ gap: 4 }}>
-        <p className="muted">{formatLongDay(today)} · ניו ג׳רזי</p>
-        <h1>{greeting()}, {settings.name}</h1>
+      <header className="between" style={{ alignItems: 'flex-start' }}>
+        <div className="col" style={{ gap: 4 }}>
+          <p className="muted">{formatLongDay(today)} · ניו ג׳רזי</p>
+          <h1>{greeting()}, {settings.name}</h1>
+        </div>
+        <a href="#/settings" className="icon-btn" aria-label="הגדרות וגיבוי"><Icon name="gear" size={20} /></a>
       </header>
+
+      {(() => {
+        const last = lastBackup()
+        return !last || daysBetween(last, today) > 30 ? (
+          <a href="#/settings" className="card link-card small" style={{ borderColor: 'var(--warn)', color: 'var(--warn)' }}>
+            {last ? 'עבר יותר מחודש מהגיבוי האחרון' : 'עוד לא גיבית את המידע שלך'} — לחצו כאן לגיבוי (לוקח כמה שניות)
+          </a>
+        ) : null
+      })()}
 
       {weather && wear && sky && (
         <div className="card" style={{ flexDirection: 'row', alignItems: 'center', gap: 12, padding: '10px 14px' }}>

@@ -138,6 +138,18 @@ export function Calendar() {
         </button>
       </div>
       {error && <p className="small" style={{ color: 'var(--danger)' }}>{error}</p>}
+      {!token && linked.length > 0 && settings.googleClientId && (
+        <button className="card" style={{ textAlign: 'start', borderColor: 'var(--primary)', color: 'var(--primary)', fontWeight: 700 }}
+          onClick={async () => {
+            try {
+              setToken(await G.connect(settings.googleClientId!))
+            } catch {
+              setShowSync(true)
+            }
+          }}>
+          החיבור ל-Google פג (זה קורה כל שעה) — לחצו כאן כדי להתחבר שוב ולסנכרן
+        </button>
+      )}
       {token && linked.length === 0 && (
         <button className="card" style={{ textAlign: 'start', borderColor: 'var(--warn)', color: 'var(--warn)' }} onClick={() => setShowSync(true)}>
           מחובר ל-Google, אבל אף קטגוריה לא מקושרת ליומן Google — לחצו כאן ובחרו יומן לכל קטגוריה.

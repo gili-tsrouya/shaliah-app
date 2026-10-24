@@ -29,9 +29,10 @@ function loadScript() {
   })
 }
 
+// Kept in localStorage so closing the app (which iOS does often) does not sign out; Google tokens still expire after ~1 hour
 export function storedToken() {
   try {
-    const t = JSON.parse(sessionStorage.getItem(TOKEN_KEY) || 'null') as { token: string; exp: number } | null
+    const t = JSON.parse(localStorage.getItem(TOKEN_KEY) || 'null') as { token: string; exp: number } | null
     return t && t.exp > Date.now() + 60_000 ? t.token : null
   } catch {
     return null
@@ -49,7 +50,7 @@ export async function connect(clientId: string, prompt: '' | 'consent' = '') {
     client!.callback = (r) => {
       if (!r.access_token) return reject(new Error(r.error || 'החיבור בוטל'))
       try {
-        sessionStorage.setItem(TOKEN_KEY, JSON.stringify({ token: r.access_token, exp: Date.now() + (r.expires_in ?? 3600) * 1000 }))
+        localStorage.setItem(TOKEN_KEY, JSON.stringify({ token: r.access_token, exp: Date.now() + (r.expires_in ?? 3600) * 1000 }))
       } catch {
         // token stays in memory only
       }
@@ -61,7 +62,7 @@ export async function connect(clientId: string, prompt: '' | 'consent' = '') {
 
 export function disconnect() {
   try {
-    sessionStorage.removeItem(TOKEN_KEY)
+    localStorage.removeItem(TOKEN_KEY)
   } catch {
     // nothing stored
   }

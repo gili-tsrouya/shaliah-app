@@ -27,9 +27,12 @@ Sefaria (for parsha texts), Jewish Agency and Young Judaea / Tzofim public pages
 - 6–12 items in total.
 
 ## If a site will not open
-Some sites block automated access. That is normal: skip it and try the next source. Try at least 10 different
-sources (official venue/organization pages, Eventbrite, Meetup, library and town calendars, news sites) before
-concluding there is nothing. Only if every page fails, keep yesterday's still-valid items, update nothing else,
+Some sites block automated access. That is normal: skip it and try the next source.
+
+## How thorough to be
+Do not stop early. Before writing the file you must have run at least 12 different searches and opened at least
+15 pages from at least 8 different sites, covering every topic in the settings. A run that ends with only a
+handful of items after a few minutes is a failed run. Only if every page fails, keep yesterday's still-valid items, update nothing else,
 and say in your final message which hosts were blocked.
 
 ## 3. Write `public/feeds/shlichut.json`
@@ -57,5 +60,19 @@ Put the פרשת השבוע item first (the app shows it as the featured card). 
 Keep the same `id` for items that are still relevant from yesterday.
 
 ## 4. Save
-Validate the JSON parses. Commit only `public/feeds/shlichut.json` with the message
-`Daily shlichut update <yyyy-mm-dd>` and push to `main`. Pushing redeploys the app automatically.
+Validate the JSON parses (`node -e "JSON.parse(require('fs').readFileSync('public/feeds/shlichut.json','utf8'))"`).
+Commit only `public/feeds/shlichut.json` with the message `Daily shlichut update <yyyy-mm-dd>` and `git push origin HEAD:main`
+(`git pull --rebase origin main` first if rejected). Pushing redeploys the app automatically.
+
+If the push is refused (403 / "doesn't have GitHub access") and the environment variable `SHALIACH_GITHUB_TOKEN`
+is set, upload the file through the GitHub API instead:
+
+```bash
+F=public/feeds/shlichut.json
+API=https://api.github.com/repos/gili-tsrouya/shaliah-app/contents/$F
+SHA=$(curl -s -H "Authorization: Bearer $SHALIACH_GITHUB_TOKEN" "$API" | node -pe 'JSON.parse(require("fs").readFileSync(0)).sha')
+node -e 'const fs=require("fs");process.stdout.write(JSON.stringify({message:process.argv[1],content:fs.readFileSync(process.argv[2]).toString("base64"),sha:process.argv[3],branch:"main"}))' "Daily shlichut update $(date +%F)" "$F" "$SHA" > /tmp/body.json
+curl -s -X PUT -H "Authorization: Bearer $SHALIACH_GITHUB_TOKEN" -H "Accept: application/vnd.github+json" "$API" --data @/tmp/body.json | node -pe 'JSON.parse(require("fs").readFileSync(0)).commit?.sha || "UPLOAD FAILED"'
+```
+
+Never print the token. Finish with one line: how many items, how many sites you opened, and whether the save succeeded.

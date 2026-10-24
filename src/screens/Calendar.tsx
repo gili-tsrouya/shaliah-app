@@ -30,12 +30,17 @@ export function Calendar() {
   const linked = calCategories.filter((c) => c.googleCalendarId)
 
   const refresh = useCallback(async (tok: string) => {
-    if (!linked.length) return
+    if (!linked.length) {
+      setGoogleEvents([])
+      return
+    }
     setSync('syncing')
     try {
       const from = addDays(today < start ? today : start, -30)
       const to = addDays(addDays(start, 6) > today ? addDays(start, 6) : today, 120)
-      const lists = await Promise.all(linked.map((c) => G.fetchEvents(tok, c.googleCalendarId!, c.id, from, to)))
+      // One fetch per Google calendar, even if two categories point at it by mistake
+      const byCalendar = new Map(linked.map((c) => [c.googleCalendarId!, c.id]))
+      const lists = await Promise.all([...byCalendar].map(([cal, work]) => G.fetchEvents(tok, cal, work, from, to)))
       setGoogleEvents(lists.flat())
       setSync('idle')
       setError('')
@@ -320,10 +325,17 @@ function SyncSheet({ token, onClose, onConnected, onDisconnect, onEditCategory }
           </button>
           <select aria-label={`יומן Google עבור ${c.label}`} style={{ flex: 1, minHeight: 44, borderRadius: 10, border: '1px solid var(--border)', padding: '0 8px' }}
             value={c.googleCalendarId ?? ''} disabled={!calendars}
-            onChange={(e) => setCalCategories((cs) => cs.map((x) => (x.id === c.id ? { ...x, googleCalendarId: e.target.value || undefined } : x)))}>
+            onChange={(e) => {
+              const cal = e.target.value || undefined
+              setCalCategories((cs) => cs.map((x) => (x.id === c.id ? { ...x, googleCalendarId: cal }
+                : x.googleCalendarId === cal ? { ...x, googleCalendarId: undefined } : x)))
+            }}>
             <option value="">רק באפליקציה</option>
             {c.googleCalendarId && !calendars && <option value={c.googleCalendarId}>{c.googleCalendarId}</option>}
-            {calendars?.map((g) => <option key={g.id} value={g.id}>{g.summary}{g.primary ? ' (ראשי)' : ''}</option>)}
+            {calendars?.map((g) => {
+              const owner = calCategories.find((x) => x.id !== c.id && x.googleCalendarId === g.id)
+              return <option key={g.id} value={g.id}>{g.summary}{g.primary ? ' (ראשי)' : ''}{owner ? ` — יעבור מ${owner.label}` : ''}</option>
+            })}
           </select>
         </div>
       ))}

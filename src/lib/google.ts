@@ -106,7 +106,7 @@ function fromGoogle(g: GEvent, calendarId: string, work: Work): CalEvent {
     // All-day: Google's end date is exclusive
     const endDate = addDays(g.end.date ?? g.start.date, -1)
     return {
-      id: 'g_' + g.id, googleId: g.id, googleCalendarId: calendarId, work, title: g.summary || '(ללא כותרת)',
+      id: `g_${calendarId}_${g.id}`, googleId: g.id, googleCalendarId: calendarId, work, title: g.summary || '(ללא כותרת)',
       kind: kind ?? (endDate > g.start.date ? 'vacation' : 'event'), date: g.start.date,
       endDate: endDate > g.start.date ? endDate : undefined,
     }
@@ -114,7 +114,7 @@ function fromGoogle(g: GEvent, calendarId: string, work: Work): CalEvent {
   const s = localDate(g.start.dateTime!)
   const e = localDate(g.end.dateTime ?? g.start.dateTime!)
   return {
-    id: 'g_' + g.id, googleId: g.id, googleCalendarId: calendarId, work, title: g.summary || '(ללא כותרת)',
+    id: `g_${calendarId}_${g.id}`, googleId: g.id, googleCalendarId: calendarId, work, title: g.summary || '(ללא כותרת)',
     kind: kind ?? 'event', date: s.date, start: s.time, end: kind === 'deadline' ? undefined : e.time,
   }
 }

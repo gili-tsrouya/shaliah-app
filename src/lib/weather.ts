@@ -20,8 +20,8 @@ const CACHE_MS = 3600_000 // the clothing advice follows the current temperature
 export function useWeather(lat: number, lng: number) {
   const [w, setW] = useState<Weather | null>(() => {
     try {
-      const c = JSON.parse(localStorage.getItem(CACHE) || 'null') as { at: number; w: Weather } | null
-      return c && Date.now() - c.at < CACHE_MS ? c.w : null
+      const c = JSON.parse(localStorage.getItem(CACHE) || 'null') as { at: number; w: Weather; lat?: number; lng?: number } | null
+      return c && Date.now() - c.at < CACHE_MS && c.lat === lat && c.lng === lng ? c.w : null
     } catch {
       return null
     }
@@ -44,7 +44,7 @@ export function useWeather(lat: number, lng: number) {
         }
         setW(next)
         try {
-          localStorage.setItem(CACHE, JSON.stringify({ at: Date.now(), w: next }))
+          localStorage.setItem(CACHE, JSON.stringify({ at: Date.now(), w: next, lat, lng }))
         } catch {
           // no cache, refetch next time
         }

@@ -2,31 +2,55 @@ import { useState } from 'react'
 import { useStore, newId } from '../lib/store'
 import { updatedText, useFeed } from '../lib/feeds'
 import { Icon } from '../components/Icon'
-import type { FeedItem } from '../lib/types'
+import { RunAgent } from '../components/RunAgent'
+import { Sheet } from '../components/ui'
+import { COMMUNITIES, type FeedItem, type Partnership } from '../lib/types'
+
+const audienceText = (p: Partnership) =>
+  `${p.community.length ? `קהילה ${p.community.join(' / ')}` : 'נוער יהודי בתפוצות'}, גילאי ${p.ageFrom}–${p.ageTo}` +
+  (p.notes ? ` (${p.notes})` : '')
 
 // Opens ChatGPT with the request already typed in; Gili only presses send
-const chatGptUrl = (i: FeedItem) =>
+const chatGptUrl = (i: FeedItem, idea: string | undefined, p: Partnership | undefined) =>
   'https://chatgpt.com/?q=' + encodeURIComponent(
-    `כתוב לי פעילות לנוער יהודי בתפוצות (גילאי 13–18) בנושא: ${i.title}.` +
-    (i.idea ? ` כיוון אפשרי: ${i.idea}.` : '') +
-    ' כלול מטרות, פתיחה, משחק או דיון, שאלות לשיחה, סיכום, משך כולל של כשעה ורשימת ציוד.',
+    `כתוב לי פעילות בנושא: ${i.title}. הקהל: ${p ? audienceText(p) : 'נוער יהודי בתפוצות (גילאי 13–18)'}.` +
+    (idea ? ` כיוון אפשרי: ${idea}.` : '') +
+    ' התאם את התוכן והשפה לקהל הזה. כלול מטרות, פתיחה, משחק או דיון, שאלות לשיחה, סיכום, משך כולל של כשעה ורשימת ציוד.',
   )
 
 const FILTERS = ['הכל', 'פרשת השבוע', 'חגים ומועדים', 'ישראל', 'העולם היהודי']
 
 export function Shlichut() {
   const { feed, error } = useFeed('shlichut')
-  const { setTasks, calCategories } = useStore()
+  const { setTasks, calCategories, partnerships, publishPartnerships } = useStore()
   const [filter, setFilter] = useState('הכל')
+  const [forId, setForId] = useState<string | null>(null)
+  const [editing, setEditing] = useState<Partnership | null>(null)
   const [made, setMade] = useState<string[]>([])
+  const [msg, setMsg] = useState('')
 
+  const partner = partnerships.find((p) => p.id === forId)
   const all = feed?.items ?? []
-  const featured = all.find((i) => i.category === 'פרשת השבוע')
-  const items = all.filter((i) => i !== featured && (filter === 'הכל' || i.category === filter))
+  const tagged = all.some((i) => i.forPartnerships?.length)
+  // Older feeds have no partnership tags yet; then show everything
+  const fits = (i: FeedItem) => !partner || !tagged || !!i.forPartnerships?.some((f) => f.id === partner.id)
+  const ideaFor = (i: FeedItem) => (partner && i.forPartnerships?.find((f) => f.id === partner.id)?.idea) || i.idea
+  const featured = all.find((i) => i.category === 'פרשת השבוע' && fits(i))
+  const items = all.filter((i) => i !== featured && fits(i) && (filter === 'הכל' || i.category === filter))
 
   const makeTask = (i: FeedItem) => {
-    setTasks((ts) => [...ts, { id: newId(), title: `הכנת פעילות: ${i.title}`, work: calCategories[0]?.id ?? 'personal', status: 'todo', note: i.idea }])
+    const title = `הכנת פעילות: ${i.title}${partner ? ` (${partner.name})` : ''}`
+    setTasks((ts) => [...ts, { id: newId(), title, work: calCategories[0]?.id ?? 'personal', status: 'todo', note: ideaFor(i) }])
     setMade((m) => [...m, i.id])
+  }
+
+  const savePartnerships = async (next: Partnership[]) => {
+    try {
+      const published = await publishPartnerships(next)
+      setMsg(published ? 'נשמר. הסוכן יתאים את התוכן בהרצה הבאה.' : 'נשמר בטלפון. כדי שהסוכן יקבל את זה, הוסיפו טוקן GitHub (גילויים בזול ← התאמה).')
+    } catch {
+      setMsg('נשמר בטלפון, אבל השמירה ב-GitHub נכשלה. בדקו את הטוקן.')
+    }
   }
 
   return (
@@ -36,11 +60,33 @@ export function Shlichut() {
         <p className="muted">מה שווה לדבר עליו השבוע עם הנוער · {updatedText(feed?.updatedAt)}</p>
       </header>
 
+      <section className="col" style={{ gap: 8 }}>
+        <span className="small bold muted">השותפויות שלי</span>
+        <div className="chips">
+          <button className={`chip ${!forId ? 'on' : ''}`} aria-pressed={!forId} onClick={() => setForId(null)}>כל השותפויות</button>
+          {partnerships.map((p) => (
+            <button key={p.id} className={`chip ${forId === p.id ? 'on' : ''}`} aria-pressed={forId === p.id}
+              onClick={() => setForId(forId === p.id ? null : p.id)} onContextMenu={(e) => { e.preventDefault(); setEditing(p) }}>{p.name}</button>
+          ))}
+          <button className="chip" style={{ borderStyle: 'dashed' }} onClick={() => setEditing({ id: '', name: '', community: [], ageFrom: 13, ageTo: 18 })}>+ שותפות</button>
+        </div>
+        {partner && (
+          <button className="card row" style={{ flexDirection: 'row', textAlign: 'start', padding: '10px 14px' }} onClick={() => setEditing(partner)}>
+            <span className="small" style={{ flex: 1 }}>{audienceText(partner)}</span>
+            <Icon name="edit" size={16} />
+          </button>
+        )}
+        {partner && !tagged && all.length > 0 && <p className="muted small">הסוכן עוד לא התאים תוכן לשותפויות. זה יקרה בהרצה הבאה.</p>}
+        {msg && <p className="small">{msg}</p>}
+      </section>
+
       <div className="chips">
         {FILTERS.map((f) => (
           <button key={f} className={`chip ${f === filter ? 'on' : ''}`} aria-pressed={f === filter} onClick={() => setFilter(f)}>{f}</button>
         ))}
       </div>
+
+      <RunAgent agent="shlichut" beforeRun={async () => { await publishPartnerships(partnerships) }} />
 
       {error && <p className="empty">לא הצלחתי לטעון את התוכן. בדקו את החיבור לאינטרנט.</p>}
       {!error && feed && all.length === 0 && <p className="empty">עוד אין תוכן — הסוכן ימלא כאן ברגע שירוץ.</p>}
@@ -49,9 +95,9 @@ export function Shlichut() {
         <article className="card blue" style={{ gap: 10 }}>
           <span className="small bold" style={{ color: '#DBE6FD' }}>{featured.category}{featured.when ? ` · ${featured.when}` : ''}</span>
           <h2 style={{ fontSize: 21, lineHeight: 1.3 }}>{featured.title}</h2>
-          {featured.idea && <p style={{ fontSize: 14, lineHeight: 1.5, color: '#EEF3FE' }}>{featured.idea}</p>}
+          {ideaFor(featured) && <p style={{ fontSize: 14, lineHeight: 1.5, color: '#EEF3FE' }}>{ideaFor(featured)}</p>}
           <div className="row">
-            <a className="btn white row" style={{ flex: 1, justifyContent: 'center', textDecoration: 'none', gap: 6 }} href={chatGptUrl(featured)} target="_blank" rel="noreferrer">
+            <a className="btn white row" style={{ flex: 1, justifyContent: 'center', textDecoration: 'none', gap: 6 }} href={chatGptUrl(featured, ideaFor(featured), partner)} target="_blank" rel="noreferrer">
               <Icon name="sparkle" size={16} /> בנה פעילות ב-ChatGPT
             </a>
             <button className="icon-btn" style={{ borderRadius: 12, background: 'transparent', color: '#fff', borderColor: '#6F95E8' }}
@@ -67,9 +113,16 @@ export function Shlichut() {
           <span className="muted small">{[i.category, i.when].filter(Boolean).join(' · ')}</span>
           <span className="bold" style={{ fontSize: 15 }}>{i.title}</span>
           {i.summary && <span style={{ fontSize: 14, color: '#3D4757', lineHeight: 1.45 }}>{i.summary}</span>}
-          {i.idea && <span style={{ fontSize: 14, lineHeight: 1.45 }}><b>רעיון לשיחה: </b>{i.idea}</span>}
+          {ideaFor(i) && <span style={{ fontSize: 14, lineHeight: 1.45 }}><b>רעיון לשיחה{partner ? ` ל${partner.name}` : ''}: </b>{ideaFor(i)}</span>}
+          {!partner && !!i.forPartnerships?.length && (
+            <span className="chips" style={{ gap: 4 }}>
+              {i.forPartnerships.map((f) => partnerships.find((p) => p.id === f.id)).filter(Boolean).map((p) => (
+                <span key={p!.id} className="tag" style={{ background: 'var(--track)', color: 'var(--ink)' }}>{p!.name}</span>
+              ))}
+            </span>
+          )}
           <div className="row">
-            <a className="btn light row" style={{ flex: 1, justifyContent: 'center', textDecoration: 'none', gap: 6, color: 'var(--primary)', fontWeight: 700 }} href={chatGptUrl(i)} target="_blank" rel="noreferrer">
+            <a className="btn light row" style={{ flex: 1, justifyContent: 'center', textDecoration: 'none', gap: 6, color: 'var(--primary)', fontWeight: 700 }} href={chatGptUrl(i, ideaFor(i), partner)} target="_blank" rel="noreferrer">
               <Icon name="sparkle" size={16} /> בנה פעילות ב-ChatGPT
             </a>
             <button className="btn light" disabled={made.includes(i.id)} onClick={() => makeTask(i)}>
@@ -79,6 +132,54 @@ export function Shlichut() {
           </div>
         </article>
       ))}
+
+      {editing && <PartnershipSheet partnership={editing} onClose={() => setEditing(null)}
+        onSave={(p) => savePartnerships(editing.id ? partnerships.map((x) => (x.id === p.id ? p : x)) : [...partnerships, { ...p, id: newId() }])}
+        onDelete={() => { savePartnerships(partnerships.filter((x) => x.id !== editing.id)); if (forId === editing.id) setForId(null) }} />}
     </main>
+  )
+}
+
+function PartnershipSheet({ partnership, onClose, onSave, onDelete }: {
+  partnership: Partnership; onClose: () => void; onSave: (p: Partnership) => void; onDelete: () => void
+}) {
+  const [community, setCommunity] = useState(partnership.community)
+  return (
+    <Sheet title={partnership.id ? 'עריכת שותפות' : 'שותפות חדשה'} onClose={onClose}>
+      <form className="col" style={{ gap: 14 }} onSubmit={(ev) => {
+        ev.preventDefault()
+        const f = new FormData(ev.currentTarget)
+        const a = Number(f.get('ageFrom')) || 0
+        const b = Number(f.get('ageTo')) || 0
+        onSave({
+          ...partnership, name: String(f.get('name')).trim(), community,
+          ageFrom: Math.min(a, b), ageTo: Math.max(a, b), notes: String(f.get('notes') || '').trim() || undefined,
+        })
+        onClose()
+      }}>
+        <label className="field">שם השותפות (למשל: צופים שבט הדסון, בית כנסת רפורמי)
+          <input name="name" defaultValue={partnership.name} required autoFocus={!partnership.id} />
+        </label>
+        <div className="field">סוג הקהילה (אפשר לבחור כמה)
+          <div className="chips" style={{ gap: 6 }}>
+            {COMMUNITIES.map((c) => {
+              const on = community.includes(c)
+              return <button type="button" key={c} className={`chip small ${on ? 'on' : ''}`} aria-pressed={on}
+                onClick={() => setCommunity(on ? community.filter((x) => x !== c) : [...community, c])}>{c}</button>
+            })}
+          </div>
+        </div>
+        <div className="grid2">
+          <label className="field">מגיל<input name="ageFrom" type="number" inputMode="numeric" min="5" max="99" defaultValue={partnership.ageFrom} required /></label>
+          <label className="field">עד גיל<input name="ageTo" type="number" inputMode="numeric" min="5" max="99" defaultValue={partnership.ageTo} required /></label>
+        </div>
+        <label className="field">הערות לסוכן (לא חובה, למשל: רובם לא דוברי עברית, שומרי שבת)
+          <input name="notes" defaultValue={partnership.notes} />
+        </label>
+        <p className="muted small">השם, סוג הקהילה והגילאים נשמרים בקובץ ההגדרות של הסוכן ב-GitHub (ציבורי). אפשר להשתמש בשם כללי.</p>
+        <button className="btn block" type="submit">שמור</button>
+        {partnership.id && <button type="button" className="btn danger block" onClick={() => { onDelete(); onClose() }}>מחק שותפות</button>}
+      </form>
+    </Sheet>
   )
 }

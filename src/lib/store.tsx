@@ -1,8 +1,8 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
-import type { AgentSettings, CalCategory, CalEvent, Category, Expense, Owed, Person, Settings, Task } from './types'
+import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from 'react'
+import type { AgentSettings, CalCategory, CalEvent, Category, Expense, Owed, Partnership, Person, Profile, Settings, Task } from './types'
 import { DEFAULT_CATEGORIES } from './types'
 import { addDays, todayISO } from './dates'
-import { loadAgentSettings } from './github'
+import { loadAgentSettings, loadShlichutSettings, saveAgentSettings, saveShlichutSettings } from './github'
 
 const PREFIX = 'shaliach:'
 
@@ -70,10 +70,44 @@ function useAppState() {
   const [savedDeals, setSavedDeals] = usePersistent<string[]>('savedDeals', () => [])
   const [agentSettings, setAgentSettings] = usePersistent<AgentSettings>('agentSettings', () => DEFAULT_AGENT_SETTINGS)
 
-  // The repo copy is what the agents use, so it wins over the phone's copy (home, weather, map, filters)
+  const [profile, setProfile] = usePersistent<Profile>('profile', () => ({
+    home: { name: DEFAULT_AGENT_SETTINGS.home, lat: DEFAULT_AGENT_SETTINGS.lat, lng: DEFAULT_AGENT_SETTINGS.lng },
+    interests: [],
+    interestsExtra: '',
+  }))
+  const [partnerships, setPartnerships] = usePersistent<Partnership[]>('partnerships', () => [])
+  const [partnershipsUpdatedAt, setPartnershipsUpdatedAt] = usePersistent<string>('partnershipsUpdatedAt', () => '')
+
+  // The repo copy is what the agents use, so it wins over the phone's copy unless the phone saved something newer
   useEffect(() => {
     loadAgentSettings().then((s) => s && setAgentSettings((cur) => ((s.updatedAt ?? '') >= (cur.updatedAt ?? '') ? { ...cur, ...s } : cur)))
-  }, [setAgentSettings])
+    loadShlichutSettings().then((s) => {
+      if (!s || s.updatedAt < partnershipsUpdatedAt) return
+      setPartnerships(s.partnerships)
+      setPartnershipsUpdatedAt(s.updatedAt)
+    })
+    // Once at start-up, comparing with what the phone had then
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  // Save on the phone and, when a GitHub token is set, in the repo so the agent uses it on its next run.
+  // Returns false when it stayed on the phone only.
+  const publishAgentSettings = useCallback(async (next: AgentSettings) => {
+    const stamped = { ...next, updatedAt: new Date().toISOString() }
+    setAgentSettings(stamped)
+    if (!settings.githubToken) return false
+    await saveAgentSettings(settings.githubToken, stamped)
+    return true
+  }, [setAgentSettings, settings.githubToken])
+
+  const publishPartnerships = useCallback(async (next: Partnership[]) => {
+    const updatedAt = new Date().toISOString()
+    setPartnerships(next)
+    setPartnershipsUpdatedAt(updatedAt)
+    if (!settings.githubToken) return false
+    await saveShlichutSettings(settings.githubToken, { updatedAt, partnerships: next })
+    return true
+  }, [setPartnerships, setPartnershipsUpdatedAt, settings.githubToken])
 
   return {
     settings, setSettings,
@@ -86,7 +120,9 @@ function useAppState() {
     owed, setOwed,
     people, setPeople,
     savedDeals, setSavedDeals,
-    agentSettings, setAgentSettings,
+    agentSettings, setAgentSettings, publishAgentSettings,
+    profile, setProfile,
+    partnerships, publishPartnerships,
   }
 }
 

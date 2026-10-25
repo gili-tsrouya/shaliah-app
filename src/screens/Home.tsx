@@ -5,6 +5,7 @@ import { budgetSummary, colorOf, daysUntilDue, eventsOn } from '../lib/derive'
 import { addDays, daysBetween, formatLongDay, todayISO } from '../lib/dates'
 import { STATUSES, type TaskStatus } from '../lib/types'
 import { lastBackup } from '../lib/backup'
+import { currentPlace } from '../lib/places'
 import { Bar, money } from '../components/ui'
 import { Icon } from '../components/Icon'
 
@@ -16,16 +17,17 @@ const greeting = () => {
 }
 
 export function Home() {
-  const { settings, expenses, tasks, people, agentSettings } = useStore()
+  const { settings, expenses, tasks, people, agentSettings, profile } = useStore()
   const events = useAllEvents()
   const cat = useCategory()
-  const weather = useWeather(agentSettings.lat, agentSettings.lng)
+  const place = currentPlace(agentSettings)
+  const weather = useWeather(place.lat, place.lng)
   const wear = weather && whatToWear(weather)
   const sky = weather && skyOf(weather.code)
   const deals = useFeed('deals').feed?.items.slice(0, 2) ?? []
   const topic = useFeed('shlichut').feed?.items[0]
   const today = todayISO()
-  const b = budgetSummary(expenses, settings.monthlyBudget, today)
+  const b = budgetSummary(expenses, settings.monthlyBudget, today, profile.savingGoal)
   const upcoming = [today, addDays(today, 1)].flatMap((d) => eventsOn(events, d).map((e) => ({ ...e, day: d })))
   const dueNow = people.filter((p) => daysUntilDue(p) <= 0)
   const counts = (['todo', 'doing', 'blocked'] as TaskStatus[]).map((s) => ({ s, n: tasks.filter((t) => t.status === s).length }))
@@ -34,10 +36,13 @@ export function Home() {
     <main className="screen">
       <header className="between" style={{ alignItems: 'flex-start' }}>
         <div className="col" style={{ gap: 4 }}>
-          <p className="muted">{formatLongDay(today)} · {agentSettings.home}</p>
+          <p className="muted">{formatLongDay(today)} · {place.name}</p>
           <h1>{greeting()}, {settings.name}</h1>
         </div>
-        <a href="#/settings" className="icon-btn" aria-label="הגדרות וגיבוי"><Icon name="gear" size={20} /></a>
+        <span className="row">
+          <a href="#/profile" className="icon-btn" aria-label="הפרופיל שלי"><Icon name="user" size={20} /></a>
+          <a href="#/settings" className="icon-btn" aria-label="הגדרות וגיבוי"><Icon name="gear" size={20} /></a>
+        </span>
       </header>
 
       {(() => {

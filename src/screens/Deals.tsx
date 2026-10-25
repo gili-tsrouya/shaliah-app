@@ -2,10 +2,14 @@ import { useCallback, useEffect, useState } from 'react'
 import { useStore, newId } from '../lib/store'
 import { updatedText, useFeed } from '../lib/feeds'
 import { inNyc, milesBetween, rangeOf } from '../lib/derive'
-import { loadAgentSettings, saveAgentSettings } from '../lib/github'
+import { loadAgentSettings } from '../lib/github'
+import { currentPlace, isAway } from '../lib/places'
+import { formatDay, todayISO, addDays } from '../lib/dates'
 import { SelfTabs } from '../components/ui'
 import { Icon } from '../components/Icon'
 import { DealsMap } from '../components/DealsMap'
+import { PlacePicker } from '../components/PlacePicker'
+import { RunAgent } from '../components/RunAgent'
 import { DEAL_TOPICS, type AgentSettings, type FeedItem } from '../lib/types'
 
 const FILTERS = ['הכל', 'חינם', 'אוכל', 'יציאות', 'מבצעים', 'שמורים']
@@ -16,21 +20,25 @@ const isFree = (d: FeedItem) => d.priceValue === 0 || d.price === 'חינם'
 
 export function Deals() {
   const { feed, error } = useFeed('deals')
-  const { savedDeals, setSavedDeals, setEvents, calCategories, agentSettings } = useStore()
+  const { savedDeals, setSavedDeals, setEvents, calCategories, agentSettings, publishAgentSettings } = useStore()
   const [filter, setFilter] = useState('הכל')
   const [view, setView] = useState<'list' | 'map'>('list')
   const [selected, setSelected] = useState<string | null>(null)
   const [added, setAdded] = useState<string[]>([])
   const [showSettings, setShowSettings] = useState(false)
   const a = agentSettings
+  const here = currentPlace(a)
+  const today = todayISO()
 
   const range = rangeOf(a)
   const items = (feed?.items ?? []).filter((d) => {
+    // Never show something that already happened, whatever the agent wrote
+    if (d.date && d.date < today) return false
     // The agent already searches by these settings; this hides older finds that no longer fit them
     if (a.maxPrice < 999 && d.priceValue != null && d.priceValue > a.maxPrice) return false
     if (d.lat != null && d.lng != null) {
       const p = { lat: d.lat, lng: d.lng }
-      if (milesBetween(a, p) > range.miles && !(range.nyc && inNyc(p))) return false
+      if (milesBetween(here, p) > range.miles && !(range.nyc && inNyc(p))) return false
     }
     if (filter === 'הכל') return true
     if (filter === 'שמורים') return savedDeals.includes(d.id)
@@ -91,7 +99,7 @@ export function Deals() {
         <span className="avatar" style={{ width: 32, height: 32, background: 'var(--personal-bg)', color: 'var(--personal-fg)' }}><Icon name="search" size={18} /></span>
         <div className="col" style={{ gap: 0, flex: 1 }}>
           <span className="bold" style={{ fontSize: 14 }}>הסוכן סורק בשבילך כל בוקר</span>
-          <span className="muted small">{rangeLabel} · {priceLabel} · {a.topics.length} נושאים · {updatedText(feed?.updatedAt)}</span>
+          <span className="muted small">{isAway(a) ? `${here.name} עד ${formatDay(a.awayUntil!)} · ` : ''}{rangeLabel} · {priceLabel} · {a.topics.length} נושאים · {updatedText(feed?.updatedAt)}</span>
         </div>
         <button className="chip small" aria-expanded={showSettings} onClick={() => setShowSettings(!showSettings)}>
           <Icon name="sliders" size={16} /> התאמה
@@ -99,6 +107,7 @@ export function Deals() {
       </div>
 
       {showSettings && <AgentSettingsPanel onDone={() => setShowSettings(false)} />}
+      <RunAgent agent="deals" beforeRun={async () => { await publishAgentSettings(agentSettings) }} />
 
       <div className="row" style={{ alignItems: 'flex-start' }}>
         <div className="chips" style={{ flex: 1 }}>
@@ -123,7 +132,7 @@ export function Deals() {
 
       {view === 'map' ? (
         <>
-          <DealsMap home={a} rangeMiles={range.miles} items={items} selected={sel?.id ?? null} onSelect={onSelect} />
+          <DealsMap home={here} rangeMiles={range.miles} items={items} selected={sel?.id ?? null} onSelect={onSelect} />
           {items.some((d) => d.lat == null) && <p className="muted small">לחלק מהגילויים אין מיקום, הם מופיעים רק ברשימה.</p>}
           {sel && card(sel)}
         </>
@@ -133,7 +142,7 @@ export function Deals() {
 }
 
 function AgentSettingsPanel({ onDone }: { onDone: () => void }) {
-  const { agentSettings, setAgentSettings, settings, setSettings } = useStore()
+  const { agentSettings, publishAgentSettings, settings, setSettings, profile } = useStore()
   const [draft, setDraft] = useState<AgentSettings>(agentSettings)
   const [status, setStatus] = useState('')
   const set = (patch: Partial<AgentSettings>) => setDraft((d) => ({ ...d, ...patch }))
@@ -144,21 +153,17 @@ function AgentSettingsPanel({ onDone }: { onDone: () => void }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const locate = () => navigator.geolocation?.getCurrentPosition(
-    (p) => set({ lat: +p.coords.latitude.toFixed(4), lng: +p.coords.longitude.toFixed(4) }),
-    () => setStatus('לא קיבלתי הרשאת מיקום.'),
-  )
+  const home = draft.homeBase ?? profile.home
+  const away = isAway(draft)
+  const goHome = () => set({ home: home.name, lat: home.lat, lng: home.lng, awayUntil: undefined })
 
   const save = async () => {
-    const next = { ...draft, updatedAt: new Date().toISOString() }
-    setAgentSettings(next)
-    if (!settings.githubToken) {
-      setStatus('נשמר בטלפון. כדי שהסוכן יקבל את ההגדרות, הוסיפו למטה טוקן של GitHub.')
-      return
-    }
     setStatus('שומר…')
     try {
-      await saveAgentSettings(settings.githubToken, next)
+      if (!(await publishAgentSettings({ ...draft, homeBase: home }))) {
+        setStatus('נשמר בטלפון. כדי שהסוכן יקבל את ההגדרות, הוסיפו למטה טוקן של GitHub.')
+        return
+      }
       setStatus('')
       onDone()
     } catch (e) {
@@ -176,13 +181,23 @@ function AgentSettingsPanel({ onDone }: { onDone: () => void }) {
 
   return (
     <section className="card" style={{ gap: 12 }}>
-      <div className="field">מאיפה למדוד מרחק
-        <div className="row">
-          <input value={draft.home} onChange={(e) => set({ home: e.target.value })} placeholder="עיר או כתובת" style={{ flex: 1 }} />
-          <button className="chip small" onClick={locate}>המיקום שלי</button>
+      <div className="field">איפה לחפש
+        <div className="chips" style={{ gap: 6 }}>
+          <button className={`chip small ${!away ? 'on' : ''}`} aria-pressed={!away} onClick={goHome}>בבית ({home.name})</button>
+          <button className={`chip small ${away ? 'on' : ''}`} aria-pressed={away}
+            onClick={() => !away && set({ awayUntil: addDays(todayISO(), 7) })}>במקום אחר זמנית (חופשה, נסיעה)</button>
         </div>
       </div>
-      <div className="field">מרחק מהבית
+      {away && (
+        <>
+          <PlacePicker label="איפה אני" value={{ name: draft.home, lat: draft.lat, lng: draft.lng }}
+            onPick={(p) => set({ home: p.name, lat: p.lat, lng: p.lng })} />
+          <label className="field">עד מתי? (אחרי התאריך הזה הסוכן חוזר לחפש ליד הבית)
+            <input type="date" value={draft.awayUntil} min={todayISO()} onChange={(e) => set({ awayUntil: e.target.value || undefined })} />
+          </label>
+        </>
+      )}
+      <div className="field">מרחק
         {pills(RANGES, rangeOf(draft).miles, (v) => set({ rangeMiles: v, includeNyc: rangeOf(draft).nyc }))}
         <button className={`chip small ${rangeOf(draft).nyc ? 'on' : ''}`} style={{ alignSelf: 'flex-start' }} aria-pressed={rangeOf(draft).nyc}
           onClick={() => set({ rangeMiles: rangeOf(draft).miles, includeNyc: !rangeOf(draft).nyc })}>

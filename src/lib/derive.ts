@@ -2,7 +2,8 @@ import type { CalEvent, Expense, Person, TouchGrade, Work } from './types'
 import { COLORS } from './types'
 import { daysBetween, daysLeftInMonth, monthKey, todayISO } from './dates'
 
-export function budgetSummary(expenses: Expense[], monthlyBudget: number, today = todayISO()) {
+// savingGoal is set aside first, so the daily pace only spreads what is left after it
+export function budgetSummary(expenses: Expense[], monthlyBudget: number, today = todayISO(), savingGoal = 0) {
   const month = monthKey(today)
   const thisMonth = expenses.filter((e) => monthKey(e.date) === month)
   const gross = thisMonth.filter((e) => !e.refund).reduce((s, e) => s + e.amount, 0)
@@ -10,7 +11,7 @@ export function budgetSummary(expenses: Expense[], monthlyBudget: number, today 
   const spent = gross - refunds
   const remaining = monthlyBudget - spent
   const daysLeft = daysLeftInMonth(today)
-  return { thisMonth, gross, refunds, spent, remaining, daysLeft, perDay: Math.max(0, remaining) / daysLeft }
+  return { thisMonth, gross, refunds, spent, remaining, daysLeft, perDay: Math.max(0, remaining - savingGoal) / daysLeft }
 }
 
 // Net spending in one budget category (refunds are booked against the category they came back to)

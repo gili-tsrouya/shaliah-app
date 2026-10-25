@@ -7,11 +7,11 @@ import { Icon } from '../components/Icon'
 import type { Category } from '../lib/types'
 
 export function Budget() {
-  const { settings, setSettings, categories, setCategories, expenses, setExpenses, owed, setOwed } = useStore()
+  const { settings, setSettings, categories, setCategories, expenses, setExpenses, owed, setOwed, profile } = useStore()
   const [adding, setAdding] = useState(false)
   const [editing, setEditing] = useState<Category | 'total' | null>(null)
   const today = todayISO()
-  const b = budgetSummary(expenses, settings.monthlyBudget, today)
+  const b = budgetSummary(expenses, settings.monthlyBudget, today, profile.savingGoal)
   const now = fromISO(today)
   const planned = categories.reduce((s, c) => s + c.plan, 0)
   const catName = (id: string) => categories.find((c) => c.id === id)?.name ?? 'אחר'
@@ -42,7 +42,7 @@ export function Budget() {
         <Bar pct={(b.spent / settings.monthlyBudget) * 100} color={b.spent > settings.monthlyBudget ? 'var(--danger)' : 'var(--ink)'} />
         <div className="between small muted">
           <span>נשאר: <b style={{ color: b.remaining < 0 ? 'var(--danger)' : 'var(--ok)' }}>{money(b.remaining)}</b></span>
-          <span>קצב יומי מומלץ: <b style={{ color: 'var(--ink)' }}>{money(b.perDay)}</b></span>
+          <span>קצב יומי מומלץ{profile.savingGoal ? ' (אחרי חיסכון)' : ''}: <b style={{ color: 'var(--ink)' }}>{money(b.perDay)}</b></span>
         </div>
       </section>
 

@@ -31,6 +31,10 @@ Match its colors, spacing and copy.
 - Calendar: user-defined categories with colors; each category can be linked to a Google calendar for two-way sync (`src/lib/google.ts`, Google Identity Services token in the browser; Client ID pasted in the app).
 - Shlichut: feed + "בנה פעילות ב-ChatGPT" link + create task.
 - Tasks board.
+- Profile (`#/profile`): name, age, home town, budget + saving goal, interests. Age/home/interests go to `public/agent-settings.json` (`age`, `interests`, `homeBase`); the התאמה panel can set a temporary place with `awayUntil`.
+- Shlichut partnerships (community types + age range) saved to `public/shlichut-settings.json`; the agent tags items with `forPartnerships`.
+- "הרץ את הסוכן עכשיו" saves preferences, then opens the routine page on claude.ai to run it (no direct trigger yet).
+- Everything under `public/` is public: keep personal details (name, budget) out of it.
 
 ## Agents
 Prompts in `agents/deals-agent.md` and `agents/shlichut-agent.md`. Run daily (e.g. a Claude Code scheduled routine on the repo): follow the prompt, write the feed JSON, commit and push to `main` (which redeploys).

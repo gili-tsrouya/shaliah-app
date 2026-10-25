@@ -5,7 +5,7 @@ import { daysBetween, formatDay, todayISO } from '../lib/dates'
 import { Icon } from '../components/Icon'
 
 export function Settings() {
-  const { settings, setSettings } = useStore()
+  const { settings } = useStore()
   const [last, setLast] = useState(lastBackup)
   const [msg, setMsg] = useState('')
   const [pending, setPending] = useState<Awaited<ReturnType<typeof readBackup>> | null>(null)
@@ -28,9 +28,14 @@ export function Settings() {
         <h1>הגדרות</h1>
       </header>
 
-      <label className="field">השם שלך
-        <input defaultValue={settings.name} onBlur={(e) => setSettings((s) => ({ ...s, name: e.target.value.trim() || s.name }))} />
-      </label>
+      <a href="#/profile" className="card link-card row" style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+        <span className="avatar"><Icon name="user" size={20} /></span>
+        <span className="col" style={{ gap: 0, flex: 1 }}>
+          <span className="bold">הפרופיל שלי</span>
+          <span className="muted small">{settings.name} · גיל, מגורים, תקציב, תחביבים</span>
+        </span>
+        <Icon name="chevronL" size={18} />
+      </a>
 
       <section className="card" style={{ gap: 12 }}>
         <h2>גיבוי</h2>

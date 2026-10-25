@@ -114,7 +114,40 @@ export interface AgentSettings {
   topics: string[]
   extra: string
   updatedAt?: string // when it was last saved from the app
+  // From the profile page. home/lat/lng above stay "where to search now"; homeBase is where Gili lives.
+  age?: number
+  interests?: string[]
+  homeBase?: Place
+  awayUntil?: string // yyyy-mm-dd: home/lat/lng is a temporary place (vacation) until this day, then homeBase again
 }
+
+export interface Place { name: string; lat: number; lng: number }
+
+export interface Profile {
+  age?: number
+  home: Place
+  savingGoal?: number // USD per month to put aside
+  interests: string[]
+  interestsExtra: string
+}
+
+export const INTERESTS = [
+  'מוזיקה חיה', 'מסיבות וברים', 'אוכל ומסעדות', 'ספורט וכושר', 'יוגה', 'ריצה', 'טבע וטיולים', 'אמנות ומוזיאונים',
+  'תיאטרון וקומדיה', 'קולנוע', 'ריקוד', 'קהילה יהודית', 'מפגשי ישראלים', 'התנדבות', 'צילום', 'קריאה וספרים',
+  'משחקי קופסה', 'הרצאות וסדנאות',
+]
+
+// Shlichut: the communities Gili works with, read by the shlichut agent from public/shlichut-settings.json
+export interface Partnership {
+  id: string
+  name: string
+  community: string[]
+  ageFrom: number
+  ageTo: number
+  notes?: string
+}
+
+export const COMMUNITIES = ['ישראלית', 'רפורמית', 'קונסרבטיבית', 'אורתודוקסית', 'מודרן אורתודוקסית', 'פלורליסטית / קהילתית', 'חילונית']
 
 export const DEAL_TOPICS: { id: string; label: string }[] = [
   { id: 'food', label: 'אוכל וארוחות' },
@@ -140,6 +173,8 @@ export interface FeedItem {
   lng?: number
   url?: string
   idea?: string
+  // Shlichut: which partnerships this fits, with an idea tailored to each
+  forPartnerships?: { id: string; idea?: string }[]
 }
 
 export interface Feed {

@@ -1,7 +1,7 @@
 {
-  "home": "Fair Lawn, NJ",
-  "lat": 40.9404,
-  "lng": -74.1318,
+  "home": "Fair Lawn, New Jersey",
+  "lat": 40.94,
+  "lng": -74.13,
   "rangeMiles": 10,
   "maxPrice": 10,
   "topics": [
@@ -11,5 +11,11 @@
     "jewish"
   ],
   "extra": "",
-  "updatedAt": "2026-10-24T19:59:39.000Z"
+  "updatedAt": "2026-10-25T17:19:28.473Z",
+  "interests": [],
+  "homeBase": {
+    "name": "Fair Lawn, New Jersey",
+    "lat": 40.94,
+    "lng": -74.13
+  }
 }

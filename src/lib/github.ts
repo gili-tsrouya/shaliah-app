@@ -39,3 +39,28 @@ export const saveShlichutSettings = (token: string, settings: ShlichutSettings) 
   saveRepoFile(token, 'public/shlichut-settings.json', settings, 'Update shlichut partnerships from the app')
 
 export const loadShlichutSettings = () => loadPublic<ShlichutSettings>('shlichut-settings.json')
+
+// "Run now": starts .github/workflows/run-agent.yml. The token also needs "Actions: read and write".
+const RUNS = 'https://api.github.com/repos/Gili-tsrouya/shaliah-app/actions/workflows/run-agent.yml'
+
+export async function startAgentRun(token: string, agent: 'deals' | 'shlichut') {
+  const r = await fetch(RUNS + '/dispatches', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}`, Accept: 'application/vnd.github+json' },
+    body: JSON.stringify({ ref: 'main', inputs: { agent } }),
+  })
+  if (!r.ok) throw new Error(String(r.status))
+}
+
+export interface AgentRun { status: 'queued' | 'in_progress' | 'completed' | string; conclusion: string | null; created_at: string; html_url: string; name: string; display_title: string }
+
+// The newest run of that agent started at or after `since`
+export async function findAgentRun(token: string, agent: string, since: string): Promise<AgentRun | null> {
+  const r = await fetch(`${RUNS}/runs?per_page=10&created=>=${since.slice(0, 19)}Z`, {
+    headers: { Authorization: `Bearer ${token}`, Accept: 'application/vnd.github+json' }, cache: 'no-store',
+  })
+  if (!r.ok) throw new Error(String(r.status))
+  const runs = ((await r.json()) as { workflow_runs: AgentRun[] }).workflow_runs
+  // run-name in the workflow is "Run <agent> agent"
+  return runs.find((x) => x.display_title === `Run ${agent} agent`) ?? null
+}

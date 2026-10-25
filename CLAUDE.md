@@ -33,7 +33,7 @@ Match its colors, spacing and copy.
 - Tasks board.
 - Profile (`#/profile`): name, age, home town, budget + saving goal, interests. Age/home/interests go to `public/agent-settings.json` (`age`, `interests`, `homeBase`); the התאמה panel can set a temporary place with `awayUntil`.
 - Shlichut partnerships (community types + age range) saved to `public/shlichut-settings.json`; the agent tags items with `forPartnerships`.
-- "הרץ את הסוכן עכשיו" saves preferences, then opens the routine page on claude.ai to run it (no direct trigger yet).
+- "הרץ את הסוכן עכשיו" saves preferences, then starts `.github/workflows/run-agent.yml` (Claude Code CLI with the `CLAUDE_CODE_OAUTH_TOKEN` secret) through the GitHub API and shows progress. Needs the app's GitHub token to have Actions read/write. Daily runs stay on the claude.ai routines.
 - Everything under `public/` is public: keep personal details (name, budget) out of it.
 
 ## Agents

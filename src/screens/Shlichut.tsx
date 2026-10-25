@@ -38,6 +38,22 @@ export function Shlichut() {
   const featured = all.find((i) => i.category === 'פרשת השבוע' && fits(i))
   const items = all.filter((i) => i !== featured && fits(i) && (filter === 'הכל' || i.category === filter))
 
+  // "מתאים ל: …" under every item, so it is clear which partnership each one is for
+  const labels = (i: FeedItem, onBlue = false) => {
+    if (!partnerships.length || !tagged) return null
+    const fitsWhom = (i.forPartnerships ?? []).map((f) => partnerships.find((p) => p.id === f.id)).filter((p): p is Partnership => !!p)
+    return (
+      <span className="row" style={{ flexWrap: 'wrap', gap: 4 }}>
+        <span className="small" style={{ color: onBlue ? '#DBE6FD' : 'var(--muted)' }}>מתאים ל:</span>
+        {fitsWhom.length
+          ? fitsWhom.map((p) => (
+            <span key={p.id} className="tag" style={onBlue ? { background: '#fff', color: 'var(--primary)' } : { background: 'var(--tzofim-bg)', color: 'var(--tzofim-fg)' }}>{p.name}</span>
+          ))
+          : <span className="small" style={{ color: onBlue ? '#DBE6FD' : 'var(--muted)' }}>כללי</span>}
+      </span>
+    )
+  }
+
   const makeTask = (i: FeedItem) => {
     const title = `הכנת פעילות: ${i.title}${partner ? ` (${partner.name})` : ''}`
     setTasks((ts) => [...ts, { id: newId(), title, work: calCategories[0]?.id ?? 'personal', status: 'todo', note: ideaFor(i) }])
@@ -76,7 +92,7 @@ export function Shlichut() {
             <Icon name="edit" size={16} />
           </button>
         )}
-        {partner && !tagged && all.length > 0 && <p className="muted small">הסוכן עוד לא התאים תוכן לשותפויות. זה יקרה בהרצה הבאה.</p>}
+        {partnerships.length > 0 && !tagged && all.length > 0 && <p className="muted small">הסוכן עוד לא התאים את התוכן לשותפויות שלך, לכן אין עדיין תוויות. זה יקרה בהרצה הבאה (או עכשיו, עם הכפתור "הרץ את הסוכן עכשיו").</p>}
         {msg && <p className="small">{msg}</p>}
       </section>
 
@@ -96,6 +112,7 @@ export function Shlichut() {
           <span className="small bold" style={{ color: '#DBE6FD' }}>{featured.category}{featured.when ? ` · ${featured.when}` : ''}</span>
           <h2 style={{ fontSize: 21, lineHeight: 1.3 }}>{featured.title}</h2>
           {ideaFor(featured) && <p style={{ fontSize: 14, lineHeight: 1.5, color: '#EEF3FE' }}>{ideaFor(featured)}</p>}
+          {labels(featured, true)}
           <div className="row">
             <a className="btn white row" style={{ flex: 1, justifyContent: 'center', textDecoration: 'none', gap: 6 }} href={chatGptUrl(featured, ideaFor(featured), partner)} target="_blank" rel="noreferrer">
               <Icon name="sparkle" size={16} /> בנה פעילות ב-ChatGPT
@@ -114,13 +131,7 @@ export function Shlichut() {
           <span className="bold" style={{ fontSize: 15 }}>{i.title}</span>
           {i.summary && <span style={{ fontSize: 14, color: '#3D4757', lineHeight: 1.45 }}>{i.summary}</span>}
           {ideaFor(i) && <span style={{ fontSize: 14, lineHeight: 1.45 }}><b>רעיון לשיחה{partner ? ` ל${partner.name}` : ''}: </b>{ideaFor(i)}</span>}
-          {!partner && !!i.forPartnerships?.length && (
-            <span className="chips" style={{ gap: 4 }}>
-              {i.forPartnerships.map((f) => partnerships.find((p) => p.id === f.id)).filter(Boolean).map((p) => (
-                <span key={p!.id} className="tag" style={{ background: 'var(--track)', color: 'var(--ink)' }}>{p!.name}</span>
-              ))}
-            </span>
-          )}
+          {labels(i)}
           <div className="row">
             <a className="btn light row" style={{ flex: 1, justifyContent: 'center', textDecoration: 'none', gap: 6, color: 'var(--primary)', fontWeight: 700 }} href={chatGptUrl(i, ideaFor(i), partner)} target="_blank" rel="noreferrer">
               <Icon name="sparkle" size={16} /> בנה פעילות ב-ChatGPT

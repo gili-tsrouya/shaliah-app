@@ -25,6 +25,7 @@ export interface SanitizeResult {
 }
 
 // Feeds have no use for control characters, tabs or line breaks inside a field
+// eslint-disable-next-line no-control-regex -- matching control characters is the point
 const clean = (s: string) => s.replace(/[\u0000-\u001F\u007F-\u009F\u2028\u2029]/g, ' ').trim()
 
 const isObject = (v: unknown): v is Record<string, unknown> => typeof v === 'object' && v !== null && !Array.isArray(v)

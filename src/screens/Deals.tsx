@@ -9,7 +9,7 @@ import { SelfTabs } from '../components/ui'
 import { Icon } from '../components/Icon'
 import { DealsMap } from '../components/DealsMap'
 import { PlacePicker } from '../components/PlacePicker'
-import { RunAgent } from '../components/RunAgent'
+import { NextRunNote } from '../components/NextRunNote'
 import { DEAL_TOPICS, type AgentSettings, type FeedItem } from '../lib/types'
 
 const FILTERS = ['הכל', 'חינם', 'אוכל', 'יציאות', 'מבצעים', 'שמורים']
@@ -20,7 +20,7 @@ const isFree = (d: FeedItem) => d.priceValue === 0 || d.price === 'חינם'
 
 export function Deals() {
   const { feed, error } = useFeed('deals')
-  const { savedDeals, setSavedDeals, setEvents, calCategories, agentSettings, publishAgentSettings } = useStore()
+  const { savedDeals, setSavedDeals, setEvents, calCategories, agentSettings } = useStore()
   const [filter, setFilter] = useState('הכל')
   const [view, setView] = useState<'list' | 'map'>('list')
   const [selected, setSelected] = useState<string | null>(null)
@@ -107,7 +107,7 @@ export function Deals() {
       </div>
 
       {showSettings && <AgentSettingsPanel onDone={() => setShowSettings(false)} />}
-      <RunAgent agent="deals" beforeRun={async () => { await publishAgentSettings(agentSettings) }} />
+      <NextRunNote />
 
       <div className="row" style={{ alignItems: 'flex-start' }}>
         <div className="chips" style={{ flex: 1 }}>

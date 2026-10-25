@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useStore, newId } from '../lib/store'
 import { updatedText, useFeed } from '../lib/feeds'
 import { Icon } from '../components/Icon'
-import { RunAgent } from '../components/RunAgent'
+import { NextRunNote } from '../components/NextRunNote'
 import { Sheet } from '../components/ui'
 import { COMMUNITIES, type FeedItem, type Partnership } from '../lib/types'
 
@@ -63,7 +63,7 @@ export function Shlichut() {
   const savePartnerships = async (next: Partnership[]) => {
     try {
       const published = await publishPartnerships(next)
-      setMsg(published ? 'נשמר. הסוכן יתאים את התוכן בהרצה הבאה.' : 'נשמר בטלפון. כדי שהסוכן יקבל את זה, הוסיפו טוקן GitHub (גילויים בזול ← התאמה).')
+      setMsg(published ? 'נשמר. הסוכן יתאים את התוכן בעדכון של מחר בבוקר.' : 'נשמר בטלפון. כדי שהסוכן יקבל את זה, הוסיפו טוקן GitHub (גילויים בזול ← התאמה).')
     } catch {
       setMsg('נשמר בטלפון, אבל השמירה ב-GitHub נכשלה. בדקו את הטוקן.')
     }
@@ -92,7 +92,7 @@ export function Shlichut() {
             <Icon name="edit" size={16} />
           </button>
         )}
-        {partnerships.length > 0 && !tagged && all.length > 0 && <p className="muted small">הסוכן עוד לא התאים את התוכן לשותפויות שלך, לכן אין עדיין תוויות. זה יקרה בהרצה הבאה (או עכשיו, עם הכפתור "הרץ את הסוכן עכשיו").</p>}
+        {partnerships.length > 0 && !tagged && all.length > 0 && <p className="muted small">הסוכן עוד לא התאים את התוכן לשותפויות שלך, לכן אין עדיין תוויות. זה יקרה בעדכון של מחר בבוקר.</p>}
         {msg && <p className="small">{msg}</p>}
       </section>
 
@@ -102,7 +102,7 @@ export function Shlichut() {
         ))}
       </div>
 
-      <RunAgent agent="shlichut" beforeRun={async () => { await publishPartnerships(partnerships) }} />
+      <NextRunNote />
 
       {error && <p className="empty">לא הצלחתי לטעון את התוכן. בדקו את החיבור לאינטרנט.</p>}
       {!error && feed && all.length === 0 && <p className="empty">עוד אין תוכן — הסוכן ימלא כאן ברגע שירוץ.</p>}

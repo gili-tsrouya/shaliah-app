@@ -29,7 +29,7 @@ export function Profile() {
         homeBase: draft.home,
         ...(away ? {} : { home: draft.home.name, lat: draft.home.lat, lng: draft.home.lng, awayUntil: undefined }),
       })
-      setStatus(published ? 'נשמר. הסוכן ישתמש בזה בהרצה הבאה.' : 'נשמר בטלפון. כדי שהסוכן יקבל את זה, הוסיפו טוקן GitHub בגילויים בזול ← התאמה.')
+      setStatus(published ? 'נשמר. הסוכן ישתמש בזה בעדכון של מחר בבוקר.' : 'נשמר בטלפון. כדי שהסוכן יקבל את זה, הוסיפו טוקן GitHub בגילויים בזול ← התאמה.')
     } catch {
       setStatus('נשמר בטלפון, אבל השמירה ב-GitHub נכשלה. בדקו את הטוקן.')
     }

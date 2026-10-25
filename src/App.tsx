@@ -43,7 +43,7 @@ export default function App() {
   return (
     <StoreProvider>
       <div className="app">
-        <ErrorBoundary key={route}><Screen /></ErrorBoundary>
+        <ErrorBoundary key={route} where={route}><Screen /></ErrorBoundary>
       </div>
       <Nav section={route.split('/')[0]} />
     </StoreProvider>

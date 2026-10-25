@@ -187,7 +187,7 @@ function PartnershipSheet({ partnership, onClose, onSave, onDelete }: {
         <label className="field">הערות לסוכן (לא חובה, למשל: רובם לא דוברי עברית, שומרי שבת)
           <input name="notes" defaultValue={partnership.notes} />
         </label>
-        <p className="muted small">השם, סוג הקהילה והגילאים נשמרים בקובץ ההגדרות של הסוכן ב-GitHub (ציבורי). אפשר להשתמש בשם כללי.</p>
+        <p className="muted small">השם, סוג הקהילה והגילאים נשמרים בהגדרות הסוכן בריפו פרטי ב-GitHub (shaliah-data). בלי פרטים מזהים של בני נוער.</p>
         <button className="btn block" type="submit">שמור</button>
         {partnership.id && <button type="button" className="btn danger block" onClick={() => { onDelete(); onClose() }}>מחק שותפות</button>}
       </form>

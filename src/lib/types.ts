@@ -103,7 +103,7 @@ export interface Settings {
   githubToken?: string // optional, lets the app save agent settings to the repo
 }
 
-// Read by the daily deals agent from public/agent-settings.json
+// Read by the daily deals agent from settings/agent-settings.json in the private data repo
 export interface AgentSettings {
   home: string // town / address the agent measures distance from
   lat: number
@@ -137,7 +137,7 @@ export const INTERESTS = [
   'משחקי קופסה', 'הרצאות וסדנאות',
 ]
 
-// Shlichut: the communities Gili works with, read by the shlichut agent from public/shlichut-settings.json
+// Shlichut: the communities Gili works with, read by the shlichut agent from settings/shlichut-settings.json in the private data repo
 export interface Partnership {
   id: string
   name: string

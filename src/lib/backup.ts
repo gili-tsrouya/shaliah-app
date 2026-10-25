@@ -3,10 +3,10 @@ import { todayISO } from './dates'
 
 const PREFIX = 'shaliach:'
 const LAST_BACKUP = PREFIX + 'lastBackup'
-// Caches and secrets stay out of the file
-const SKIP = new Set([PREFIX + 'weather', LAST_BACKUP])
+// Caches and secrets stay out of the file (the GitHub token is removed from settings below)
+const SKIP = new Set([PREFIX + 'weather', LAST_BACKUP, PREFIX + 'googleToken'])
 
-interface BackupFile { app: 'shaliach'; version: 1; createdAt: string; data: Record<string, unknown> }
+export interface BackupFile { app: 'shaliach'; version: 1; createdAt: string; data: Record<string, unknown> }
 
 export function buildBackup(): BackupFile {
   const data: Record<string, unknown> = {}

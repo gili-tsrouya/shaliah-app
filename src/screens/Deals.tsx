@@ -149,7 +149,7 @@ function AgentSettingsPanel({ onDone }: { onDone: () => void }) {
 
   // Start from what the agent actually uses
   useEffect(() => {
-    loadAgentSettings().then((s) => s && setDraft((d) => (JSON.stringify(d) === JSON.stringify(agentSettings) ? s : d)))
+    loadAgentSettings(settings.githubToken).then((s) => s && setDraft((d) => (JSON.stringify(d) === JSON.stringify(agentSettings) ? s : d)))
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -221,7 +221,7 @@ function AgentSettingsPanel({ onDone }: { onDone: () => void }) {
       {status && <p className="small" style={{ color: status.startsWith('נשמר') ? 'var(--muted)' : 'var(--danger)' }}>{status}</p>}
       <details>
         <summary className="small muted" style={{ cursor: 'pointer' }}>חיבור ל-GitHub (פעם אחת)</summary>
-        <label className="field" style={{ marginTop: 8 }}>טוקן GitHub (fine-grained, רק לריפו shaliah-app, הרשאת Contents)
+        <label className="field" style={{ marginTop: 8 }}>טוקן GitHub (fine-grained, רק לריפו הפרטי shaliah-data, הרשאת Contents: read and write)
           <input type="password" dir="ltr" defaultValue={settings.githubToken} autoComplete="off"
             onBlur={(e) => setSettings((s) => ({ ...s, githubToken: e.target.value.trim() || undefined }))} />
         </label>

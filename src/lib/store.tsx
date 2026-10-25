@@ -78,10 +78,10 @@ function useAppState() {
   const [partnerships, setPartnerships] = usePersistent<Partnership[]>('partnerships', () => [])
   const [partnershipsUpdatedAt, setPartnershipsUpdatedAt] = usePersistent<string>('partnershipsUpdatedAt', () => '')
 
-  // The repo copy is what the agents use, so it wins over the phone's copy unless the phone saved something newer
+  // The data-repo copy is what the agents use, so it wins over the phone's copy unless the phone saved something newer
   useEffect(() => {
-    loadAgentSettings().then((s) => s && setAgentSettings((cur) => ((s.updatedAt ?? '') >= (cur.updatedAt ?? '') ? { ...cur, ...s } : cur)))
-    loadShlichutSettings().then((s) => {
+    loadAgentSettings(settings.githubToken).then((s) => s && setAgentSettings((cur) => ((s.updatedAt ?? '') >= (cur.updatedAt ?? '') ? { ...cur, ...s } : cur)))
+    loadShlichutSettings(settings.githubToken).then((s) => {
       if (!s || s.updatedAt < partnershipsUpdatedAt) return
       setPartnerships(s.partnerships)
       setPartnershipsUpdatedAt(s.updatedAt)
@@ -90,7 +90,7 @@ function useAppState() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  // Save on the phone and, when a GitHub token is set, in the repo so the agent uses it on its next run.
+  // Save on the phone and, when a GitHub token is set, in the private data repo so the agent uses it on its next run.
   // Returns false when it stayed on the phone only.
   const publishAgentSettings = useCallback(async (next: AgentSettings) => {
     const stamped = { ...next, updatedAt: new Date().toISOString() }

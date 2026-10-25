@@ -83,7 +83,7 @@ export function Profile() {
       <button className="btn block" onClick={save}>שמור פרופיל</button>
       {status && <p className="small">{status}</p>}
       <p className="muted small">
-        גיל, עיר ותחביבים נשמרים בקובץ ההגדרות של הסוכן ב-GitHub (ציבורי). השם, התקציב ויעד החיסכון נשארים רק בטלפון.
+        גיל, עיר ותחביבים נשמרים בהגדרות הסוכן בריפו פרטי ב-GitHub (shaliah-data) שרק את והסוכנים רואים. השם, התקציב ויעד החיסכון נשארים רק בטלפון.
       </p>
     </main>
   )

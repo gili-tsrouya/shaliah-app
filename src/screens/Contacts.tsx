@@ -1,13 +1,14 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useStore, newId } from '../lib/store'
 import { FREQUENCIES, GRADE_COLORS, daysUntilDue, freqLabel, gradeNow, scoreColor, sortByPriority, touchScore } from '../lib/derive'
 import { agoText, daysBetween, inDaysText, israelTime, todayISO } from '../lib/dates'
 import { Fab, SelfTabs, Sheet } from '../components/ui'
 import { Icon } from '../components/Icon'
 import type { Person } from '../lib/types'
+import { parseVCards, pickContacts, pickerSupported, type ImportedContact } from '../lib/contacts'
 
 // Shrinks a picked photo to a small square so it fits in phone storage
-function resizePhoto(file: File) {
+function resizePhoto(file: Blob) {
   return new Promise<string>((resolve, reject) => {
     const img = new Image()
     img.onload = () => {
@@ -29,7 +30,30 @@ const digits = (phone: string) => phone.replace(/[^\d+]/g, '')
 export function Contacts() {
   const { people, setPeople, settings, setSettings } = useStore()
   const [editing, setEditing] = useState<Person | null>(null)
+  const [imported, setImported] = useState<ImportedContact[] | null>(null)
+  const [importError, setImportError] = useState('')
+  const fileInput = useRef<HTMLInputElement>(null)
   const today = todayISO()
+
+  const startImport = async () => {
+    setImportError('')
+    if (!pickerSupported()) {
+      fileInput.current?.click()
+      return
+    }
+    try {
+      const picked = await pickContacts()
+      if (picked.length) setImported(picked)
+    } catch {
+      fileInput.current?.click()
+    }
+  }
+
+  const readFile = async (file: File) => {
+    const found = parseVCards(await file.text())
+    if (found.length) setImported(found)
+    else setImportError('לא מצאתי אנשי קשר בקובץ הזה. צריך קובץ .vcf מאפליקציית אנשי הקשר.')
+  }
   const sorted = sortByPriority(people, today)
   const due = sorted.filter((p) => daysUntilDue(p) <= 0)
 
@@ -63,6 +87,23 @@ export function Contacts() {
         <span className="row" style={{ gap: 4 }}><span className="dot" style={{ background: GRADE_COLORS.y }} />קצת באיחור</span>
         <span className="row" style={{ gap: 4 }}><span className="dot" style={{ background: GRADE_COLORS.r }} />באיחור גדול</span>
       </div>
+
+      <button className="btn light row" style={{ justifyContent: 'center', gap: 8 }} onClick={startImport}>
+        <Icon name="contacts" size={18} /> הוספה מאנשי הקשר
+      </button>
+      <input ref={fileInput} type="file" accept=".vcf,.vcard,text/vcard,text/x-vcard,text/directory" aria-label="קובץ אנשי קשר" style={{ display: 'none' }}
+        onChange={(e) => { const file = e.target.files?.[0]; e.target.value = ''; if (file) readFile(file) }} />
+      {importError && <p className="small" style={{ color: 'var(--danger)' }}>{importError}</p>}
+      {!pickerSupported() && (
+        <details className="muted small">
+          <summary style={{ cursor: 'pointer' }}>איך מוציאים אנשי קשר מהאייפון?</summary>
+          <ol style={{ margin: '8px 0 0', paddingInlineStart: 20, lineHeight: 1.6 }}>
+            <li><b>איש קשר אחד:</b> באפליקציית אנשי הקשר פותחים את האדם ← "שיתוף איש קשר" ← "שמירה בקבצים".</li>
+            <li><b>כמה ביחד:</b> באפליקציית אנשי הקשר עוברים ל"רשימות", לוחצים לחיצה ארוכה על רשימה ← "ייצוא" ← "שמירה בקבצים". אפשר לפתוח רשימה חדשה רק עם האנשים שרוצים.</li>
+            <li>חוזרים לכאן, לוחצים "הוספה מאנשי הקשר" ובוחרים את הקובץ. תופיע רשימה ותבחרו את מי להוסיף.</li>
+          </ol>
+        </details>
+      )}
 
       {sorted.length === 0 && <p className="empty">הוסיפו את האנשים שחשוב לכם לשמור איתם על קשר</p>}
 
@@ -123,6 +164,9 @@ export function Contacts() {
 
       <Fab label="אדם" onClick={() => setEditing({ id: '', name: '', everyDays: 7, lastTalk: today })} />
 
+      {imported && <ImportSheet contacts={imported} people={people} onClose={() => setImported(null)}
+        onAdd={(added) => setPeople((ps) => [...ps, ...added])} />}
+
       {editing && <PersonSheet person={editing} today={today} onClose={() => setEditing(null)}
         onSave={(next) => setPeople((ps) => (editing.id ? ps.map((p) => (p.id === editing.id ? next : p)) : [...ps, { ...next, id: newId() }]))}
         onDelete={() => setPeople((ps) => ps.filter((p) => p.id !== editing.id))} />}
@@ -167,6 +211,71 @@ function PersonSheet({ person, today, onClose, onSave, onDelete }: {
         <button className="btn block" type="submit">שמור</button>
         {person.id && <button type="button" className="btn danger block" onClick={() => { onDelete(); onClose() }}>הסר מהרשימה</button>}
       </form>
+    </Sheet>
+  )
+}
+
+const samePhone = (a?: string, b?: string) => !!a && !!b && digits(a).slice(-9) === digits(b).slice(-9)
+
+function ImportSheet({ contacts, people, onClose, onAdd }: {
+  contacts: ImportedContact[]; people: Person[]; onClose: () => void; onAdd: (ps: Person[]) => void
+}) {
+  const today = todayISO()
+  const exists = (c: ImportedContact) => people.some((p) => p.name.trim() === c.name.trim() || samePhone(p.phone, c.phone))
+  const [chosen, setChosen] = useState<boolean[]>(() => contacts.map((c) => !exists(c)))
+  const [every, setEvery] = useState(7)
+  const [saving, setSaving] = useState(false)
+  const count = chosen.filter(Boolean).length
+
+  const add = async () => {
+    setSaving(true)
+    const picked = contacts.filter((_, i) => chosen[i])
+    const added: Person[] = []
+    for (const c of picked) {
+      let photo: string | undefined
+      if (c.photo) {
+        try { photo = await resizePhoto(c.photo) } catch { /* keep the person without a photo */ }
+      }
+      // Starting from today means nobody shows up as overdue the moment they are added
+      added.push({ id: newId(), name: c.name, phone: c.phone, photo, everyDays: every, lastTalk: today })
+    }
+    onAdd(added)
+    onClose()
+  }
+
+  return (
+    <Sheet title="הוספה מאנשי הקשר" onClose={onClose}>
+      <div className="between small">
+        <span className="muted">{count} נבחרו מתוך {contacts.length}</span>
+        <button className="chip small" onClick={() => setChosen(contacts.map((c) => (count === 0 ? !exists(c) : false)))}>
+          {count === 0 ? 'בחר הכל' : 'נקה בחירה'}
+        </button>
+      </div>
+      <div className="col" style={{ gap: 6 }}>
+        {contacts.map((c, i) => {
+          const dup = exists(c)
+          return (
+            <label key={i} className="row" style={{ gap: 10, padding: '6px 4px', opacity: dup && !chosen[i] ? 0.55 : 1, cursor: 'pointer' }}>
+              <input type="checkbox" checked={chosen[i]} style={{ width: 22, height: 22, flexShrink: 0 }}
+                onChange={(e) => setChosen((ch) => ch.map((v, j) => (j === i ? e.target.checked : v)))} />
+              <span className="col" style={{ gap: 0, flex: 1, minWidth: 0 }}>
+                <span className="bold">{c.name}</span>
+                <span className="muted small" dir={c.phone ? 'ltr' : undefined} style={{ alignSelf: 'flex-start' }}>{c.phone ?? 'אין מספר'}</span>
+              </span>
+              {dup && <span className="tag paid">כבר ברשימה</span>}
+            </label>
+          )
+        })}
+      </div>
+      <label className="field">כל כמה זמן לדבר איתם?
+        <select value={every} onChange={(e) => setEvery(Number(e.target.value))}>
+          {FREQUENCIES.map((f) => <option key={f.days} value={f.days}>{f.label}</option>)}
+        </select>
+      </label>
+      <p className="muted small">אפשר לשנות לכל אחד בנפרד אחר כך, בלחיצה על התמונה שלו.</p>
+      <button className="btn block" disabled={count === 0 || saving} onClick={add}>
+        {saving ? 'מוסיף…' : count === 1 ? 'הוסף אדם אחד' : `הוסף ${count} אנשים`}
+      </button>
     </Sheet>
   )
 }

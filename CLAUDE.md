@@ -27,6 +27,7 @@ Match its colors, spacing and copy.
 - Cheap finds: agent settings panel (distance, max price, topics, free text; saved to `public/agent-settings.json` through the GitHub API with a token the user pastes once), list/map toggle (Leaflet + OpenStreetMap, pins need `lat`/`lng`).
 - Budget: one "+ הוצאה" sheet with optional "someone owes me" split and a refund mode; "חייבים לי" list; refunds reduce net spending.
 - Stay in touch: photo, ring color by on-time score, last-8 history dots, priority sort, optional phone with WhatsApp (wa.me) and FaceTime video/audio links.
+  Import from the address book (`src/lib/contacts.ts`): the Contact Picker API where the browser has it (Android; iPhone only with Safari's feature flag), otherwise a .vcf file exported from the iPhone Contacts app. Phones are normalized to +972 / +1, duplicates are skipped, new people start with today as last talk.
 - Calendar: user-defined categories with colors; each category can be linked to a Google calendar for two-way sync (`src/lib/google.ts`, Google Identity Services token in the browser; Client ID pasted in the app).
 - Shlichut: feed + "בנה פעילות ב-ChatGPT" link + create task.
 - Tasks board.

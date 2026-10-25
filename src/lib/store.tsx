@@ -130,13 +130,18 @@ type AppState = ReturnType<typeof useAppState>
 
 const Ctx = createContext<AppState | null>(null)
 
+// The latest store, for the rare case a screen renders without the context (seen once on an iPhone)
+let lastState: AppState | null = null
+
 export function StoreProvider({ children }: { children: ReactNode }) {
-  return <Ctx.Provider value={useAppState()}>{children}</Ctx.Provider>
+  const state = useAppState()
+  lastState = state
+  return <Ctx.Provider value={state}>{children}</Ctx.Provider>
 }
 
 // eslint-disable-next-line react-refresh/only-export-components
 export function useStore() {
-  const s = useContext(Ctx)
+  const s = useContext(Ctx) ?? lastState
   if (!s) throw new Error('useStore outside StoreProvider')
   return s
 }

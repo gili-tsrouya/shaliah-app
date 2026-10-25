@@ -43,7 +43,15 @@ export function Contacts() {
     }
     try {
       const picked = await pickContacts()
-      if (picked.length) setImported(picked)
+      if (picked.length === 1) {
+        // One person: open the normal add form already filled in, so only the rhythm is left to choose
+        const c = picked[0]
+        let photo: string | undefined
+        if (c.photo) {
+          try { photo = await resizePhoto(c.photo) } catch { /* fine without a photo */ }
+        }
+        setEditing({ id: '', name: c.name, phone: c.phone, photo, everyDays: 7, lastTalk: today })
+      } else if (picked.length) setImported(picked)
     } catch {
       fileInput.current?.click()
     }
@@ -96,8 +104,14 @@ export function Contacts() {
       {importError && <p className="small" style={{ color: 'var(--danger)' }}>{importError}</p>}
       {!pickerSupported() && (
         <details className="muted small">
-          <summary style={{ cursor: 'pointer' }}>איך מוציאים אנשי קשר מהאייפון?</summary>
-          <ol style={{ margin: '8px 0 0', paddingInlineStart: 20, lineHeight: 1.6 }}>
+          <summary style={{ cursor: 'pointer' }}>רוצה לבחור ישר מאנשי הקשר?</summary>
+          <p style={{ margin: '8px 0 0', lineHeight: 1.6 }}>
+            אפל חוסמת את זה לאפליקציות רשת כברירת מחדל, אבל אפשר להפעיל פעם אחת:
+            <b> הגדרות ← אפליקציות ← Safari ← מתקדם ← Feature Flags ← Contact Picker API</b> (להדליק).
+            אחר כך סוגרים ופותחים את האפליקציה, והכפתור יפתח את רשימת אנשי הקשר.
+          </p>
+          <p style={{ margin: '8px 0 0' }}>בלי ההגדרה הזו אפשר לייבא קובץ:</p>
+          <ol style={{ margin: '4px 0 0', paddingInlineStart: 20, lineHeight: 1.6 }}>
             <li><b>איש קשר אחד:</b> באפליקציית אנשי הקשר פותחים את האדם ← "שיתוף איש קשר" ← "שמירה בקבצים".</li>
             <li><b>כמה ביחד:</b> באפליקציית אנשי הקשר עוברים ל"רשימות", לוחצים לחיצה ארוכה על רשימה ← "ייצוא" ← "שמירה בקבצים". אפשר לפתוח רשימה חדשה רק עם האנשים שרוצים.</li>
             <li>חוזרים לכאן, לוחצים "הוספה מאנשי הקשר" ובוחרים את הקובץ. תופיע רשימה ותבחרו את מי להוסיף.</li>

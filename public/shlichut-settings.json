@@ -1,4 +1,14 @@
 {
-  "updatedAt": "",
-  "partnerships": []
+  "updatedAt": "2026-10-25T17:20:33.679Z",
+  "partnerships": [
+    {
+      "id": "9m43vufe",
+      "name": "צופים",
+      "community": [
+        "ישראלית"
+      ],
+      "ageFrom": 15,
+      "ageTo": 18
+    }
+  ]
 }

@@ -50,24 +50,22 @@ export function Home() {
       })()}
 
       {weather && wear && sky && (
-        <div className="card" style={{ flexDirection: 'row', alignItems: 'center', gap: 12, padding: '10px 14px' }}>
-          <span className="avatar" style={{ borderRadius: 12, background: sky === 'sun' ? '#FEF3C7' : '#E8EEF7', color: sky === 'sun' ? '#B45309' : '#3D5A80' }}>
-            <Icon name={sky} size={26} stroke={1.8} />
-          </span>
-          <span className="col" style={{ gap: 0, flex: 1, minWidth: 0 }}>
-            <span className="row" style={{ alignItems: 'baseline', gap: 6 }}>
+        <div className="card" style={{ gap: 10, padding: '10px 14px' }}>
+          <div className="row" style={{ gap: 12 }}>
+            <span className="avatar" style={{ borderRadius: 12, background: sky === 'sun' ? '#FEF3C7' : '#E8EEF7', color: sky === 'sun' ? '#B45309' : '#3D5A80' }}>
+              <Icon name={sky} size={26} stroke={1.8} />
+            </span>
+            <span className="row" style={{ alignItems: 'baseline', gap: 6, flex: 1, minWidth: 0 }}>
               <span className="big-num ltr" style={{ fontSize: 22 }}>{Math.round(weather.temp)}°C</span>
               <span style={{ fontSize: 14 }}>{SKY_TEXT[sky]}{weather.rainChance >= 30 ? ` · ${weather.rainChance}% גשם` : ''}</span>
             </span>
-            <span className="muted small ltr" style={{ textAlign: 'end' }}>{Math.round(weather.max)}° / {Math.round(weather.min)}° · {toF(weather.temp)}°F</span>
-          </span>
-          <span className="row" style={{ background: 'var(--ground)', borderRadius: 12, padding: '6px 10px 6px 8px', gap: 8 }}>
-            <Icon name={wear.wear} size={26} stroke={1.8} />
-            <span className="col" style={{ gap: 0 }}>
-              <span className="muted" style={{ fontSize: 11 }}>מה ללבוש</span>
-              <span className="bold" style={{ fontSize: 13 }}>{wear.text}</span>
-            </span>
-          </span>
+            <span className="muted small ltr" style={{ whiteSpace: 'nowrap' }}>{Math.round(weather.min)}°–{Math.round(weather.max)}° · {toF(weather.temp)}°F</span>
+          </div>
+          <div className="row" style={{ background: 'var(--ground)', borderRadius: 12, padding: '6px 10px', gap: 8 }}>
+            <Icon name={wear.wear} size={24} stroke={1.8} />
+            <span className="muted" style={{ fontSize: 12 }}>מה ללבוש:</span>
+            <span className="bold" style={{ fontSize: 14 }}>{wear.text}</span>
+          </div>
         </div>
       )}
 

@@ -21,7 +21,8 @@ export async function pickContacts(): Promise<ImportedContact[]> {
   const m = manager()!
   const available = (await m.getProperties?.()) ?? ['name', 'tel']
   const props = ['name', 'tel', 'icon'].filter((p) => available.includes(p))
-  const picked = await m.select(props, { multiple: true })
+  // One at a time: on iPhone the single-choice list is the one more likely to offer search
+  const picked = await m.select(props, { multiple: false })
   return picked
     .map((c) => ({ name: c.name?.[0]?.trim() ?? '', phone: c.tel?.[0] ? normalizePhone(c.tel[0]) : undefined, photo: c.icon?.[0] }))
     .filter((c) => c.name || c.phone)

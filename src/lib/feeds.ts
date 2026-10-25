@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import type { Feed } from './types'
+import { sanitizeFeed } from './feedSchema'
 
 export function useFeed(name: 'deals' | 'shlichut') {
   const [feed, setFeed] = useState<Feed | null>(null)
@@ -8,7 +9,13 @@ export function useFeed(name: 'deals' | 'shlichut') {
     let alive = true
     fetch(`${import.meta.env.BASE_URL}feeds/${name}.json`, { cache: 'no-cache' })
       .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
-      .then((f: Feed) => alive && setFeed(f))
+      // The feed is checked in CI too; checking again here keeps a bad file from ever reaching the screen
+      .then((raw: unknown) => {
+        const { feed: f, fatal } = sanitizeFeed(raw, name)
+        if (!alive) return
+        if (fatal) setError(true)
+        else setFeed(f)
+      })
       .catch(() => alive && setError(true))
     return () => {
       alive = false

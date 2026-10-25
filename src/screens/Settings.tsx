@@ -74,6 +74,7 @@ export function Settings() {
         )}
         {msg && <p className="small">{msg}</p>}
       </section>
+      <p className="muted small ltr" style={{ textAlign: 'center' }}>גרסה {__BUILD__}</p>
     </main>
   )
 }

@@ -5,6 +5,8 @@ import { VitePWA } from 'vite-plugin-pwa'
 export default defineConfig({
   // Served from https://gili-tsrouya.github.io/shaliah-app/
   base: '/shaliah-app/',
+  // Shown in Settings so we can tell which version a phone is running
+  define: { __BUILD__: JSON.stringify(new Date().toISOString().slice(0, 16).replace('T', ' ')) },
   plugins: [
     react(),
     VitePWA({

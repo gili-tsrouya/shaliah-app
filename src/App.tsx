@@ -10,6 +10,7 @@ import { Calendar } from './screens/Calendar'
 import { Tasks } from './screens/Tasks'
 import { Settings } from './screens/Settings'
 import { Profile } from './screens/Profile'
+import { ErrorBoundary } from './components/ErrorBoundary'
 
 const routes: Record<string, () => React.JSX.Element> = {
   home: Home,
@@ -42,7 +43,7 @@ export default function App() {
   return (
     <StoreProvider>
       <div className="app">
-        <Screen />
+        <ErrorBoundary key={route}><Screen /></ErrorBoundary>
       </div>
       <Nav section={route.split('/')[0]} />
     </StoreProvider>

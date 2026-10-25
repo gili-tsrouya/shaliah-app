@@ -4,6 +4,9 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+  # Picks up new feeds from the private data repo; deploys only when they changed
+  schedule:
+    - cron: '40 * * * *'
 
 # Nothing in this workflow can write to the repository
 permissions:
@@ -13,10 +16,16 @@ concurrency:
   group: pages
   cancel-in-progress: true
 
+env:
+  DATA_REPO: Gili-tsrouya/shaliah-data
+  SITE_URL: https://gili-tsrouya.github.io/shaliah-app
+
 jobs:
   # Every check must pass before anything is published
   check:
     runs-on: ubuntu-latest
+    outputs:
+      feeds_changed: ${{ steps.compare.outputs.changed }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -26,8 +35,42 @@ jobs:
       - run: npm ci
       - run: npm run lint
       - run: npm test
+
+      # The agents write feeds to the private data repo, never to this repo. Each fetched feed must pass
+      # the schema; otherwise the copy committed here is published instead. Without the secret
+      # (before the data repo is set up) the committed copies are published, as before.
+      - name: Fetch the latest feeds from the data repo
+        env:
+          DATA_REPO_TOKEN: ${{ secrets.DATA_REPO_TOKEN }}
+        run: |
+          if [ -z "$DATA_REPO_TOKEN" ]; then
+            echo "::warning::DATA_REPO_TOKEN is not set; publishing the feeds committed in this repo"
+            exit 0
+          fi
+          mkdir -p incoming
+          for f in deals shlichut; do
+            if curl -fsS -H "Authorization: Bearer $DATA_REPO_TOKEN" -H "Accept: application/vnd.github.raw+json" \
+                 "https://api.github.com/repos/$DATA_REPO/contents/feeds/$f.json" -o "incoming/$f.json" \
+               && npm run --silent check:feeds -- --dir incoming --only "$f" --write --strict; then
+              cp "incoming/$f.json" "public/feeds/$f.json"
+            else
+              echo "::warning::feeds/$f.json from the data repo is missing or invalid; keeping the committed copy"
+            fi
+          done
+
       - name: Validate agent feeds
         run: npm run check:feeds -- --write
+
+      - name: Did the feeds change since the last deploy?
+        id: compare
+        run: |
+          changed=false
+          for f in deals shlichut; do
+            live=$(curl -fsS "$SITE_URL/feeds/$f.json" || echo missing)
+            if [ "$live" != "$(cat public/feeds/$f.json)" ]; then changed=true; fi
+          done
+          echo "changed=$changed" >> "$GITHUB_OUTPUT"
+
       - run: npm run build
       - uses: actions/upload-pages-artifact@v3
         with:
@@ -35,6 +78,8 @@ jobs:
 
   deploy:
     needs: check
+    # Scheduled runs only redeploy when there is something new to show
+    if: github.event_name != 'schedule' || needs.check.outputs.feeds_changed == 'true'
     runs-on: ubuntu-latest
     permissions:
       pages: write

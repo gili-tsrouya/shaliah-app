@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-25T11:10:14.010Z",
+  "updatedAt": "2026-10-26T11:20:03.333Z",
   "items": [
     {
       "id": "baselocal-2026-10-31-heights-halloween-party",
@@ -44,6 +44,17 @@
       "url": "https://baselocal.com/nj/bergen-county/events/"
     },
     {
+      "id": "krazycouponlady-2026-11-05-target-early-black-friday",
+      "title": "מבצע Early Black Friday ב-Target",
+      "summary": "שלושה ימי מבצעים מוקדמים על כלי בית ואביזרים לדירה - כדאי לחכות עם קניות לדירה.",
+      "category": "מבצעים",
+      "when": "5–7 בנובמבר",
+      "date": "2026-11-05",
+      "where": "Target, Paramus ואונליין",
+      "price": "מבצעים",
+      "url": "https://thekrazycouponlady.com/tips/store-hacks/early-target-black-friday-deals"
+    },
+    {
       "id": "baselocal-2026-11-07-festival-of-the-night",
       "title": "Festival of the Night בטינק",
       "summary": "אירוע ערב קהילתי ב-Ethical Culture Society בכניסה של $10 למבוגרים.",
@@ -56,45 +67,6 @@
       "lat": 40.8976,
       "lng": -74.0116,
       "url": "https://baselocal.com/nj/bergen-county/events/"
-    },
-    {
-      "id": "thelocalgirl-craftsman-fair-lawn-happy-hour",
-      "title": "Happy hour ב-The Craftsman",
-      "summary": "קוקטיילים נבחרים וביסים ב-$9 כל אחד, ממש בפייר לאון (לפי מאמר מדצמבר 2024 - כדאי לאמת שעות).",
-      "category": "אוכל",
-      "when": "ב׳–ו׳ 16:00–19:00",
-      "where": "The Craftsman, Fair Lawn · כ-5 דק׳ נסיעה",
-      "price": "$9",
-      "priceValue": 9,
-      "lat": 40.9404,
-      "lng": -74.1318,
-      "url": "https://thelocalgirl.com/bergen/best-happy-hours-bergen-county-nj/"
-    },
-    {
-      "id": "thelocalgirl-steel-wheel-ridgewood-happy-hour",
-      "title": "Happy hour ב-Steel Wheel Tavern",
-      "summary": "אוכל ושתייה ב-$7 כל פריט ברידג׳ווד (לפי מאמר מדצמבר 2024 - כדאי לאמת שעות).",
-      "category": "אוכל",
-      "when": "ב׳–ה׳ (שעות לא צוינו)",
-      "where": "Steel Wheel Tavern, Ridgewood · כ-10 דק׳ נסיעה",
-      "price": "$7",
-      "priceValue": 7,
-      "lat": 40.9793,
-      "lng": -74.1165,
-      "url": "https://thelocalgirl.com/bergen/best-happy-hours-bergen-county-nj/"
-    },
-    {
-      "id": "thelocalgirl-gus-last-word-happy-hour",
-      "title": "Happy hour ב-Gus's Last Word",
-      "summary": "50% הנחה על הבר וביסים ב-$7–8 בווד-רידג׳ (לפי מאמר מדצמבר 2024 - כדאי לאמת שעות).",
-      "category": "אוכל",
-      "when": "ב׳–ו׳ 16:00–19:00",
-      "where": "Gus's Last Word, Wood-Ridge · כ-15 דק׳ נסיעה",
-      "price": "$7",
-      "priceValue": 7,
-      "lat": 40.8498,
-      "lng": -74.0876,
-      "url": "https://thelocalgirl.com/bergen/best-happy-hours-bergen-county-nj/"
     },
     {
       "id": "dealnews-ikea-family-promo-2026",

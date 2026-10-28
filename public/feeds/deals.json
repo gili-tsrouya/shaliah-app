@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-27T11:18:57.299Z",
+  "updatedAt": "2026-10-28T11:23:55.811Z",
   "items": [
     {
       "id": "baselocal-2026-10-31-heights-halloween-party",
@@ -41,20 +41,6 @@
       "url": "https://baselocal.com/nj/bergen-county/events/"
     },
     {
-      "id": "baselocal-2026-11-01-soup-symposium",
-      "title": "Soup Symposium: Economics 101 בטינק",
-      "summary": "דיון פתוח על כלכלה בליווי מרק בהתאמה אישית ב-$6 - ערב חברתי וזול.",
-      "category": "אוכל",
-      "when": "ראשון 13:00",
-      "date": "2026-11-01",
-      "where": "Ethical Culture Society of Bergen County, Teaneck · כ-20 דק׳ נסיעה",
-      "price": "$6",
-      "priceValue": 6,
-      "lat": 40.8976,
-      "lng": -74.0116,
-      "url": "https://baselocal.com/nj/bergen-county/events/"
-    },
-    {
       "id": "fine-grind-2026-11-01-open-mic",
       "title": "ערב Open Mic ב-Fine Grind",
       "summary": "ערב במה פתוחה בבית קפה בליטל פולס, חינם - מקום נחמד להכיר אנשים ולשמוע מוזיקה.",
@@ -71,32 +57,18 @@
     {
       "id": "krazycouponlady-2026-11-05-target-early-black-friday",
       "title": "מבצע Early Black Friday ב-Target",
-      "summary": "שלושה ימי מבצעים מוקדמים על כלי בית ואביזרים לדירה - כדאי לחכות עם קניות לדירה.",
+      "summary": "מבצע Early Black Friday של Target בין 5 ל-7 בנובמבר (עד 50% על צעצועים) - כדאי להיערך לקניות לדירה.",
       "category": "מבצעים",
-      "when": "5–7 בנובמבר",
+      "when": "5-7 בנובמבר",
       "date": "2026-11-05",
       "where": "Target, Paramus ואונליין",
-      "price": "מבצעים",
+      "price": "עד -50%",
       "url": "https://thekrazycouponlady.com/tips/store-hacks/early-target-black-friday-deals"
-    },
-    {
-      "id": "baselocal-2026-11-07-festival-of-the-night",
-      "title": "Festival of the Night בטינק",
-      "summary": "אירוע ערב קהילתי ב-Ethical Culture Society בכניסה של $10 למבוגרים.",
-      "category": "יציאות",
-      "when": "שבת 18:00",
-      "date": "2026-11-07",
-      "where": "Ethical Culture Society of Bergen County, Teaneck · כ-20 דק׳ נסיעה",
-      "price": "$10",
-      "priceValue": 10,
-      "lat": 40.8976,
-      "lng": -74.0116,
-      "url": "https://baselocal.com/nj/bergen-county/events/"
     },
     {
       "id": "ikea-paramus-2026-11-11-besta-lamps",
       "title": "IKEA: 15% על BESTÅ ו-20% על מנורות שולחן",
-      "summary": "הנחות על ארונות אחסון ומנורות לדירה, לחברי IKEA Family (חינם להצטרפות).",
+      "summary": "15% על ארונות BESTÅ ו-20% על מנורות שולחן עם חברות IKEA Family (חינמית), עד 11/11.",
       "category": "מבצעים",
       "when": "עד 11.11",
       "date": "2026-11-11",
@@ -105,30 +77,6 @@
       "lat": 40.9333,
       "lng": -74.0711,
       "url": "https://www.ikea.com/us/en/stores/paramus/"
-    },
-    {
-      "id": "dealnews-ikea-family-promo-2026",
-      "title": "מבצע IKEA Family - עד 50% הנחה",
-      "summary": "חברות חינמית ב-IKEA Family נותנת הנחות של עד 50% על ריהוט וציוד לדירה, בתוקף עד 31.12.2026.",
-      "category": "מבצעים",
-      "when": "עד 31.12",
-      "date": "2026-12-31",
-      "where": "IKEA · אונליין",
-      "price": "-50%",
-      "url": "https://www.dealnews.com/features/IKEA/discount-codes/"
-    },
-    {
-      "id": "craftsman-fairlawn-weekday-happy-hour",
-      "title": "שעת שמחה ב-The Craftsman",
-      "summary": "קוקטיילים נבחרים וביסים קטנים ב-9 דולר כל אחד, חמישה ימים בשבוע ממש בפייר לון.",
-      "category": "אוכל",
-      "when": "ב׳-ו׳ 16:00-19:00",
-      "where": "The Craftsman, 1609 Maple Ave, Fair Lawn · קרוב לבית",
-      "price": "",
-      "priceValue": 9,
-      "lat": 40.9358,
-      "lng": -74.1218,
-      "url": "https://thelocalgirl.com/bergen/best-happy-hours-bergen-county-nj/"
     }
   ]
 }

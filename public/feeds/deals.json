@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-28T11:23:55.811Z",
+  "updatedAt": "2026-10-29T11:24:17.222Z",
   "items": [
     {
       "id": "baselocal-2026-10-31-heights-halloween-party",
@@ -55,6 +55,20 @@
       "url": "https://thelocalgirl.com/calendar/bergen/"
     },
     {
+      "id": "baselocal-2026-11-01-soup-symposium",
+      "title": "Soup Symposium: Economics 101",
+      "summary": "הרצאה וקהילה בטינק עם מרק אופציונלי ב-$6 - דרך לפגוש אנשים ביום ראשון.",
+      "category": "תרבות",
+      "when": "ראשון 13:00",
+      "date": "2026-11-01",
+      "where": "Ethical Culture Society of Bergen County, Teaneck · כ-15 דק׳ נסיעה",
+      "price": "$6",
+      "priceValue": 6,
+      "lat": 40.8887,
+      "lng": -74.0116,
+      "url": "https://baselocal.com/nj/bergen-county/events/"
+    },
+    {
       "id": "krazycouponlady-2026-11-05-target-early-black-friday",
       "title": "מבצע Early Black Friday ב-Target",
       "summary": "מבצע Early Black Friday של Target בין 5 ל-7 בנובמבר (עד 50% על צעצועים) - כדאי להיערך לקניות לדירה.",
@@ -76,7 +90,18 @@
       "price": "-15%",
       "lat": 40.9333,
       "lng": -74.0711,
-      "url": "https://www.ikea.com/us/en/stores/paramus/"
+      "url": "https://www.ikea.com/us/en/offers/"
+    },
+    {
+      "id": "today-2026-11-12-walmart-early-black-friday",
+      "title": "Walmart: מבצעי Black Friday מוקדמים",
+      "summary": "אירוע המבצעים המוקדם של Walmart - הזדמנות לציוד לדירה במחיר נמוך.",
+      "category": "מבצעים",
+      "when": "12-15 בנובמבר",
+      "date": "2026-11-12",
+      "where": "Walmart · אונליין ובסניפים",
+      "price": "מבצעים",
+      "url": "https://www.today.com/shop/black-friday-sales-2026-rcna605702"
     }
   ]
 }

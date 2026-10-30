@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-29T11:24:17.222Z",
+  "updatedAt": "2026-10-30T11:22:40.573Z",
   "items": [
     {
       "id": "baselocal-2026-10-31-heights-halloween-party",
@@ -14,17 +14,6 @@
       "lat": 40.8629,
       "lng": -74.0757,
       "url": "https://baselocal.com/nj/bergen-county/events/"
-    },
-    {
-      "id": "target-2026-10-31-kitchen-floorcare",
-      "title": "מבצעי Target: עד 30% על כלי מטבח ועד 35% על ניקוי רצפות",
-      "summary": "הנחות על כלי מטבח ומוצרי ניקיון לדירה, בתוקף עד סוף החודש.",
-      "category": "מבצעים",
-      "when": "עד שבת",
-      "date": "2026-10-31",
-      "where": "Target · אונליין ובסניפים",
-      "price": "-30%",
-      "url": "https://www.target.com/c/target-circle-week-deals/-/N-4xw74"
     },
     {
       "id": "baselocal-2026-11-01-lower-brett-trail-cleanup",
@@ -102,6 +91,17 @@
       "where": "Walmart · אונליין ובסניפים",
       "price": "מבצעים",
       "url": "https://www.today.com/shop/black-friday-sales-2026-rcna605702"
+    },
+    {
+      "id": "costco97-2026-11-15-coupon-book",
+      "title": "חוברת קופונים של Costco: ניקיון ומזון עד $10 הנחה למוצר",
+      "summary": "הנחות על חומרי ניקיון, קפה וחטיפים לדירה (דורש כרטיס חבר), בתוקף עד אמצע נובמבר.",
+      "category": "מבצעים",
+      "when": "עד יום א׳ 15.11",
+      "date": "2026-11-15",
+      "where": "Costco · בסניפים ואונליין",
+      "price": "עד $10 הנחה",
+      "url": "https://costco97.com/coupon-book/november-2026/"
     }
   ]
 }

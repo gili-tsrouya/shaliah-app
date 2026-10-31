@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-30T11:22:40.573Z",
+  "updatedAt": "2026-10-31T11:15:51.971Z",
   "items": [
     {
       "id": "baselocal-2026-10-31-heights-halloween-party",
@@ -34,14 +34,14 @@
       "title": "ערב Open Mic ב-Fine Grind",
       "summary": "ערב במה פתוחה בבית קפה בליטל פולס, חינם - מקום נחמד להכיר אנשים ולשמוע מוזיקה.",
       "category": "יציאות",
-      "when": "ראשון",
+      "when": "ראשון הראשון בחודש 17:30",
       "date": "2026-11-01",
       "where": "The Fine Grind, Little Falls · כ-20 דק׳ נסיעה",
       "price": "חינם",
       "priceValue": 0,
       "lat": 40.8826,
       "lng": -74.2193,
-      "url": "https://thelocalgirl.com/calendar/bergen/"
+      "url": "https://openmikes.org/listings/finegrind3"
     },
     {
       "id": "baselocal-2026-11-01-soup-symposium",
@@ -69,6 +69,34 @@
       "url": "https://thekrazycouponlady.com/tips/store-hacks/early-target-black-friday-deals"
     },
     {
+      "id": "bergen-edu-2026-11-05-stories-history-forgot",
+      "title": "הרצאה: Stories History Forgot ב-Bergen Community College",
+      "summary": "שיחה חינמית עם הסופר Doug Melville על סיפורים היסטוריים נשכחים - ערב תרבותי בלי עלות.",
+      "category": "תרבות",
+      "when": "חמישי 12:30",
+      "date": "2026-11-05",
+      "where": "Bergen Community College, Paramus · כ-10 דק׳ נסיעה",
+      "price": "חינם",
+      "priceValue": 0,
+      "lat": 40.9361,
+      "lng": -74.0689,
+      "url": "https://thelocalgirl.com/calendar/event/stories-history-forgot-how-personal-and-national-narratives-intertwine/"
+    },
+    {
+      "id": "bergen-edu-2026-11-06-public-viewing-night",
+      "title": "ערב צפייה בכוכבים במצפה של Bergen Community College",
+      "summary": "ערב צפייה אסטרונומי פתוח לקהל במצפה הכוכבים של המכללה - אירוע שקט וחינמי (גם ב-13.11).",
+      "category": "תרבות",
+      "when": "שישי 19:00-22:00",
+      "date": "2026-11-06",
+      "where": "Emil Buehler Trust Observatory, Paramus · כ-10 דק׳ נסיעה",
+      "price": "חינם",
+      "priceValue": 0,
+      "lat": 40.9361,
+      "lng": -74.0689,
+      "url": "https://bergen.edu/events/month/2026-11/"
+    },
+    {
       "id": "ikea-paramus-2026-11-11-besta-lamps",
       "title": "IKEA: 15% על BESTÅ ו-20% על מנורות שולחן",
       "summary": "15% על ארונות BESTÅ ו-20% על מנורות שולחן עם חברות IKEA Family (חינמית), עד 11/11.",
@@ -91,6 +119,20 @@
       "where": "Walmart · אונליין ובסניפים",
       "price": "מבצעים",
       "url": "https://www.today.com/shop/black-friday-sales-2026-rcna605702"
+    },
+    {
+      "id": "thelocalgirl-2026-11-14-habit-burger-party",
+      "title": "מסיבת טעימות ב-Habit Burger & Grill",
+      "summary": "מסיבה חינמית עם טעימות, מוזיקה חיה ומרצ׳נדייז לרגל שיתוף פעולה עם שפית מניו יורק.",
+      "category": "אוכל",
+      "when": "שבת",
+      "date": "2026-11-14",
+      "where": "Habit Burger & Grill, Teterboro · כ-15 דק׳ נסיעה",
+      "price": "חינם",
+      "priceValue": 0,
+      "lat": 40.8587,
+      "lng": -74.0585,
+      "url": "https://thelocalgirl.com/calendar/event/habit-burger-grills-fresh-off-the-block-party/"
     },
     {
       "id": "costco97-2026-11-15-coupon-book",

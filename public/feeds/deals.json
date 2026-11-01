@@ -1,20 +1,6 @@
 {
-  "updatedAt": "2026-10-31T11:15:51.971Z",
+  "updatedAt": "2026-11-01T11:16:16.863Z",
   "items": [
-    {
-      "id": "baselocal-2026-10-31-heights-halloween-party",
-      "title": "מסיבת האלווין ב-Heights Bar & Grill",
-      "summary": "מסיבת האלווין בבר השכונתי בהאסברוק הייטס בכניסה חופשית - הזדמנות להתחפש ולהכיר אנשים.",
-      "category": "יציאות",
-      "when": "שבת 21:00",
-      "date": "2026-10-31",
-      "where": "The Heights Bar & Grill, Hasbrouck Heights · כ-15 דק׳ נסיעה",
-      "price": "חינם",
-      "priceValue": 0,
-      "lat": 40.8629,
-      "lng": -74.0757,
-      "url": "https://baselocal.com/nj/bergen-county/events/"
-    },
     {
       "id": "baselocal-2026-11-01-lower-brett-trail-cleanup",
       "title": "ניקיון והכרויות בשביל Lower Brett Trail",
@@ -97,6 +83,20 @@
       "url": "https://bergen.edu/events/month/2026-11/"
     },
     {
+      "id": "bergen-edu-2026-11-10-night-of-broken-glass",
+      "title": "אירוע וידאו immersive: ליל הבדולח",
+      "summary": "אירוע זיכרון חינמי פתוח לקהל במכללה, בהנחיית המרכז לשלום, צדק ופיוס.",
+      "category": "קהילה",
+      "when": "שלישי 12:30",
+      "date": "2026-11-10",
+      "where": "Bergen Community College, Paramus · כ-10 דק׳ נסיעה",
+      "price": "חינם",
+      "priceValue": 0,
+      "lat": 40.9446,
+      "lng": -74.0872,
+      "url": "https://bergen.edu/events/month/2026-11/"
+    },
+    {
       "id": "ikea-paramus-2026-11-11-besta-lamps",
       "title": "IKEA: 15% על BESTÅ ו-20% על מנורות שולחן",
       "summary": "15% על ארונות BESTÅ ו-20% על מנורות שולחן עם חברות IKEA Family (חינמית), עד 11/11.",
@@ -119,6 +119,20 @@
       "where": "Walmart · אונליין ובסניפים",
       "price": "מבצעים",
       "url": "https://www.today.com/shop/black-friday-sales-2026-rcna605702"
+    },
+    {
+      "id": "bergen-edu-2026-11-13-public-viewing-night",
+      "title": "ערב צפייה בכוכבים במצפה של Bergen CC",
+      "summary": "ערב צפייה חינמי בטלסקופים במצפה הכוכבים של המכללה - תוכנית זולה ומיוחדת לערב (בכפוף לתנאי מזג אוויר).",
+      "category": "תרבות",
+      "when": "שישי 19:00",
+      "date": "2026-11-13",
+      "where": "Emil Buehler Trust Observatory, Paramus · כ-10 דק׳ נסיעה",
+      "price": "חינם",
+      "priceValue": 0,
+      "lat": 40.9446,
+      "lng": -74.0872,
+      "url": "https://bergen.edu/events/month/2026-11/"
     },
     {
       "id": "thelocalgirl-2026-11-14-habit-burger-party",
@@ -144,6 +158,20 @@
       "where": "Costco · בסניפים ואונליין",
       "price": "עד $10 הנחה",
       "url": "https://costco97.com/coupon-book/november-2026/"
+    },
+    {
+      "id": "baselocal-2026-11-15-paramus-catholic-craft-fair",
+      "title": "יריד מלאכה ב-Paramus Catholic High School",
+      "summary": "יריד קראפט מקומי בכניסה של $2 - מקום טוב למצוא מתנות ולטייל בזול.",
+      "category": "מבצעים",
+      "when": "ראשון 10:00",
+      "date": "2026-11-15",
+      "where": "Paramus Catholic High School, Paramus · כ-10 דק׳ נסיעה",
+      "price": "$2",
+      "priceValue": 2,
+      "lat": 40.9437,
+      "lng": -74.0701,
+      "url": "https://baselocal.com/nj/bergen-county/events/"
     }
   ]
 }

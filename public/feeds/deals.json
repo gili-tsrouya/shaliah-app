@@ -1,48 +1,6 @@
 {
-  "updatedAt": "2026-11-01T11:16:16.863Z",
+  "updatedAt": "2026-11-02T11:22:29.902Z",
   "items": [
-    {
-      "id": "baselocal-2026-11-01-lower-brett-trail-cleanup",
-      "title": "ניקיון והכרויות בשביל Lower Brett Trail",
-      "summary": "פעילות התנדבותית חינמית בטבע בטינק, דרך טובה לפגוש אנשים חדשים.",
-      "category": "קהילה",
-      "when": "ראשון 10:00",
-      "date": "2026-11-01",
-      "where": "Lower Brett Trail, Teaneck · כ-20 דק׳ נסיעה",
-      "price": "חינם",
-      "priceValue": 0,
-      "lat": 40.8976,
-      "lng": -74.0116,
-      "url": "https://baselocal.com/nj/bergen-county/events/"
-    },
-    {
-      "id": "fine-grind-2026-11-01-open-mic",
-      "title": "ערב Open Mic ב-Fine Grind",
-      "summary": "ערב במה פתוחה בבית קפה בליטל פולס, חינם - מקום נחמד להכיר אנשים ולשמוע מוזיקה.",
-      "category": "יציאות",
-      "when": "ראשון הראשון בחודש 17:30",
-      "date": "2026-11-01",
-      "where": "The Fine Grind, Little Falls · כ-20 דק׳ נסיעה",
-      "price": "חינם",
-      "priceValue": 0,
-      "lat": 40.8826,
-      "lng": -74.2193,
-      "url": "https://openmikes.org/listings/finegrind3"
-    },
-    {
-      "id": "baselocal-2026-11-01-soup-symposium",
-      "title": "Soup Symposium: Economics 101",
-      "summary": "הרצאה וקהילה בטינק עם מרק אופציונלי ב-$6 - דרך לפגוש אנשים ביום ראשון.",
-      "category": "תרבות",
-      "when": "ראשון 13:00",
-      "date": "2026-11-01",
-      "where": "Ethical Culture Society of Bergen County, Teaneck · כ-15 דק׳ נסיעה",
-      "price": "$6",
-      "priceValue": 6,
-      "lat": 40.8887,
-      "lng": -74.0116,
-      "url": "https://baselocal.com/nj/bergen-county/events/"
-    },
     {
       "id": "krazycouponlady-2026-11-05-target-early-black-friday",
       "title": "מבצע Early Black Friday ב-Target",
@@ -81,6 +39,34 @@
       "lat": 40.9361,
       "lng": -74.0689,
       "url": "https://bergen.edu/events/month/2026-11/"
+    },
+    {
+      "id": "meetup-2026-11-07-adult-kickball-hackensack",
+      "title": "משחק Kickball חופשי למבוגרים בהאקנסק",
+      "summary": "מפגש ספורט קליל וחינמי לכל הרמות, אחריו יוצאים יחד לבר מיצים - דרך קלה להכיר אנשים.",
+      "category": "ספורט",
+      "when": "שבת 12:00-15:00",
+      "date": "2026-11-07",
+      "where": "Columbus Park, Hackensack · כ-15 דק׳ נסיעה",
+      "price": "חינם",
+      "priceValue": 0,
+      "lat": 40.8886,
+      "lng": -74.0435,
+      "url": "https://www.meetup.com/north-jersey-bowling-soccer-volleyball/events/316703899/"
+    },
+    {
+      "id": "thelocalgirl-2026-11-08-coffee-and-birds",
+      "title": "Coffee and Birds בשמורת Lorrimer",
+      "summary": "פעילות טבע חינמית עם קפה בשמורה בפרנקלין לייקס.",
+      "category": "ספורט",
+      "when": "ראשון",
+      "date": "2026-11-08",
+      "where": "Lorrimer Sanctuary, Franklin Lakes · כ-15 דק׳ נסיעה",
+      "price": "חינם",
+      "priceValue": 0,
+      "lat": 40.999,
+      "lng": -74.2058,
+      "url": "https://thelocalgirl.com/bergen/event/coffee-and-birds-2/"
     },
     {
       "id": "bergen-edu-2026-11-10-night-of-broken-glass",
@@ -172,6 +158,20 @@
       "lat": 40.9437,
       "lng": -74.0701,
       "url": "https://baselocal.com/nj/bergen-county/events/"
+    },
+    {
+      "id": "thelocalgirl-2026-11-15-k-beauty-swap",
+      "title": "K-Beauty Sample Swap בקריוקי Rock 21",
+      "summary": "ערב חינמי להחלפת דוגמיות טיפוח, עם הגרלה וחדר קריוקי - 30 מקומות, הרשמה ב-Partiful.",
+      "category": "יציאות",
+      "when": "ראשון 15 בנובמבר",
+      "date": "2026-11-15",
+      "where": "Rock 21 Karaoke, Palisades Park · כ-20 דק׳ נסיעה",
+      "price": "חינם",
+      "priceValue": 0,
+      "lat": 40.8476,
+      "lng": -73.9988,
+      "url": "https://thelocalgirl.com/bergen/event/k-beauty-sample-swap-price-hack-night/"
     }
   ]
 }

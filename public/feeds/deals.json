@@ -1,10 +1,10 @@
 {
-  "updatedAt": "2026-11-04T11:16:02.787Z",
+  "updatedAt": "2026-11-05T11:15:38.226Z",
   "items": [
     {
       "id": "krazycouponlady-2026-11-05-target-early-black-friday",
       "title": "מבצע Early Black Friday ב-Target",
-      "summary": "מבצע Early Black Friday של Target בין 5 ל-7 בנובמבר (עד 50% על צעצועים) - כדאי להיערך לקניות לדירה.",
+      "summary": "Early Black Friday של Target בין 5 ל-7 בנובמבר - הנחות על בית ומטבח (למשל סט תבניות Staub ב-58% הנחה).",
       "category": "מבצעים",
       "when": "5-7 בנובמבר",
       "date": "2026-11-05",
@@ -69,22 +69,9 @@
       "url": "https://bergen.edu/events/month/2026-11/"
     },
     {
-      "id": "ikea-paramus-2026-11-11-besta-lamps",
-      "title": "IKEA: 15% על BESTÅ ו-20% על מנורות שולחן",
-      "summary": "15% על ארונות BESTÅ ו-20% על מנורות שולחן עם חברות IKEA Family (חינמית), עד 11/11.",
-      "category": "מבצעים",
-      "when": "עד 11.11",
-      "date": "2026-11-11",
-      "where": "IKEA Paramus · כ-15 דק׳ נסיעה",
-      "price": "-15%",
-      "lat": 40.9333,
-      "lng": -74.0711,
-      "url": "https://www.ikea.com/us/en/offers/"
-    },
-    {
       "id": "today-2026-11-12-walmart-early-black-friday",
       "title": "Walmart: מבצעי Black Friday מוקדמים",
-      "summary": "אירוע המבצעים המוקדם של Walmart - הזדמנות לציוד לדירה במחיר נמוך.",
+      "summary": "Walmart Early Black Friday בין 12 ל-15 בנובמבר (דוגמה: סט סכינים 14 חלקים ב-$42.98) - כדאי לציוד למטבח ולדירה.",
       "category": "מבצעים",
       "when": "12-15 בנובמבר",
       "date": "2026-11-12",
@@ -123,9 +110,9 @@
     {
       "id": "costco97-2026-11-15-coupon-book",
       "title": "חוברת קופונים של Costco: ניקיון ומזון עד $10 הנחה למוצר",
-      "summary": "הנחות על חומרי ניקיון, קפה וחטיפים לדירה (דורש כרטיס חבר), בתוקף עד אמצע נובמבר.",
+      "summary": "חוברת הקופונים של Costco בתוקף עד 15 בנובמבר (שואב אבק Shark מ-$149.99, מערכת סירים $139.99).",
       "category": "מבצעים",
-      "when": "עד יום א׳ 15.11",
+      "when": "עד 15 בנובמבר",
       "date": "2026-11-15",
       "where": "Costco · בסניפים ואונליין",
       "price": "עד $10 הנחה",
@@ -158,6 +145,19 @@
       "lat": 40.8476,
       "lng": -73.9988,
       "url": "https://thelocalgirl.com/bergen/event/k-beauty-sample-swap-price-hack-night/"
+    },
+    {
+      "id": "ikea-2026-11-24-sofas-dinnerware",
+      "title": "IKEA: הנחות לחברי IKEA Family על ספות ואוכל",
+      "summary": "עד 30% על ספות, 20% על שולחנות אוכל, כלים וווילונות לחברי IKEA Family (חינם להצטרפות) - טוב לריהוט הדירה.",
+      "category": "מבצעים",
+      "when": "עד 24 בנובמבר",
+      "date": "2026-11-24",
+      "where": "IKEA Paramus ואונליין · כ-15 דק׳ נסיעה",
+      "price": "עד -30%",
+      "lat": 40.9137,
+      "lng": -74.0745,
+      "url": "https://www.ikea.com/us/en/offers/"
     }
   ]
 }

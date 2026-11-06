@@ -5,7 +5,7 @@ import { agoText, daysBetween, inDaysText, israelTime, todayISO } from '../lib/d
 import { Fab, SelfTabs, Sheet } from '../components/ui'
 import { Icon } from '../components/Icon'
 import type { Person } from '../lib/types'
-import { disablePush, enablePush, pushSupport, testNotification, updatePushTime } from '../lib/push'
+import { disablePush, enablePush, pushSupport, updatePushTime } from '../lib/push'
 import { parseVCards, pickContacts, pickerSupported, type ImportedContact } from '../lib/contacts'
 
 // Shrinks a picked photo to a small square so it fits in phone storage
@@ -29,7 +29,7 @@ function resizePhoto(file: Blob) {
 const digits = (phone: string) => phone.replace(/[^\d+]/g, '')
 
 export function Contacts() {
-  const { people, setPeople, settings, setSettings } = useStore()
+  const { people, setPeople } = useStore()
   const [editing, setEditing] = useState<Person | null>(null)
   const [imported, setImported] = useState<ImportedContact[] | null>(null)
   const [importError, setImportError] = useState('')
@@ -76,20 +76,7 @@ export function Contacts() {
       <h1>לעצמי</h1>
       <SelfTabs active="contacts" />
 
-      <div className="card dark" style={{ flexDirection: 'row', alignItems: 'center', gap: 12, padding: '14px 16px', borderRadius: 16 }}>
-        <span className="avatar" style={{ background: '#2A3A55', color: '#fff', width: 40, height: 40 }}><Icon name="bell" size={20} /></span>
-        <div className="col" style={{ gap: 2, flex: 1 }}>
-          <span className="bold" style={{ fontSize: 15 }}>{due.length ? `היום כדאי לדבר עם: ${due.map((p) => p.name).join(', ')}` : 'דיברת עם כולם, כל הכבוד'}</span>
-          <label className="small" style={{ color: '#C9D2E3', display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 6, whiteSpace: 'nowrap' }}>
-            תזכורת יומית:
-            <input type="time" value={settings.reminderTime} aria-label="שעת תזכורת"
-              onChange={(e) => setSettings((s) => ({ ...s, reminderTime: e.target.value || '12:00' }))}
-              style={{ background: 'transparent', border: '1px solid #3A4A66', borderRadius: 6, color: '#fff', padding: '0 4px' }} />
-            <span>· {israelTime(settings.reminderTime)} בישראל</span>
-          </label>
-          <PushControls />
-        </div>
-      </div>
+      <ReminderCard due={due.map((p) => p.name)} />
 
       <div className="row small muted" style={{ flexWrap: 'wrap', gap: 12 }}>
         <span className="bold">כל נקודה = שיחה:</span>
@@ -303,18 +290,20 @@ const pushError = (e: unknown) => {
   return 'משהו השתבש, נסו שוב בעוד רגע.'
 }
 
-// Morning "who to call" notification: on/off, a test, and keeping the server's time in step
-function PushControls() {
+// Who to call today, the reminder time, and the morning notification switch
+function ReminderCard({ due }: { due: string[] }) {
   const { settings, setSettings } = useStore()
   const [token, setToken] = useState(settings.dataRepoToken ?? '')
+  const [askToken, setAskToken] = useState(false)
   const [busy, setBusy] = useState(false)
   const [msg, setMsg] = useState('')
   const support = pushSupport()
+  const on = !!settings.pushEnabled
   const lastTime = useRef(settings.reminderTime)
 
   // A new reminder time goes to the daily job too (after the picker settles)
   useEffect(() => {
-    if (!settings.pushEnabled || !settings.dataRepoToken || settings.reminderTime === lastTime.current) return
+    if (!on || !settings.dataRepoToken || settings.reminderTime === lastTime.current) return
     const t = setTimeout(() => {
       lastTime.current = settings.reminderTime
       updatePushTime(settings.dataRepoToken!, settings.reminderTime)
@@ -322,25 +311,21 @@ function PushControls() {
         .catch((e) => setMsg(pushError(e)))
     }, 1500)
     return () => clearTimeout(t)
-  }, [settings.pushEnabled, settings.dataRepoToken, settings.reminderTime])
+  }, [on, settings.dataRepoToken, settings.reminderTime])
 
-  const light = { color: '#C9D2E3' }
-  const small = { minHeight: 36, padding: '0 12px', borderRadius: 10, fontSize: 13 }
-
-  if (support === 'install') return <span className="small" style={light}>כדי לקבל התראה כל בוקר, פתחו את האפליקציה מהמסך הראשי (שיתוף ← הוספה למסך הבית).</span>
-  if (support === 'unsupported') return <span className="small" style={light}>הדפדפן הזה לא תומך בהתראות.</span>
-
-  const turnOn = async () => {
-    const t = token.trim()
-    if (!t) return setMsg('צריך קודם להדביק טוקן.')
+  // Called from a tap, which iPhone needs before it asks for permission
+  const turnOn = async (t: string) => {
+    if (!t.trim()) return setAskToken(true)
     setBusy(true)
     try {
-      await enablePush(t, settings.reminderTime)
+      await enablePush(t.trim(), settings.reminderTime)
       lastTime.current = settings.reminderTime
-      setSettings((s) => ({ ...s, dataRepoToken: t, pushEnabled: true }))
+      setSettings((s) => ({ ...s, dataRepoToken: t.trim(), pushEnabled: true }))
+      setAskToken(false)
       setMsg('')
     } catch (e) {
       setMsg(pushError(e))
+      if ((e as Error).message === 'token') setAskToken(true)
     }
     setBusy(false)
   }
@@ -358,28 +343,63 @@ function PushControls() {
   }
 
   return (
-    <div className="col" style={{ gap: 6, marginTop: 6 }}>
-      {settings.pushEnabled ? (
-        <div className="row" style={{ flexWrap: 'wrap', gap: 6 }}>
-          <span className="small" style={{ color: '#fff' }}>התראה כל בוקר בשעה הזו ✓</span>
-          <button className="btn light" style={small} onClick={() => testNotification().catch((e) => setMsg(pushError(e)))}>בדיקה</button>
-          <button className="btn light" style={small} disabled={busy} onClick={turnOff}>כיבוי</button>
-        </div>
-      ) : (
-        <>
-          {!settings.dataRepoToken && (
-            <label className="small" style={{ ...light, display: 'flex', flexDirection: 'column', gap: 4 }}>
-              טוקן לריפו shaliah-data (פעם אחת)
-              <input type="password" dir="ltr" autoComplete="off" value={token} onChange={(e) => setToken(e.target.value)}
-                style={{ minHeight: 36, borderRadius: 8, border: '1px solid #3A4A66', background: 'transparent', color: '#fff', padding: '0 8px' }} />
-            </label>
+    <section className="card dark" style={{ gap: 14, padding: 16, borderRadius: 20 }} aria-label="שומרים על קשר היום">
+      <div className="row" style={{ gap: 12, alignItems: 'flex-start' }}>
+        <span className="avatar" style={{ background: '#2A3A55', color: '#fff', width: 40, height: 40, flexShrink: 0 }}><Icon name="bell" size={20} /></span>
+        <div className="col" style={{ gap: 8, flex: 1, minWidth: 0 }}>
+          <span className="small" style={{ color: '#C9D2E3' }}>{due.length ? 'היום כדאי לדבר עם' : 'היום'}</span>
+          {due.length ? (
+            <div className="row" style={{ flexWrap: 'wrap', gap: 6 }}>
+              {due.map((name) => (
+                <span key={name} style={{ background: '#fff', color: 'var(--ink)', borderRadius: 999, padding: '4px 12px', fontSize: 14, fontWeight: 700 }}>{name}</span>
+              ))}
+            </div>
+          ) : (
+            <span className="bold" style={{ fontSize: 16 }}>דיברת עם כולם בזמן, כל הכבוד</span>
           )}
-          <button className="btn white" style={{ ...small, alignSelf: 'flex-start' }} disabled={busy} onClick={turnOn}>
-            {busy ? 'מפעיל…' : 'הפעלת התראה כל בוקר'}
+        </div>
+      </div>
+
+      <div style={{ height: 1, background: '#2A3A55' }} />
+
+      <div className="row" style={{ gap: 12 }}>
+        <div className="col" style={{ gap: 4, flex: 1, minWidth: 0 }}>
+          <span className="bold" style={{ fontSize: 14 }}>תזכורת כל בוקר</span>
+          <span className="row small" style={{ gap: 6, color: '#C9D2E3', flexWrap: 'wrap' }}>
+            <input type="time" value={settings.reminderTime} aria-label="שעת התזכורת"
+              onChange={(e) => setSettings((s) => ({ ...s, reminderTime: e.target.value || '09:00' }))}
+              style={{ background: '#2A3A55', border: 'none', borderRadius: 8, color: '#fff', colorScheme: 'dark', padding: '4px 8px', fontSize: 15, fontWeight: 700, minHeight: 32 }} />
+            <span>{israelTime(settings.reminderTime)} בישראל</span>
+          </span>
+        </div>
+        {support === 'ok' && (
+          <button role="switch" aria-checked={on} aria-label="התראה כל בוקר" disabled={busy}
+            onClick={() => (on ? turnOff() : turnOn(settings.dataRepoToken ?? ''))}
+            style={{ width: 52, height: 32, borderRadius: 16, border: 'none', padding: 0, flexShrink: 0, position: 'relative', cursor: 'pointer',
+              background: on ? '#34C759' : '#3A4A66', opacity: busy ? 0.6 : 1, transition: 'background .2s' }}>
+            <span style={{ position: 'absolute', top: 3, insetInlineStart: on ? 23 : 3, width: 26, height: 26, borderRadius: 13, background: '#fff',
+              boxShadow: '0 1px 3px rgba(0,0,0,.3)', transition: 'inset-inline-start .2s' }} />
           </button>
-        </>
+        )}
+      </div>
+
+      {support === 'install' && <span className="small" style={{ color: '#C9D2E3' }}>כדי לקבל התראה כל בוקר, פתחו את האפליקציה מהמסך הראשי.</span>}
+      {support === 'unsupported' && <span className="small" style={{ color: '#C9D2E3' }}>הדפדפן הזה לא תומך בהתראות.</span>}
+
+      {askToken && !on && (
+        <div className="col" style={{ gap: 8, background: '#1B2940', borderRadius: 12, padding: 12 }}>
+          <label className="small" style={{ color: '#C9D2E3', display: 'flex', flexDirection: 'column', gap: 6 }}>
+            כדי להפעיל צריך פעם אחת טוקן לריפו shaliah-data
+            <input type="password" dir="ltr" autoComplete="off" value={token} onChange={(e) => setToken(e.target.value)}
+              style={{ minHeight: 40, borderRadius: 8, border: '1px solid #3A4A66', background: 'transparent', color: '#fff', padding: '0 10px' }} />
+          </label>
+          <button className="btn white" style={{ minHeight: 40 }} disabled={busy || !token.trim()} onClick={() => turnOn(token)}>
+            {busy ? 'מפעיל…' : 'הפעלה'}
+          </button>
+        </div>
       )}
+
       {msg && <span className="small" style={{ color: '#FCA5A5' }}>{msg}</span>}
-    </div>
+    </section>
   )
 }

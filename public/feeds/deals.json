@@ -1,31 +1,6 @@
 {
-  "updatedAt": "2026-11-05T11:15:38.226Z",
+  "updatedAt": "2026-11-06T11:16:16.988Z",
   "items": [
-    {
-      "id": "krazycouponlady-2026-11-05-target-early-black-friday",
-      "title": "מבצע Early Black Friday ב-Target",
-      "summary": "Early Black Friday של Target בין 5 ל-7 בנובמבר - הנחות על בית ומטבח (למשל סט תבניות Staub ב-58% הנחה).",
-      "category": "מבצעים",
-      "when": "5-7 בנובמבר",
-      "date": "2026-11-05",
-      "where": "Target, Paramus ואונליין",
-      "price": "עד -50%",
-      "url": "https://thekrazycouponlady.com/tips/store-hacks/early-target-black-friday-deals"
-    },
-    {
-      "id": "bergen-edu-2026-11-05-stories-history-forgot",
-      "title": "הרצאה: Stories History Forgot ב-Bergen Community College",
-      "summary": "שיחה חינמית עם הסופר Doug Melville על סיפורים היסטוריים נשכחים - ערב תרבותי בלי עלות.",
-      "category": "תרבות",
-      "when": "חמישי 12:30",
-      "date": "2026-11-05",
-      "where": "Bergen Community College, Paramus · כ-10 דק׳ נסיעה",
-      "price": "חינם",
-      "priceValue": 0,
-      "lat": 40.9361,
-      "lng": -74.0689,
-      "url": "https://thelocalgirl.com/calendar/event/stories-history-forgot-how-personal-and-national-narratives-intertwine/"
-    },
     {
       "id": "bergen-edu-2026-11-06-public-viewing-night",
       "title": "ערב צפייה בכוכבים במצפה של Bergen Community College",
@@ -55,6 +30,31 @@
       "url": "https://www.meetup.com/north-jersey-bowling-soccer-volleyball/events/316703899/"
     },
     {
+      "id": "krazycouponlady-2026-11-07-target-early-black-friday",
+      "title": "מבצע Early Black Friday ב-Target",
+      "summary": "Early Black Friday של Target נגמר ב-7 בנובמבר - מיקרוגל BLACK+DECKER מ-$47, מתלה ייבוש כלים מ-$22 ועוד לדירה.",
+      "category": "מבצעים",
+      "when": "עד שבת 7 בנובמבר",
+      "date": "2026-11-07",
+      "where": "Target, Paramus ואונליין",
+      "price": "עד -50%",
+      "url": "https://thekrazycouponlady.com/tips/store-hacks/early-target-black-friday-deals"
+    },
+    {
+      "id": "thelocalgirl-2026-11-08-fall-festival-bergen-town-center",
+      "title": "Fall Festival ב-Bergen Town Center",
+      "summary": "פסטיבל סתיו עם DJ, משאיות אוכל, בר בירה ומשחקים - כרטיס יחיד ב-$5 בלבד.",
+      "category": "יציאות",
+      "when": "ראשון 8 בנובמבר",
+      "date": "2026-11-08",
+      "where": "Bergen Town Center, Paramus · כ-10 דק׳ נסיעה",
+      "price": "$5",
+      "priceValue": 5,
+      "lat": 40.9162,
+      "lng": -74.0731,
+      "url": "https://thelocalgirl.com/bergen/event/fourth-annual-fall-festival/"
+    },
+    {
       "id": "bergen-edu-2026-11-10-night-of-broken-glass",
       "title": "אירוע וידאו immersive: ליל הבדולח",
       "summary": "אירוע זיכרון חינמי פתוח לקהל במכללה, בהנחיית המרכז לשלום, צדק ופיוס.",
@@ -67,6 +67,17 @@
       "lat": 40.9446,
       "lng": -74.0872,
       "url": "https://bergen.edu/events/month/2026-11/"
+    },
+    {
+      "id": "ikea-2026-11-11-besta-lamps",
+      "title": "IKEA: 15% הנחה על BESTÅ ומנורות שולחן",
+      "summary": "לחברי IKEA Family (חברות חינם): 15% על כל פתרונות האחסון BESTÅ ו-20% על מנורות שולחן, עד 11 בנובמבר.",
+      "category": "מבצעים",
+      "when": "עד יום ד׳ 11 בנובמבר",
+      "date": "2026-11-11",
+      "where": "IKEA Paramus ואונליין",
+      "price": "עד -20%",
+      "url": "https://www.ikea.com/us/en/offers/family-offers/"
     },
     {
       "id": "today-2026-11-12-walmart-early-black-friday",
@@ -145,6 +156,20 @@
       "lat": 40.8476,
       "lng": -73.9988,
       "url": "https://thelocalgirl.com/bergen/event/k-beauty-sample-swap-price-hack-night/"
+    },
+    {
+      "id": "bergen-edu-2026-11-20-public-viewing-night",
+      "title": "ערב צפייה בכוכבים במצפה של Bergen CC",
+      "summary": "צפייה בכוכבים בטלסקופים במצפה של המכללה, חינם (מתבטל בגשם או עננים).",
+      "category": "תרבות",
+      "when": "שישי 19:00-22:00",
+      "date": "2026-11-20",
+      "where": "Bergen Community College, Paramus · כ-10 דק׳ נסיעה",
+      "price": "חינם",
+      "priceValue": 0,
+      "lat": 40.9361,
+      "lng": -74.0689,
+      "url": "https://bergen.edu/event/public-viewing-night-fall-2026-12/"
     },
     {
       "id": "ikea-2026-11-24-sofas-dinnerware",

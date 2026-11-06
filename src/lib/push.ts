@@ -24,7 +24,7 @@ export function pushSupport(): PushSupport {
 
 // What the service worker needs to name people: nothing more
 export function mirrorPeople(people: Person[]) {
-  const slim = people.map((p) => ({ name: p.name, everyDays: p.everyDays, lastTalk: p.lastTalk }))
+  const slim = people.map((p) => ({ name: p.name, everyDays: p.everyDays, lastTalk: p.lastTalk, callDays: p.callDays }))
   try {
     const open = indexedDB.open('shaliach-push', 1)
     open.onupgradeneeded = () => open.result.createObjectStore('kv')

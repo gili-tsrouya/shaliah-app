@@ -21,19 +21,29 @@ function readPeople() {
 
 const pad = (n) => String(n).padStart(2, '0')
 const localDay = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`
+// Calendar days since 1 Jan 1970, the same whatever the time zone
 const dayNumber = (iso) => {
   const [y, m, d] = iso.split('-').map(Number)
-  return Math.round(new Date(y, m - 1, d).getTime() / 86400000)
+  return Date.UTC(y, m - 1, d) / 86400000
 }
 
-// Same rules as the stay-in-touch screen (src/lib/derive.ts): due when the chosen rhythm has passed,
-// most neglected first
+// Same rules as the stay-in-touch screen (nextCallDate in src/lib/calls.ts): due when the chosen rhythm
+// has passed, or on the next fixed call day; most neglected first
+function nextCallDay(p) {
+  const last = dayNumber(p.lastTalk)
+  if (!Array.isArray(p.callDays) || !p.callDays.length || p.everyDays <= 1) return last + p.everyDays
+  let d = last + Math.max(1, p.everyDays - 3)
+  // day number 0 (1 Jan 1970) was a Thursday
+  for (let i = 0; i < 7 && !p.callDays.includes((d + 4) % 7); i++) d++
+  return d
+}
+
 function dueToday(people, today) {
   const t = dayNumber(today)
   return people
     .filter((p) => p && p.name && p.everyDays > 0 && p.lastTalk)
-    .map((p) => ({ name: p.name, ago: t - dayNumber(p.lastTalk), every: p.everyDays }))
-    .filter((p) => p.every - p.ago <= 0)
+    .map((p) => ({ name: p.name, ago: t - dayNumber(p.lastTalk), every: p.everyDays, due: nextCallDay(p) - t }))
+    .filter((p) => p.due <= 0)
     .sort((a, b) => b.ago / b.every - a.ago / a.every)
     .map((p) => p.name)
 }

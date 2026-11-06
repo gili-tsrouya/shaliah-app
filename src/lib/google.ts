@@ -151,5 +151,12 @@ export const createEvent = (token: string, calendarId: string, e: CalEvent) =>
 export const updateEvent = (token: string, calendarId: string, googleId: string, e: CalEvent) =>
   api<GEvent>(token, `/calendars/${encodeURIComponent(calendarId)}/events/${googleId}`, { method: 'PATCH', body: toGoogle(e) })
 
+// Events built elsewhere (e.g. repeating calls, see src/lib/calls.ts)
+export const createRawEvent = (token: string, calendarId: string, body: object) =>
+  api<GEvent>(token, `/calendars/${encodeURIComponent(calendarId)}/events`, { method: 'POST', body: JSON.stringify(body) })
+
+export const updateRawEvent = (token: string, calendarId: string, googleId: string, body: object) =>
+  api<GEvent>(token, `/calendars/${encodeURIComponent(calendarId)}/events/${googleId}`, { method: 'PUT', body: JSON.stringify(body) })
+
 export const deleteEvent = (token: string, calendarId: string, googleId: string) =>
   api<void>(token, `/calendars/${encodeURIComponent(calendarId)}/events/${googleId}`, { method: 'DELETE' })

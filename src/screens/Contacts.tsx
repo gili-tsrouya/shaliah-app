@@ -6,6 +6,7 @@ import { Fab, SelfTabs, Sheet } from '../components/ui'
 import { Icon } from '../components/Icon'
 import type { Person } from '../lib/types'
 import { disablePush, enablePush, pushSupport, updatePushTime } from '../lib/push'
+import { DEFAULT_CALL_TIME, WEEKDAYS, WEEKDAY_NAMES, callDaysLabel } from '../lib/calls'
 import { parseVCards, pickContacts, pickerSupported, type ImportedContact } from '../lib/contacts'
 
 // Shrinks a picked photo to a small square so it fits in phone storage
@@ -127,7 +128,7 @@ export function Contacts() {
               </button>
               <div className="col" style={{ gap: 2, flex: 1, minWidth: 0 }}>
                 <span className="bold" style={{ fontSize: 16 }}>{p.name}</span>
-                <span className="muted small">{freqLabel(p.everyDays)} · דיברנו {agoText(daysBetween(p.lastTalk, today))}</span>
+                <span className="muted small">{freqLabel(p.everyDays)}{p.callDays?.length && p.everyDays > 1 ? ` · ${callDaysLabel(p.callDays)}` : ''} · דיברנו {agoText(daysBetween(p.lastTalk, today))}</span>
                 {p.history?.length ? (
                   <span className="row" style={{ gap: 4, padding: '2px 0' }} role="img"
                     aria-label={`היסטוריית קשר: ${p.history.filter((g) => g === 'g').length} מתוך ${p.history.length} שיחות בזמן`}>
@@ -181,14 +182,22 @@ function PersonSheet({ person, today, onClose, onSave, onDelete }: {
   person: Person; today: string; onClose: () => void; onSave: (p: Person) => void; onDelete: () => void
 }) {
   const [photo, setPhoto] = useState(person.photo)
+  const [every, setEvery] = useState(person.everyDays)
+  const [days, setDays] = useState<number[]>(person.callDays ?? [])
+  const [time, setTime] = useState(person.callTime ?? DEFAULT_CALL_TIME)
+  const { calCategories } = useStore()
+  const toGoogle = !!calCategories.find((c) => c.id === 'personal')?.googleCalendarId
+  const fixedDays = every > 1 ? days : []
+  const toggleDay = (d: number) => setDays((ds) => (ds.includes(d) ? ds.filter((x) => x !== d) : [...ds, d].sort()))
   return (
     <Sheet title={person.id ? 'עריכה' : 'אדם חדש'} onClose={onClose}>
       <form className="col" style={{ gap: 14 }} onSubmit={(ev) => {
         ev.preventDefault()
         const f = new FormData(ev.currentTarget)
         onSave({
-          ...person, name: String(f.get('name')), everyDays: Number(f.get('every')), lastTalk: String(f.get('last')),
+          ...person, name: String(f.get('name')), everyDays: every, lastTalk: String(f.get('last')),
           phone: String(f.get('phone') || '').trim() || undefined, photo,
+          callDays: fixedDays.length ? fixedDays : undefined, callTime: fixedDays.length ? time : undefined,
         })
         onClose()
       }}>
@@ -203,10 +212,37 @@ function PersonSheet({ person, today, onClose, onSave, onDelete }: {
         </div>
         <label className="field">שם<input name="name" defaultValue={person.name} required autoFocus={!person.id} /></label>
         <label className="field">כל כמה זמן לדבר?
-          <select name="every" defaultValue={person.everyDays}>
+          <select value={every} onChange={(e) => setEvery(Number(e.target.value))}>
             {FREQUENCIES.map((f) => <option key={f.days} value={f.days}>{f.label}</option>)}
           </select>
         </label>
+        {every > 1 && (
+          <div className="field">
+            <span>ביום קבוע? (לא חובה)</span>
+            <div className="row" role="group" aria-label="ימים קבועים לשיחה" style={{ gap: 6, flexWrap: 'wrap' }}>
+              {WEEKDAYS.map((label, d) => (
+                <button key={d} type="button" aria-pressed={days.includes(d)} aria-label={WEEKDAY_NAMES[d]} onClick={() => toggleDay(d)}
+                  style={{ width: 40, height: 40, borderRadius: 20, fontWeight: 700, fontSize: 15,
+                    border: days.includes(d) ? 'none' : '1px solid var(--border)',
+                    background: days.includes(d) ? 'var(--ink)' : '#fff', color: days.includes(d) ? '#fff' : 'var(--ink)' }}>
+                  {label}
+                </button>
+              ))}
+            </div>
+            {fixedDays.length > 0 && (
+              <>
+                <label className="row" style={{ gap: 8, marginTop: 4 }}>
+                  <span>בשעה</span>
+                  <input type="time" value={time} onChange={(e) => setTime(e.target.value || DEFAULT_CALL_TIME)} style={{ flex: 1 }} />
+                </label>
+                <span className="muted small">
+                  {callDaysLabel(fixedDays)} בשעה {time} — תתווסף ליומן שיחה חוזרת{toGoogle ? ', וגם ל-Google Calendar' : ''}.
+                  {every >= 14 ? ` חוזרת כל ${every >= 28 ? '4 שבועות' : 'שבועיים'}.` : ''}
+                </span>
+              </>
+            )}
+          </div>
+        )}
         <label className="field">טלפון (לא חובה, עם קידומת מדינה, למשל +972…)
           <input name="phone" type="tel" dir="ltr" defaultValue={person.phone} placeholder="+972 50 123 4567" />
         </label>

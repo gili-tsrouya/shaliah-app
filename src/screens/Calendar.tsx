@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useRef, useEffect, useState } from 'react'
 import { useAllEvents, useCategory, useStore, newId } from '../lib/store'
 import { colorOf, eventsOn } from '../lib/derive'
 import { DAY_LETTERS, MONTHS, addDays, formatDay, formatLongDay, fromISO, toISO, todayISO, weekStart } from '../lib/dates'
@@ -54,6 +54,9 @@ export function Calendar() {
   const move = (n: number) => (view === 'week' ? setDay(addDays(day, 7 * n)) : moveMonth(n))
   const dayEvents = eventsOn(all, day, visible)
   const vacations = all.filter((e) => e.kind === 'vacation' && (e.endDate ?? e.date) >= today).sort((a, b) => a.date.localeCompare(b.date))
+  const { syncCalls } = useStore()
+  const syncCallsRef = useRef(syncCalls)
+  syncCallsRef.current = syncCalls
   const linked = calCategories.filter((c) => c.googleCalendarId)
 
   const refresh = useCallback(async (tok: string) => {
@@ -63,6 +66,8 @@ export function Calendar() {
     }
     setSync('syncing')
     try {
+      // Repeating calls from the stay-in-touch list first, so they come back with the fetch
+      await syncCallsRef.current(tok).catch(() => {})
       const from = addDays(today < start ? today : start, -30)
       const to = addDays(end > today ? end : today, 120)
       // One fetch per Google calendar, even if two categories point at it by mistake
@@ -219,7 +224,7 @@ export function Calendar() {
           return (
             <button key={e.id} className={`event ${e.kind === 'deadline' ? 'deadline' : ''}`}
               style={{ background: col.bg, color: col.fg, border: e.kind === 'deadline' ? undefined : 'none', textAlign: 'start' }}
-              onClick={() => setEditing(e)}>
+              onClick={() => (e.id.startsWith('call_') ? (location.hash = '#/self/contacts') : setEditing(e))}>
               <span className="time ltr">{e.kind === 'vacation' ? '—' : e.start ?? 'כל היום'}</span>
               <span className="col" style={{ gap: 2, flex: 1 }}>
                 <span className="title">{e.title}</span>

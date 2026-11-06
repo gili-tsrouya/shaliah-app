@@ -1,5 +1,6 @@
 import type { CalEvent, Expense, Person, TouchGrade, Work } from './types'
 import { COLORS } from './types'
+import { nextCallDate } from './calls'
 import { daysBetween, daysLeftInMonth, monthKey, todayISO } from './dates'
 
 // savingGoal is set aside first, so the daily pace only spreads what is left after it
@@ -19,7 +20,8 @@ export const spentInCategory = (thisMonth: Expense[], id: string) =>
   thisMonth.filter((e) => e.categoryId === id).reduce((s, e) => s + (e.refund ? -e.amount : e.amount), 0)
 
 // Positive = days until the next talk is due, 0 = today, negative = overdue
-export const daysUntilDue = (p: Person, today = todayISO()) => p.everyDays - daysBetween(p.lastTalk, today)
+// With fixed call days the next one of those days counts, see src/lib/calls.ts
+export const daysUntilDue = (p: Person, today = todayISO()) => daysBetween(today, nextCallDate(p))
 
 // Most neglected first, relative to the rhythm chosen for each person
 export const sortByPriority = (people: Person[], today = todayISO()) =>

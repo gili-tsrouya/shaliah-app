@@ -93,6 +93,8 @@ export interface Person {
   phone?: string
   photo?: string // small data URL
   history?: TouchGrade[] // oldest first, last 8
+  callDays?: number[] // fixed call days, 0 = Sunday … 6 = Saturday (e.g. Grandma on Fridays)
+  callTime?: string // HH:mm, for the calendar event on those days
 }
 
 export interface Settings {

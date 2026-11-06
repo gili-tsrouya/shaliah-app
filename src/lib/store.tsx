@@ -3,6 +3,8 @@ import type { AgentSettings, CalCategory, CalEvent, Category, Expense, Owed, Par
 import { DEFAULT_CATEGORIES } from './types'
 import { addDays, todayISO } from './dates'
 import { mirrorPeople } from './push'
+import { callEvents as callOccurrences, syncCallEvents, type SyncedCall } from './calls'
+import { createRawEvent, deleteEvent, storedToken, updateRawEvent } from './google'
 import { loadAgentSettings, loadShlichutSettings, saveAgentSettings, saveShlichutSettings } from './github'
 
 const PREFIX = 'shaliach:'
@@ -70,6 +72,8 @@ function useAppState() {
   const [people, setPeople] = usePersistent<Person[]>('people', defaultPeople)
   // The morning notification is put together by the service worker, which cannot read localStorage
   useEffect(() => mirrorPeople(people), [people])
+  // Which Google Calendar event holds each person's repeating call
+  const [callEvents, setCallEvents] = usePersistent<Record<string, SyncedCall>>('callEvents', () => ({}))
   const [savedDeals, setSavedDeals] = usePersistent<string[]>('savedDeals', () => [])
   const [agentSettings, setAgentSettings] = usePersistent<AgentSettings>('agentSettings', () => DEFAULT_AGENT_SETTINGS)
 
@@ -112,6 +116,27 @@ function useAppState() {
     return true
   }, [setPartnerships, setPartnershipsUpdatedAt, settings.githubToken])
 
+  // Brings Google Calendar in line with the fixed call days (needs a valid Google token).
+  // Calls go to the Google calendar linked to the personal category; without one they stay in the app.
+  const syncCalls = useCallback(async (token: string) => {
+    const calendarId = calCategories.find((c) => c.id === 'personal')?.googleCalendarId
+    if (!calendarId) return
+    const next = await syncCallEvents(people, callEvents, calendarId, {
+      create: (cal, body) => createRawEvent(token, cal, body),
+      update: (cal, id, body) => updateRawEvent(token, cal, id, body),
+      remove: (cal, id) => deleteEvent(token, cal, id),
+    })
+    if (JSON.stringify(next) !== JSON.stringify(callEvents)) setCallEvents(next)
+  }, [people, callEvents, calCategories, setCallEvents])
+
+  // Whenever the list changes and Google is connected, update the calendar too
+  useEffect(() => {
+    const token = storedToken()
+    if (!token) return
+    const t = setTimeout(() => syncCalls(token).catch(() => {}), 1000)
+    return () => clearTimeout(t)
+  }, [syncCalls])
+
   return {
     settings, setSettings,
     tasks, setTasks,
@@ -122,6 +147,7 @@ function useAppState() {
     expenses, setExpenses,
     owed, setOwed,
     people, setPeople,
+    callEvents, syncCalls,
     savedDeals, setSavedDeals,
     agentSettings, setAgentSettings, publishAgentSettings,
     profile, setProfile,
@@ -152,8 +178,11 @@ export function useStore() {
 // All events the calendar shows: local ones plus those mirrored from Google
 // eslint-disable-next-line react-refresh/only-export-components
 export function useAllEvents() {
-  const { events, googleEvents } = useStore()
-  return [...events, ...googleEvents]
+  const { events, googleEvents, people, callEvents } = useStore()
+  // Fixed call days that are not in Google Calendar (yet) show as repeating calls here
+  const today = todayISO()
+  const calls = callOccurrences(people, callEvents, addDays(today, -60), addDays(today, 180))
+  return [...events, ...googleEvents, ...calls]
 }
 
 // eslint-disable-next-line react-refresh/only-export-components

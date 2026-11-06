@@ -20,7 +20,7 @@ export function buildBackup(): BackupFile {
     }
   }
   if (data.settings && typeof data.settings === 'object') {
-    data.settings = { ...(data.settings as Record<string, unknown>), githubToken: undefined }
+    data.settings = { ...(data.settings as Record<string, unknown>), githubToken: undefined, dataRepoToken: undefined }
   }
   return { app: 'shaliach', version: 1, createdAt: new Date().toISOString(), data }
 }
@@ -53,14 +53,16 @@ export async function readBackup(file: File) {
   return parsed as BackupFile
 }
 
-// Replaces the app's data with the backup; the GitHub token already on this phone is kept
+// Replaces the app's data with the backup. The GitHub tokens and the notification switch stay as they are
+// on this phone: notifications have to be allowed on each phone separately.
 export function restoreBackup(b: BackupFile) {
-  const token = (JSON.parse(localStorage.getItem(PREFIX + 'settings') || '{}') as { githubToken?: string }).githubToken
+  const current = JSON.parse(localStorage.getItem(PREFIX + 'settings') || '{}') as { githubToken?: string; dataRepoToken?: string; pushEnabled?: boolean }
+  const phoneOnly = { githubToken: current.githubToken, dataRepoToken: current.dataRepoToken, pushEnabled: current.pushEnabled }
   for (const key of Object.keys(localStorage)) {
     if (key.startsWith(PREFIX) && !SKIP.has(key)) localStorage.removeItem(key)
   }
   for (const [key, value] of Object.entries(b.data)) {
-    const v = key === 'settings' && token ? { ...(value as object), githubToken: token } : value
+    const v = key === 'settings' ? { ...(value as object), ...phoneOnly } : value
     localStorage.setItem(PREFIX + key, JSON.stringify(v))
   }
   location.reload()

@@ -29,6 +29,8 @@ export default defineConfig({
         ],
       },
       workbox: {
+        // Morning "who to call" notification handlers
+        importScripts: ['push-sw.js'],
         // Feeds are refreshed by the daily agents, so always try the network first.
         runtimeCaching: [
           { urlPattern: /\/feeds\/.*\.json$/, handler: 'NetworkFirst' },

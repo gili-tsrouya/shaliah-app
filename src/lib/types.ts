@@ -101,6 +101,8 @@ export interface Settings {
   reminderTime: string // HH:mm, local time
   googleClientId?: string
   githubToken?: string // optional, lets the app save agent settings to the repo
+  dataRepoToken?: string // optional, token for the private data repo (morning reminder); never in backups
+  pushEnabled?: boolean // morning "who to call" notification is on
 }
 
 // Read by the daily deals agent from public/agent-settings.json

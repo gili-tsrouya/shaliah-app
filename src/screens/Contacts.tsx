@@ -1,10 +1,11 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useStore, newId } from '../lib/store'
 import { FREQUENCIES, GRADE_COLORS, daysUntilDue, freqLabel, gradeNow, scoreColor, sortByPriority, touchScore } from '../lib/derive'
 import { agoText, daysBetween, inDaysText, israelTime, todayISO } from '../lib/dates'
 import { Fab, SelfTabs, Sheet } from '../components/ui'
 import { Icon } from '../components/Icon'
 import type { Person } from '../lib/types'
+import { disablePush, enablePush, pushSupport, testNotification, updatePushTime } from '../lib/push'
 import { parseVCards, pickContacts, pickerSupported, type ImportedContact } from '../lib/contacts'
 
 // Shrinks a picked photo to a small square so it fits in phone storage
@@ -86,6 +87,7 @@ export function Contacts() {
               style={{ background: 'transparent', border: '1px solid #3A4A66', borderRadius: 6, color: '#fff', padding: '0 4px' }} />
             <span>· {israelTime(settings.reminderTime)} בישראל</span>
           </label>
+          <PushControls />
         </div>
       </div>
 
@@ -291,5 +293,93 @@ function ImportSheet({ contacts, people, onClose, onAdd }: {
         {saving ? 'מוסיף…' : count === 1 ? 'הוסף אדם אחד' : `הוסף ${count} אנשים`}
       </button>
     </Sheet>
+  )
+}
+
+const pushError = (e: unknown) => {
+  const m = (e as Error).message
+  if (m === 'denied') return 'לא ניתנה הרשאה להתראות. אפשר לשנות בהגדרות האייפון ← התראות ← השליח.'
+  if (m === 'token') return 'הטוקן לא עובד. צריך טוקן fine-grained לריפו shaliah-data, עם הרשאת Contents: read and write.'
+  return 'משהו השתבש, נסו שוב בעוד רגע.'
+}
+
+// Morning "who to call" notification: on/off, a test, and keeping the server's time in step
+function PushControls() {
+  const { settings, setSettings } = useStore()
+  const [token, setToken] = useState(settings.dataRepoToken ?? '')
+  const [busy, setBusy] = useState(false)
+  const [msg, setMsg] = useState('')
+  const support = pushSupport()
+  const lastTime = useRef(settings.reminderTime)
+
+  // A new reminder time goes to the daily job too (after the picker settles)
+  useEffect(() => {
+    if (!settings.pushEnabled || !settings.dataRepoToken || settings.reminderTime === lastTime.current) return
+    const t = setTimeout(() => {
+      lastTime.current = settings.reminderTime
+      updatePushTime(settings.dataRepoToken!, settings.reminderTime)
+        .then(() => setMsg(''))
+        .catch((e) => setMsg(pushError(e)))
+    }, 1500)
+    return () => clearTimeout(t)
+  }, [settings.pushEnabled, settings.dataRepoToken, settings.reminderTime])
+
+  const light = { color: '#C9D2E3' }
+  const small = { minHeight: 36, padding: '0 12px', borderRadius: 10, fontSize: 13 }
+
+  if (support === 'install') return <span className="small" style={light}>כדי לקבל התראה כל בוקר, פתחו את האפליקציה מהמסך הראשי (שיתוף ← הוספה למסך הבית).</span>
+  if (support === 'unsupported') return <span className="small" style={light}>הדפדפן הזה לא תומך בהתראות.</span>
+
+  const turnOn = async () => {
+    const t = token.trim()
+    if (!t) return setMsg('צריך קודם להדביק טוקן.')
+    setBusy(true)
+    try {
+      await enablePush(t, settings.reminderTime)
+      lastTime.current = settings.reminderTime
+      setSettings((s) => ({ ...s, dataRepoToken: t, pushEnabled: true }))
+      setMsg('')
+    } catch (e) {
+      setMsg(pushError(e))
+    }
+    setBusy(false)
+  }
+
+  const turnOff = async () => {
+    setBusy(true)
+    try {
+      await disablePush(settings.dataRepoToken ?? '')
+      setSettings((s) => ({ ...s, pushEnabled: false }))
+      setMsg('')
+    } catch (e) {
+      setMsg(pushError(e))
+    }
+    setBusy(false)
+  }
+
+  return (
+    <div className="col" style={{ gap: 6, marginTop: 6 }}>
+      {settings.pushEnabled ? (
+        <div className="row" style={{ flexWrap: 'wrap', gap: 6 }}>
+          <span className="small" style={{ color: '#fff' }}>התראה כל בוקר בשעה הזו ✓</span>
+          <button className="btn light" style={small} onClick={() => testNotification().catch((e) => setMsg(pushError(e)))}>בדיקה</button>
+          <button className="btn light" style={small} disabled={busy} onClick={turnOff}>כיבוי</button>
+        </div>
+      ) : (
+        <>
+          {!settings.dataRepoToken && (
+            <label className="small" style={{ ...light, display: 'flex', flexDirection: 'column', gap: 4 }}>
+              טוקן לריפו shaliah-data (פעם אחת)
+              <input type="password" dir="ltr" autoComplete="off" value={token} onChange={(e) => setToken(e.target.value)}
+                style={{ minHeight: 36, borderRadius: 8, border: '1px solid #3A4A66', background: 'transparent', color: '#fff', padding: '0 8px' }} />
+            </label>
+          )}
+          <button className="btn white" style={{ ...small, alignSelf: 'flex-start' }} disabled={busy} onClick={turnOn}>
+            {busy ? 'מפעיל…' : 'הפעלת התראה כל בוקר'}
+          </button>
+        </>
+      )}
+      {msg && <span className="small" style={{ color: '#FCA5A5' }}>{msg}</span>}
+    </div>
   )
 }

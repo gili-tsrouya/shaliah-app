@@ -2,6 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useState, type React
 import type { AgentSettings, CalCategory, CalEvent, Category, Expense, Owed, Partnership, Person, Profile, Settings, Task } from './types'
 import { DEFAULT_CATEGORIES } from './types'
 import { addDays, todayISO } from './dates'
+import { mirrorPeople } from './push'
 import { loadAgentSettings, loadShlichutSettings, saveAgentSettings, saveShlichutSettings } from './github'
 
 const PREFIX = 'shaliach:'
@@ -67,6 +68,8 @@ function useAppState() {
   const [expenses, setExpenses] = usePersistent<Expense[]>('expenses', () => [])
   const [owed, setOwed] = usePersistent<Owed[]>('owed', () => [])
   const [people, setPeople] = usePersistent<Person[]>('people', defaultPeople)
+  // The morning notification is put together by the service worker, which cannot read localStorage
+  useEffect(() => mirrorPeople(people), [people])
   const [savedDeals, setSavedDeals] = usePersistent<string[]>('savedDeals', () => [])
   const [agentSettings, setAgentSettings] = usePersistent<AgentSettings>('agentSettings', () => DEFAULT_AGENT_SETTINGS)
 

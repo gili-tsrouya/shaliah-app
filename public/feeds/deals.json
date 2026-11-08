@@ -1,30 +1,30 @@
 {
-  "updatedAt": "2026-11-07T11:15:29.964Z",
+  "updatedAt": "2026-11-08T11:15:32.131Z",
   "items": [
     {
-      "id": "meetup-2026-11-07-adult-kickball-hackensack",
-      "title": "משחק Kickball חופשי למבוגרים בהאקנסק",
-      "summary": "מפגש ספורט קליל וחינמי לכל הרמות, אחריו יוצאים יחד לבר מיצים - דרך קלה להכיר אנשים.",
-      "category": "ספורט",
-      "when": "שבת 12:00-15:00",
-      "date": "2026-11-07",
-      "where": "Columbus Park, Hackensack · כ-15 דק׳ נסיעה",
-      "price": "חינם",
-      "priceValue": 0,
-      "lat": 40.8886,
-      "lng": -74.0435,
-      "url": "https://www.meetup.com/north-jersey-bowling-soccer-volleyball/events/316703899/"
+      "id": "meetup-2026-11-08-adult-coloring-paramus",
+      "title": "ערב צביעה למבוגרים (גילאי 20-40)",
+      "summary": "מפגש חברתי רגוע של Bergen & Rockland County Singles בבית קפה - דרך נוחה להכיר אנשים בגילך.",
+      "category": "יציאות",
+      "when": "ראשון 18:00",
+      "date": "2026-11-08",
+      "where": "Paris Baguette, Paramus · כ-10 דק׳ נסיעה",
+      "price": "לא צוין (כנראה חינם)",
+      "lat": 40.9445,
+      "lng": -74.0754,
+      "url": "https://meetup.com/find/us--nj--paramus/bergen-county"
     },
     {
-      "id": "krazycouponlady-2026-11-07-target-early-black-friday",
-      "title": "מבצע Early Black Friday ב-Target",
-      "summary": "Early Black Friday של Target נגמר ב-7 בנובמבר - מיקרוגל BLACK+DECKER מ-$47, מתלה ייבוש כלים מ-$22 ועוד לדירה.",
+      "id": "today-2026-11-08-target-air-fryer-toaster-oven",
+      "title": "Target: טוסטר אובן Cuisinart עם אייר פרייר",
+      "summary": "$99.99 במקום $229.99 (נכון ל-6 בנובמבר) - מכשיר מטבח שימושי לדירה ראשונה.",
       "category": "מבצעים",
-      "when": "עד שבת 7 בנובמבר",
-      "date": "2026-11-07",
-      "where": "Target, Paramus ואונליין",
-      "price": "עד -50%",
-      "url": "https://thekrazycouponlady.com/tips/store-hacks/early-target-black-friday-deals"
+      "when": "בזמן המבצע",
+      "date": "2026-11-08",
+      "where": "Target ואונליין",
+      "price": "$99.99",
+      "priceValue": 100,
+      "url": "https://www.today.com/shop/black-friday-sales-2026-rcna605702"
     },
     {
       "id": "bergen-edu-2026-11-10-night-of-broken-glass",
@@ -89,6 +89,19 @@
       "lat": 40.8587,
       "lng": -74.0585,
       "url": "https://thelocalgirl.com/calendar/event/habit-burger-grills-fresh-off-the-block-party/"
+    },
+    {
+      "id": "moneysavingmom-2026-11-22-target-deal-of-the-day",
+      "title": "Target: מבצע יומי + מבצעי סוף שבוע",
+      "summary": "Deal of the Day חדש כל יום עד 24 בדצמבר, ומבצעי סוף שבוע חדשים מ-14 בנובמבר - כולל מכשירי מטבח לדירה.",
+      "category": "מבצעים",
+      "when": "עד 24 בדצמבר",
+      "date": "2026-11-14",
+      "where": "Target, Paramus ואונליין · כ-10 דק׳ נסיעה",
+      "price": "עד -40%",
+      "lat": 40.9168,
+      "lng": -74.0754,
+      "url": "https://moneysavingmom.com/target-black-friday-sales-2026-begin-november-1st/"
     },
     {
       "id": "costco97-2026-11-15-coupon-book",

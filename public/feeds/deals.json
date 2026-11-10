@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-11-09T11:22:07.277Z",
+  "updatedAt": "2026-11-10T11:17:43.031Z",
   "items": [
     {
       "id": "bergen-edu-2026-11-10-night-of-broken-glass",
@@ -22,7 +22,7 @@
       "category": "אוכל",
       "when": "רביעי 13:00-14:30",
       "date": "2026-11-11",
-      "where": "ShopRite, Fair Lawn · כ-5 דק׳ נסיעה",
+      "where": "ShopRite of Maple & Hemlock, 2200 Maple Ave, Fair Lawn · כ-5 דק׳ נסיעה",
       "price": "חינם",
       "priceValue": 0,
       "lat": 40.94,
@@ -92,19 +92,6 @@
       "lat": 40.8476,
       "lng": -73.9988,
       "url": "https://thelocalgirl.com/bergen/event/k-beauty-sample-swap-price-hack-night/"
-    },
-    {
-      "id": "meetup-2026-11-15-pickleball-fair-lawn",
-      "title": "פיקלבול של יום ראשון בבוקר",
-      "summary": "מפגש ספורט חברתי של Rockland Social Sandbox בפארק - דרך קלה להכיר אנשים (המחיר לא צוין, כדאי לשאול את המארח).",
-      "category": "ספורט",
-      "when": "ראשון 10:00-12:00",
-      "date": "2026-11-15",
-      "where": "Warren Point Annex Park, Fair Lawn · קרוב לבית",
-      "price": "לא צוין",
-      "lat": 41,
-      "lng": -74.12,
-      "url": "https://www.meetup.com/rockland-social-sandbox/events/317254217/"
     },
     {
       "id": "bergen-edu-2026-11-20-public-viewing-night",

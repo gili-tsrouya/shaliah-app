@@ -1,0 +1,46 @@
+# Phase 0 checks against the Supabase TEST project only (shaliah-dev).
+# Runs only on the `migration` branch. Never deploys; the live site deploys only from `main`.
+# Prints no secrets: tokens and passwords come from GitHub secrets and are masked.
+name: Phase 0 (test project only)
+
+on:
+  push:
+    branches: [migration]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: phase0-dev
+  cancel-in-progress: false
+
+env:
+  PROJECT_REF: iidxjorwnsvtlhivymuv
+
+jobs:
+  connection-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Look up the session-pooler address (not secret)
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        run: |
+          set -euo pipefail
+          curl -fsS -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+            "https://api.supabase.com/v1/projects/$PROJECT_REF/config/database/pooler" > pooler.json
+          echo "Pooler entries:"
+          jq -r '.[] | "  pool_mode=\(.pool_mode) host=\(.db_host) port=\(.db_port) user=\(.db_user) db=\(.db_name)"' pooler.json
+          echo "Connection string template (password placeholder only):"
+          jq -r '.[0].connection_string // empty' pooler.json | sed -E 's#(postgres(ql)?://[^:]+:)[^@]*@#\1[YOUR-PASSWORD]@#'
+
+      - name: Check the database password works (session mode, port 5432)
+        env:
+          PGPASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+        run: |
+          set -euo pipefail
+          command -v psql >/dev/null || (sudo apt-get update -qq && sudo apt-get install -y -qq postgresql-client)
+          host=$(jq -r '.[0].db_host' pooler.json)
+          user=$(jq -r '.[0].db_user' pooler.json)
+          psql "host=$host port=5432 user=$user dbname=postgres sslmode=require connect_timeout=15" \
+            -tAc "select 'connected to ' || current_database() || ' as ' || current_user || ' on ' || split_part(version(), ' ', 2);"

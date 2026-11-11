@@ -1,20 +1,6 @@
 {
-  "updatedAt": "2026-11-10T11:17:43.031Z",
+  "updatedAt": "2026-11-11T11:23:07.465Z",
   "items": [
-    {
-      "id": "bergen-edu-2026-11-10-night-of-broken-glass",
-      "title": "אירוע וידאו immersive: ליל הבדולח",
-      "summary": "אירוע זיכרון חינמי פתוח לקהל במכללה, בהנחיית המרכז לשלום, צדק ופיוס.",
-      "category": "קהילה",
-      "when": "שלישי 12:30",
-      "date": "2026-11-10",
-      "where": "Bergen Community College, Paramus · כ-10 דק׳ נסיעה",
-      "price": "חינם",
-      "priceValue": 0,
-      "lat": 40.9446,
-      "lng": -74.0872,
-      "url": "https://bergen.edu/events/month/2026-11/"
-    },
     {
       "id": "valleyhealth-2026-11-11-shoprite-thanksgiving-tour",
       "title": "סיור קניות ושיעור בישול לחג ההודיה ב-ShopRite",
@@ -67,6 +53,20 @@
       "lat": 40.8587,
       "lng": -74.0585,
       "url": "https://thelocalgirl.com/calendar/event/habit-burger-grills-fresh-off-the-block-party/"
+    },
+    {
+      "id": "thelocalgirl-2026-11-14-u2-listening-party",
+      "title": "מסיבת האזנה לאלבום החדש של U2 ב-BB’s Records",
+      "summary": "האזנה משותפת לאלבום החדש בחנות תקליטים עצמאית - דרך חינמית להכיר אנשים אוהבי מוזיקה.",
+      "category": "יציאות",
+      "when": "שבת",
+      "date": "2026-11-14",
+      "where": "BB’s Records, 24 S Front St, Bergenfield · כ-15 דק׳ נסיעה",
+      "price": "חינם",
+      "priceValue": 0,
+      "lat": 40.9276,
+      "lng": -73.9972,
+      "url": "https://thelocalgirl.com/calendar/event/u2-carnaval-de-luz-listening-party/"
     },
     {
       "id": "costco97-2026-11-15-coupon-book",

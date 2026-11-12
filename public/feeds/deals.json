@@ -1,24 +1,10 @@
 {
-  "updatedAt": "2026-11-11T11:23:07.465Z",
+  "updatedAt": "2026-11-12T11:18:28.770Z",
   "items": [
-    {
-      "id": "valleyhealth-2026-11-11-shoprite-thanksgiving-tour",
-      "title": "סיור קניות ושיעור בישול לחג ההודיה ב-ShopRite",
-      "summary": "סיור חינמי בסופר עם טיפים לקנייה חכמה והדגמת מתכונים - דרך זולה להכיר את קניות החג.",
-      "category": "אוכל",
-      "when": "רביעי 13:00-14:30",
-      "date": "2026-11-11",
-      "where": "ShopRite of Maple & Hemlock, 2200 Maple Ave, Fair Lawn · כ-5 דק׳ נסיעה",
-      "price": "חינם",
-      "priceValue": 0,
-      "lat": 40.94,
-      "lng": -74.12,
-      "url": "https://www.valleyhealth.com/events/shoprite-grocery-tour-and-recipe-demonstration-thanksgiving-edition"
-    },
     {
       "id": "today-2026-11-12-walmart-early-black-friday",
       "title": "Walmart: מבצעי Black Friday מוקדמים",
-      "summary": "Walmart Early Black Friday בין 12 ל-15 בנובמבר (דוגמה: סט סכינים 14 חלקים ב-$42.98) - כדאי לציוד למטבח ולדירה.",
+      "summary": "Walmart Early Black Friday בין 12 ל-15 בנובמבר, ואירוע נוסף 23-29 בנובמבר (דוגמה: סט סכינים 14 חלקים ב-$42.98) - כדאי לציוד למטבח ולדירה.",
       "category": "מבצעים",
       "when": "12-15 בנובמבר",
       "date": "2026-11-12",
@@ -39,6 +25,20 @@
       "lat": 40.9446,
       "lng": -74.0872,
       "url": "https://bergen.edu/events/month/2026-11/"
+    },
+    {
+      "id": "thelocalgirl-2026-11-13-women-entrepreneur-networking",
+      "title": "מפגש נטוורקינג חינמי לנשים יזמיות בקרסקיל",
+      "summary": "מפגש היכרויות חינמי לנשים יזמיות בבריגן קאונטי - הזדמנות להכיר אנשים חדשים באזור.",
+      "category": "יציאות",
+      "when": "שישי 13 בנובמבר",
+      "date": "2026-11-13",
+      "where": "Balansa Center, 32 Piermont Rd, Cresskill · כ-20 דק׳ נסיעה",
+      "price": "חינם",
+      "priceValue": 0,
+      "lat": 40.9437,
+      "lng": -73.9621,
+      "url": "https://thelocalgirl.com/bergen/events/"
     },
     {
       "id": "thelocalgirl-2026-11-14-habit-burger-party",

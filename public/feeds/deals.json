@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-11-12T11:18:28.770Z",
+  "updatedAt": "2026-11-13T11:17:03.867Z",
   "items": [
     {
       "id": "today-2026-11-12-walmart-early-black-friday",
@@ -119,6 +119,20 @@
       "lat": 40.9137,
       "lng": -74.0745,
       "url": "https://www.ikea.com/us/en/offers/"
+    },
+    {
+      "id": "thelocalgirl-2026-11-27-record-store-day-black-friday",
+      "title": "Record Store Day Black Friday ב-BB's Records",
+      "summary": "אירוע חינם בחנות תקליטים עצמאית בברגנפילד - תקליטים מהדורות מוגבלות ואווירה מוזיקלית, מתאים לבוא לבד ולפגוש אנשים.",
+      "category": "יציאות",
+      "when": "שישי 27 בנובמבר",
+      "date": "2026-11-27",
+      "where": "BB's Records, Bergenfield · כ-15 דק׳ נסיעה",
+      "price": "חינם",
+      "priceValue": 0,
+      "lat": 40.9276,
+      "lng": -73.998,
+      "url": "https://thelocalgirl.com/bergen/events/"
     }
   ]
 }

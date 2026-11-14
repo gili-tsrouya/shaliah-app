@@ -1,45 +1,6 @@
 {
-  "updatedAt": "2026-11-13T11:17:03.867Z",
+  "updatedAt": "2026-11-14T11:15:47.331Z",
   "items": [
-    {
-      "id": "today-2026-11-12-walmart-early-black-friday",
-      "title": "Walmart: מבצעי Black Friday מוקדמים",
-      "summary": "Walmart Early Black Friday בין 12 ל-15 בנובמבר, ואירוע נוסף 23-29 בנובמבר (דוגמה: סט סכינים 14 חלקים ב-$42.98) - כדאי לציוד למטבח ולדירה.",
-      "category": "מבצעים",
-      "when": "12-15 בנובמבר",
-      "date": "2026-11-12",
-      "where": "Walmart · אונליין ובסניפים",
-      "price": "מבצעים",
-      "url": "https://www.today.com/shop/black-friday-sales-2026-rcna605702"
-    },
-    {
-      "id": "bergen-edu-2026-11-13-public-viewing-night",
-      "title": "ערב צפייה בכוכבים במצפה של Bergen CC",
-      "summary": "ערב צפייה חינמי בטלסקופים במצפה הכוכבים של המכללה - תוכנית זולה ומיוחדת לערב (בכפוף לתנאי מזג אוויר) (מתבטל בגשם או עננות).",
-      "category": "תרבות",
-      "when": "שישי 19:00",
-      "date": "2026-11-13",
-      "where": "Emil Buehler Trust Observatory, Paramus · כ-10 דק׳ נסיעה",
-      "price": "חינם",
-      "priceValue": 0,
-      "lat": 40.9446,
-      "lng": -74.0872,
-      "url": "https://bergen.edu/events/month/2026-11/"
-    },
-    {
-      "id": "thelocalgirl-2026-11-13-women-entrepreneur-networking",
-      "title": "מפגש נטוורקינג חינמי לנשים יזמיות בקרסקיל",
-      "summary": "מפגש היכרויות חינמי לנשים יזמיות בברגן קאונטי - הזדמנות להכיר אנשים חדשים באזור.",
-      "category": "יציאות",
-      "when": "שישי 13 בנובמבר",
-      "date": "2026-11-13",
-      "where": "Balansa Center, 32 Piermont Rd, Cresskill · כ-20 דק׳ נסיעה",
-      "price": "חינם",
-      "priceValue": 0,
-      "lat": 40.9437,
-      "lng": -73.9621,
-      "url": "https://thelocalgirl.com/bergen/events/"
-    },
     {
       "id": "thelocalgirl-2026-11-14-habit-burger-party",
       "title": "מסיבת טעימות ב-Habit Burger & Grill",
@@ -67,6 +28,17 @@
       "lat": 40.9276,
       "lng": -73.9972,
       "url": "https://thelocalgirl.com/calendar/event/u2-carnaval-de-luz-listening-party/"
+    },
+    {
+      "id": "today-2026-11-12-walmart-early-black-friday",
+      "title": "Walmart: מבצעי Black Friday מוקדמים",
+      "summary": "Walmart Early Black Friday בין 12 ל-15 בנובמבר, ואירוע נוסף 23-29 בנובמבר (דוגמה: סט סכינים 14 חלקים ב-$42.98) - כדאי לציוד למטבח ולדירה.",
+      "category": "מבצעים",
+      "when": "עד יום א׳ 15 בנובמבר",
+      "date": "2026-11-15",
+      "where": "Walmart · אונליין ובסניפים",
+      "price": "מבצעים",
+      "url": "https://www.today.com/shop/black-friday-sales-2026-rcna605702"
     },
     {
       "id": "costco97-2026-11-15-coupon-book",
@@ -108,6 +80,17 @@
       "url": "https://bergen.edu/event/public-viewing-night-fall-2026-12/"
     },
     {
+      "id": "today-2026-11-23-walmart-black-friday",
+      "title": "Walmart: Black Friday Deals",
+      "summary": "אירוע Black Friday של Walmart בין 23 ל-29 בנובמבר (ואחריו Cyber Monday עד 2 בדצמבר) - הזדמנות לציוד לדירה.",
+      "category": "מבצעים",
+      "when": "23-29 בנובמבר",
+      "date": "2026-11-23",
+      "where": "Walmart · אונליין ובסניפים",
+      "price": "מבצעים",
+      "url": "https://www.today.com/shop/black-friday-sales-2026-rcna605702"
+    },
+    {
       "id": "ikea-2026-11-24-sofas-dinnerware",
       "title": "IKEA: הנחות לחברי IKEA Family על ספות ואוכל",
       "summary": "עד 30% על ספות, 20% על שולחנות אוכל, כלים וווילונות לחברי IKEA Family (חינם להצטרפות) - טוב לריהוט הדירה.",
@@ -118,7 +101,7 @@
       "price": "עד -30%",
       "lat": 40.9137,
       "lng": -74.0745,
-      "url": "https://www.ikea.com/us/en/offers/"
+      "url": "https://www.ikea.com/us/en/offers/black-friday"
     },
     {
       "id": "thelocalgirl-2026-11-27-record-store-day-black-friday",

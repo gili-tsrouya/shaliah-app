@@ -1,34 +1,6 @@
 {
-  "updatedAt": "2026-11-14T11:15:47.331Z",
+  "updatedAt": "2026-11-15T11:15:35.442Z",
   "items": [
-    {
-      "id": "thelocalgirl-2026-11-14-habit-burger-party",
-      "title": "מסיבת טעימות ב-Habit Burger & Grill",
-      "summary": "מסיבה חינמית עם טעימות, מוזיקה חיה ומרצ׳נדייז לרגל שיתוף פעולה עם שפית מניו יורק.",
-      "category": "אוכל",
-      "when": "שבת",
-      "date": "2026-11-14",
-      "where": "Habit Burger & Grill, Teterboro · כ-15 דק׳ נסיעה",
-      "price": "חינם",
-      "priceValue": 0,
-      "lat": 40.8587,
-      "lng": -74.0585,
-      "url": "https://thelocalgirl.com/calendar/event/habit-burger-grills-fresh-off-the-block-party/"
-    },
-    {
-      "id": "thelocalgirl-2026-11-14-u2-listening-party",
-      "title": "מסיבת האזנה לאלבום החדש של U2 ב-BB’s Records",
-      "summary": "האזנה משותפת לאלבום החדש בחנות תקליטים עצמאית - דרך חינמית להכיר אנשים אוהבי מוזיקה.",
-      "category": "יציאות",
-      "when": "שבת",
-      "date": "2026-11-14",
-      "where": "BB’s Records, 24 S Front St, Bergenfield · כ-15 דק׳ נסיעה",
-      "price": "חינם",
-      "priceValue": 0,
-      "lat": 40.9276,
-      "lng": -73.9972,
-      "url": "https://thelocalgirl.com/calendar/event/u2-carnaval-de-luz-listening-party/"
-    },
     {
       "id": "today-2026-11-12-walmart-early-black-friday",
       "title": "Walmart: מבצעי Black Friday מוקדמים",
@@ -39,17 +11,6 @@
       "where": "Walmart · אונליין ובסניפים",
       "price": "מבצעים",
       "url": "https://www.today.com/shop/black-friday-sales-2026-rcna605702"
-    },
-    {
-      "id": "costco97-2026-11-15-coupon-book",
-      "title": "חוברת קופונים של Costco: ניקיון ומזון עד $10 הנחה למוצר",
-      "summary": "חוברת הקופונים של Costco בתוקף עד 15 בנובמבר (שואב אבק Shark מ-$149.99, מערכת סירים $139.99).",
-      "category": "מבצעים",
-      "when": "עד יום א׳ 15.11",
-      "date": "2026-11-15",
-      "where": "Costco · בסניפים ואונליין",
-      "price": "עד $10 הנחה",
-      "url": "https://costco97.com/coupon-book/november-2026/"
     },
     {
       "id": "thelocalgirl-2026-11-15-k-beauty-swap",
@@ -66,6 +27,20 @@
       "url": "https://thelocalgirl.com/bergen/event/k-beauty-sample-swap-price-hack-night/"
     },
     {
+      "id": "thelocalgirl-2026-11-18-passport-party-bare-ramsey",
+      "title": "פתיחת סטודיו Bare ברמזי עם כיבוד",
+      "summary": "ערב פתיחה חינמי עם כיבוד קל ושתייה וסיור בסטודיו - דרך קלה לצאת מהבית ולפגוש אנשים.",
+      "category": "יציאות",
+      "when": "רביעי 18 בנובמבר",
+      "date": "2026-11-18",
+      "where": "Bare Beauty Collective, 45 East Main St, Ramsey · כ-20 דק׳ נסיעה",
+      "price": "חינם",
+      "priceValue": 0,
+      "lat": 41.0577,
+      "lng": -74.1415,
+      "url": "https://thelocalgirl.com/calendar/event/the-passport-party-at-bare-grand-opening-in-ramsey/"
+    },
+    {
       "id": "bergen-edu-2026-11-20-public-viewing-night",
       "title": "ערב צפייה בכוכבים במצפה של Bergen CC",
       "summary": "צפייה בכוכבים בטלסקופים במצפה של המכללה, חינם (מתבטל בגשם או עננים) (מתבטל בגשם או עננות).",
@@ -80,6 +55,18 @@
       "url": "https://bergen.edu/event/public-viewing-night-fall-2026-12/"
     },
     {
+      "id": "hip2save-2026-11-22-wayfair-early-black-friday",
+      "title": "מבצע Black Friday מוקדם ב-Wayfair",
+      "summary": "עד 75% הנחה על ריהוט ובית, למשל מדף מטבח ב-$57.99 ושולחן עבודה מ-$85.99, עם משלוח חינם מעל $35.",
+      "category": "מבצעים",
+      "when": "עד יום א׳ 22 בנובמבר",
+      "date": "2026-11-22",
+      "where": "Wayfair · אונליין",
+      "price": "עד -75%",
+      "priceValue": 58,
+      "url": "https://hip2save.com/deals/wayfair-black-friday/"
+    },
+    {
       "id": "today-2026-11-23-walmart-black-friday",
       "title": "Walmart: Black Friday Deals",
       "summary": "אירוע Black Friday של Walmart בין 23 ל-29 בנובמבר (ואחריו Cyber Monday עד 2 בדצמבר) - הזדמנות לציוד לדירה.",
@@ -89,6 +76,18 @@
       "where": "Walmart · אונליין ובסניפים",
       "price": "מבצעים",
       "url": "https://www.today.com/shop/black-friday-sales-2026-rcna605702"
+    },
+    {
+      "id": "hip2save-2026-11-27-walmart-towel-set",
+      "title": "סט 10 מגבות ב-Walmart",
+      "summary": "סט של 4 מגבות רחצה ו-6 מגבות קטנות ב-$10 במקום $16, מבצע Black Friday של Walmart.",
+      "category": "מבצעים",
+      "when": "במסגרת Black Friday (23-29 בנובמבר)",
+      "date": "2026-11-23",
+      "where": "Walmart · אונליין ובסניפים",
+      "price": "$10",
+      "priceValue": 10,
+      "url": "https://hip2save.com/deals/walmart-bath-towel/"
     },
     {
       "id": "ikea-2026-11-24-sofas-dinnerware",

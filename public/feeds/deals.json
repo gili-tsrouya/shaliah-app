@@ -1,98 +1,6 @@
 {
-  "updatedAt": "2026-11-10T11:17:43.031Z",
+  "updatedAt": "2026-11-16T11:16:18.052Z",
   "items": [
-    {
-      "id": "bergen-edu-2026-11-10-night-of-broken-glass",
-      "title": "אירוע וידאו immersive: ליל הבדולח",
-      "summary": "אירוע זיכרון חינמי פתוח לקהל במכללה, בהנחיית המרכז לשלום, צדק ופיוס.",
-      "category": "קהילה",
-      "when": "שלישי 12:30",
-      "date": "2026-11-10",
-      "where": "Bergen Community College, Paramus · כ-10 דק׳ נסיעה",
-      "price": "חינם",
-      "priceValue": 0,
-      "lat": 40.9446,
-      "lng": -74.0872,
-      "url": "https://bergen.edu/events/month/2026-11/"
-    },
-    {
-      "id": "valleyhealth-2026-11-11-shoprite-thanksgiving-tour",
-      "title": "סיור קניות ושיעור בישול לחג ההודיה ב-ShopRite",
-      "summary": "סיור חינמי בסופר עם טיפים לקנייה חכמה והדגמת מתכונים - דרך זולה להכיר את קניות החג.",
-      "category": "אוכל",
-      "when": "רביעי 13:00-14:30",
-      "date": "2026-11-11",
-      "where": "ShopRite of Maple & Hemlock, 2200 Maple Ave, Fair Lawn · כ-5 דק׳ נסיעה",
-      "price": "חינם",
-      "priceValue": 0,
-      "lat": 40.94,
-      "lng": -74.12,
-      "url": "https://www.valleyhealth.com/events/shoprite-grocery-tour-and-recipe-demonstration-thanksgiving-edition"
-    },
-    {
-      "id": "today-2026-11-12-walmart-early-black-friday",
-      "title": "Walmart: מבצעי Black Friday מוקדמים",
-      "summary": "Walmart Early Black Friday בין 12 ל-15 בנובמבר (דוגמה: סט סכינים 14 חלקים ב-$42.98) - כדאי לציוד למטבח ולדירה.",
-      "category": "מבצעים",
-      "when": "12-15 בנובמבר",
-      "date": "2026-11-12",
-      "where": "Walmart · אונליין ובסניפים",
-      "price": "מבצעים",
-      "url": "https://www.today.com/shop/black-friday-sales-2026-rcna605702"
-    },
-    {
-      "id": "bergen-edu-2026-11-13-public-viewing-night",
-      "title": "ערב צפייה בכוכבים במצפה של Bergen CC",
-      "summary": "ערב צפייה חינמי בטלסקופים במצפה הכוכבים של המכללה - תוכנית זולה ומיוחדת לערב (בכפוף לתנאי מזג אוויר) (מתבטל בגשם או עננות).",
-      "category": "תרבות",
-      "when": "שישי 19:00",
-      "date": "2026-11-13",
-      "where": "Emil Buehler Trust Observatory, Paramus · כ-10 דק׳ נסיעה",
-      "price": "חינם",
-      "priceValue": 0,
-      "lat": 40.9446,
-      "lng": -74.0872,
-      "url": "https://bergen.edu/events/month/2026-11/"
-    },
-    {
-      "id": "thelocalgirl-2026-11-14-habit-burger-party",
-      "title": "מסיבת טעימות ב-Habit Burger & Grill",
-      "summary": "מסיבה חינמית עם טעימות, מוזיקה חיה ומרצ׳נדייז לרגל שיתוף פעולה עם שפית מניו יורק.",
-      "category": "אוכל",
-      "when": "שבת",
-      "date": "2026-11-14",
-      "where": "Habit Burger & Grill, Teterboro · כ-15 דק׳ נסיעה",
-      "price": "חינם",
-      "priceValue": 0,
-      "lat": 40.8587,
-      "lng": -74.0585,
-      "url": "https://thelocalgirl.com/calendar/event/habit-burger-grills-fresh-off-the-block-party/"
-    },
-    {
-      "id": "costco97-2026-11-15-coupon-book",
-      "title": "חוברת קופונים של Costco: ניקיון ומזון עד $10 הנחה למוצר",
-      "summary": "חוברת הקופונים של Costco בתוקף עד 15 בנובמבר (שואב אבק Shark מ-$149.99, מערכת סירים $139.99).",
-      "category": "מבצעים",
-      "when": "עד יום א׳ 15.11",
-      "date": "2026-11-15",
-      "where": "Costco · בסניפים ואונליין",
-      "price": "עד $10 הנחה",
-      "url": "https://costco97.com/coupon-book/november-2026/"
-    },
-    {
-      "id": "thelocalgirl-2026-11-15-k-beauty-swap",
-      "title": "K-Beauty Sample Swap בקריוקי Rock 21",
-      "summary": "ערב חינמי להחלפת דוגמיות טיפוח, עם הגרלה וחדר קריוקי - 30 מקומות, הרשמה ב-Partiful.",
-      "category": "יציאות",
-      "when": "ראשון 15 בנובמבר",
-      "date": "2026-11-15",
-      "where": "Rock 21 Karaoke, Palisades Park · כ-20 דק׳ נסיעה",
-      "price": "חינם",
-      "priceValue": 0,
-      "lat": 40.8476,
-      "lng": -73.9988,
-      "url": "https://thelocalgirl.com/bergen/event/k-beauty-sample-swap-price-hack-night/"
-    },
     {
       "id": "bergen-edu-2026-11-20-public-viewing-night",
       "title": "ערב צפייה בכוכבים במצפה של Bergen CC",
@@ -108,6 +16,29 @@
       "url": "https://bergen.edu/event/public-viewing-night-fall-2026-12/"
     },
     {
+      "id": "hip2save-2026-11-22-wayfair-early-black-friday",
+      "title": "מבצע Black Friday מוקדם ב-Wayfair",
+      "summary": "עד 75% הנחה על ריהוט ובית, למשל מדף מטבח ב-$57.99 ושולחן עבודה מ-$85.99, עם משלוח חינם מעל $35.",
+      "category": "מבצעים",
+      "when": "עד יום א׳ 22 בנובמבר",
+      "date": "2026-11-22",
+      "where": "Wayfair · אונליין",
+      "price": "עד -75%",
+      "priceValue": 58,
+      "url": "https://hip2save.com/deals/wayfair-black-friday/"
+    },
+    {
+      "id": "today-2026-11-23-walmart-black-friday",
+      "title": "Walmart: Black Friday Deals",
+      "summary": "אירוע Black Friday של Walmart בין 23 ל-29 בנובמבר (ואחריו Cyber Monday עד 2 בדצמבר) - הזדמנות לציוד לדירה.",
+      "category": "מבצעים",
+      "when": "23-29 בנובמבר",
+      "date": "2026-11-23",
+      "where": "Walmart · אונליין ובסניפים",
+      "price": "מבצעים",
+      "url": "https://www.today.com/shop/black-friday-sales-2026-rcna605702"
+    },
+    {
       "id": "ikea-2026-11-24-sofas-dinnerware",
       "title": "IKEA: הנחות לחברי IKEA Family על ספות ואוכל",
       "summary": "עד 30% על ספות, 20% על שולחנות אוכל, כלים וווילונות לחברי IKEA Family (חינם להצטרפות) - טוב לריהוט הדירה.",
@@ -118,7 +49,45 @@
       "price": "עד -30%",
       "lat": 40.9137,
       "lng": -74.0745,
-      "url": "https://www.ikea.com/us/en/offers/"
+      "url": "https://www.ikea.com/us/en/offers/black-friday"
+    },
+    {
+      "id": "thelocalgirl-2026-11-27-record-store-day-black-friday",
+      "title": "Record Store Day Black Friday ב-BB's Records",
+      "summary": "אירוע חינם בחנות תקליטים עצמאית בברגנפילד - תקליטים מהדורות מוגבלות ואווירה מוזיקלית, מתאים לבוא לבד ולפגוש אנשים.",
+      "category": "יציאות",
+      "when": "שישי 27 בנובמבר",
+      "date": "2026-11-27",
+      "where": "BB's Records, Bergenfield · כ-15 דק׳ נסיעה",
+      "price": "חינם",
+      "priceValue": 0,
+      "lat": 40.9276,
+      "lng": -73.998,
+      "url": "https://thelocalgirl.com/bergen/event/record-store-day-black-friday/"
+    },
+    {
+      "id": "fairsandfestivals-2026-11-29-paramus-thanksgiving-craft-fair",
+      "title": "Paramus Thanksgiving Craft Fair",
+      "summary": "יריד מלאכה עם כ-125 דוכנים בבית הספר התיכון של Paramus - כניסה ב-$3 בלבד, טוב למתנות וליציאה קטנה.",
+      "category": "יציאות",
+      "when": "ראשון 10:00-17:00",
+      "date": "2026-11-29",
+      "where": "Paramus High School, 99 E Century Rd · כ-10 דק׳ נסיעה",
+      "price": "$3",
+      "priceValue": 3,
+      "lat": 40.9488,
+      "lng": -74.0587,
+      "url": "https://www.fairsandfestivals.net/events/details/2026-paramus-thanksgiving-craft-fair"
+    },
+    {
+      "id": "today-2026-11-24-target-holiday-price-match",
+      "title": "Target: התאמת מחיר לחגים",
+      "summary": "Target מתאימה מחיר אם מוצר יורד אחרי הקנייה (1 בנובמבר עד 24 בדצמבר) - נוח לקניות לדירה בלי לחשוש מהמחיר.",
+      "category": "מבצעים",
+      "when": "עד 24 בדצמבר",
+      "where": "Target · אונליין ובסניפים",
+      "price": "מבצעים",
+      "url": "https://www.today.com/shop/target-early-black-friday-sale-2026-rcna607288"
     }
   ]
 }

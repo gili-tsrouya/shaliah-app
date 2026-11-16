@@ -33,7 +33,12 @@ export const saveAgentSettings = (token: string, settings: AgentSettings) =>
 
 export const loadAgentSettings = () => loadPublic<AgentSettings>('agent-settings.json')
 
-export interface ShlichutSettings { updatedAt: string; partnerships: Partnership[] }
+export interface ShlichutSettings {
+  updatedAt: string
+  partnerships: Partnership[]
+  // Learned from the daily deck: idea categories she tends to keep, and ones she tends to skip
+  taste?: { more: string[]; less: string[] }
+}
 
 export const saveShlichutSettings = (token: string, settings: ShlichutSettings) =>
   saveRepoFile(token, 'public/shlichut-settings.json', settings, 'Update shlichut partnerships from the app')

@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useAllEvents, useCategory, useStore } from '../lib/store'
 import { maybeSignedIn } from '../lib/cloud'
 import { loadMemories, type Memory } from '../lib/journal'
-import { todayISO } from '../lib/dates'
+import { addDays, daysBetween, todayISO } from '../lib/dates'
 import { money } from '../components/ui'
 import { Icon } from '../components/Icon'
 
@@ -60,8 +60,19 @@ export function Wrapped() {
 
     const kept = Object.values(dropSeen).filter((s) => inMonth(s.at) && s.did !== 'skip').length
     if (kept) out.push({ kicker: 'גילויים ורעיונות', big: String(kept), title: 'דברים ששמרת מהחפיסה', body: 'הכול נמצא ב"כל התוכן", תחת שמורים.', bg: '#D7F2E3', fg: '#14532D' })
+    if (profile.shlichutStart && profile.shlichutStart <= today) {
+      const end = profile.shlichutEnd && profile.shlichutEnd > profile.shlichutStart ? profile.shlichutEnd : addDays(profile.shlichutStart, 730)
+      const total = daysBetween(profile.shlichutStart, end)
+      // for an earlier month, the count as it stood on that month's last day
+      const upTo = back === 0 ? today : `${key}-${String(new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate()).padStart(2, '0')}`
+      const passed = Math.min(total, daysBetween(profile.shlichutStart, upTo) + 1)
+      if (passed > 0) {
+        out.push({ kicker: 'המסע', big: String(passed), title: `ימים מתוך ${total}`,
+          body: passed >= total ? 'כל הדרך. איזה מסע.' : `${Math.round((passed / total) * 100)}% מהדרך.`, bg: '#EDE4FB', fg: '#4C1D95' })
+      }
+    }
     return out
-  }, [today, back, people, expenses, settings.monthlyBudget, profile.savingGoal, categories, events, category, memories, dropSeen])
+  }, [profile.shlichutStart, profile.shlichutEnd, today, back, people, expenses, settings.monthlyBudget, profile.savingGoal, categories, events, category, memories, dropSeen])
 
   const s = slides[Math.min(i, slides.length - 1)]
   const last = i >= slides.length - 1

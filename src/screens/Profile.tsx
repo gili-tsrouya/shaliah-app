@@ -55,6 +55,17 @@ export function Profile() {
       </section>
 
       <section className="card" style={{ gap: 12 }}>
+        <h2>השליחות</h2>
+        <label className="field">מתי התחילה?
+          <input type="date" value={draft.shlichutStart ?? ''} onChange={(e) => set({ shlichutStart: e.target.value || undefined })} />
+        </label>
+        <label className="field">מתי היא אמורה להסתיים? (אם ריק: שנתיים מההתחלה)
+          <input type="date" value={draft.shlichutEnd ?? ''} min={draft.shlichutStart} onChange={(e) => set({ shlichutEnd: e.target.value || undefined })} />
+        </label>
+        <span className="small muted">נשאר בטלפון. משמש רק לסיכום החודשי, כדי להראות כמה מהדרך כבר עברת.</span>
+      </section>
+
+      <section className="card" style={{ gap: 12 }}>
         <h2>כסף</h2>
         <label className="field">תקציב חודשי (מלגה + הכנסות, $)
           <input type="number" inputMode="decimal" value={budget} onChange={(e) => setBudget(e.target.value)} />

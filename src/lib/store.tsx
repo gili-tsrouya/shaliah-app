@@ -110,14 +110,25 @@ function useAppState() {
     return true
   }, [setAgentSettings, settings.githubToken])
 
+  // What the deck learned about shlichut ideas; travels with the partnerships file the agent reads
+  const [shlichutTaste, setShlichutTaste] = usePersistent<{ more: string[]; less: string[] }>('shlichutTaste', () => ({ more: [], less: [] }))
+
   const publishPartnerships = useCallback(async (next: Partnership[]) => {
     const updatedAt = new Date().toISOString()
     setPartnerships(next)
     setPartnershipsUpdatedAt(updatedAt)
     if (!settings.githubToken) return false
-    await saveShlichutSettings(settings.githubToken, { updatedAt, partnerships: next })
+    await saveShlichutSettings(settings.githubToken, { updatedAt, partnerships: next, taste: shlichutTaste })
     return true
-  }, [setPartnerships, setPartnershipsUpdatedAt, settings.githubToken])
+  }, [setPartnerships, setPartnershipsUpdatedAt, settings.githubToken, shlichutTaste])
+
+  const publishShlichutTaste = useCallback(async (taste: { more: string[]; less: string[] }) => {
+    setShlichutTaste(taste)
+    if (!settings.githubToken) return false
+    // the partnerships did not change, so their own timestamp stays as it is
+    await saveShlichutSettings(settings.githubToken, { updatedAt: partnershipsUpdatedAt || new Date().toISOString(), partnerships, taste })
+    return true
+  }, [setShlichutTaste, settings.githubToken, partnershipsUpdatedAt, partnerships])
 
   // Brings Google Calendar in line with the fixed call days (needs a valid Google token).
   // Calls go to the Google calendar linked to the personal category; without one they stay in the app.
@@ -160,6 +171,7 @@ function useAppState() {
     agentSettings, setAgentSettings, publishAgentSettings,
     profile, setProfile,
     partnerships, publishPartnerships,
+    shlichutTaste, publishShlichutTaste,
   }
 }
 

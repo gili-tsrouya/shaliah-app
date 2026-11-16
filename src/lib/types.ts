@@ -133,6 +133,8 @@ export interface Profile {
   age?: number
   home: Place
   savingGoal?: number // USD per month to put aside
+  shlichutStart?: string // yyyy-mm-dd, the first day of the shlichut
+  shlichutEnd?: string // yyyy-mm-dd, the planned last day; two years after the start when not set
   interests: string[]
   interestsExtra: string
 }

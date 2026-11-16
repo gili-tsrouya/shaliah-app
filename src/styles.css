@@ -214,3 +214,12 @@ a { color: var(--primary); }
 .drop-badge.deal { background: var(--personal-bg); color: var(--personal-fg); }
 .drop-gpt { width: 44px; height: 44px; border-radius: 12px; background: #EEF3FE; color: var(--primary); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 @media (prefers-reduced-motion: reduce) { .drop-card { transition: none !important; } }
+
+/* Journal photos: one large, two side by side, three or more in a grid */
+.journal-photos { display: grid; gap: 4px; border-radius: 14px; overflow: hidden; }
+.journal-photos.n1 { grid-template-columns: 1fr; }
+.journal-photos.n2 { grid-template-columns: 1fr 1fr; }
+.journal-photos.n3 { grid-template-columns: 1fr 1fr 1fr; }
+.journal-photos button { border: 0; padding: 0; background: var(--ground); aspect-ratio: 1; display: flex; align-items: center; justify-content: center; }
+.journal-photos.n1 button { aspect-ratio: 4 / 3; }
+.journal-photos img { width: 100%; height: 100%; object-fit: cover; display: block; }

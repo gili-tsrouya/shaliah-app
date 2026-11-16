@@ -45,6 +45,7 @@ Match its colors, spacing and copy.
 - `#/account` (`src/screens/Account.tsx`, `src/lib/cloud.ts`): sign in with Google. The phone stays the source of truth and works offline; a signed-in device backs up automatically (`backupIfNeeded` in `App.tsx`, RPC `sync_phone_snapshot`) when something changed, but only the device the account's copy came from, so two devices cannot overwrite each other silently. "שחזור מהחשבון" brings the latest snapshot onto a new phone through `restoreBackup` and makes that phone the one that backs up. Keys without the `shaliach:` prefix (`shaliach-device`, `shaliach-synced`, `shaliach-claim`, `shaliach-account`) are per device and never travel in a backup.
 - `.env.production` holds the project address and the publishable key (public by design). No other key may ever be in the app or the repo.
 - Google Calendar on the server: refresh tokens are encrypted in `google_connections`; events go out through `sync_outbox` and the `google-sync` function.
+- Journal (`#/journal`, `src/screens/Journal.tsx`, `src/lib/journal.ts`): notes with photos, kept in the account (tables `memories`, `photos`; files in the private bucket `media` at `<user>/<memory>/<photo>/display.jpg`, shown only through short-lived signed links). Needs a signed-in device and a connection; only the text being written is kept locally as a draft. Photos of a shlichut memory are flagged `may_show_minors` by the database and must never be offered for sharing or export.
 - Backups and health checks of the project run from the private repo `shaliah-data`.
 
 ## Agents

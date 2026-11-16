@@ -12,6 +12,7 @@ import { Settings } from './screens/Settings'
 import { Profile } from './screens/Profile'
 import { Account } from './screens/Account'
 import { Drop } from './screens/Drop'
+import { Journal } from './screens/Journal'
 import { backupIfNeeded, maybeSignedIn } from './lib/cloud'
 import { ErrorBoundary } from './components/ErrorBoundary'
 
@@ -27,10 +28,11 @@ const routes: Record<string, () => React.JSX.Element> = {
   profile: Profile,
   account: Account,
   drop: Drop,
+  journal: Journal,
 }
 
 const currentRoute = () => {
-  const r = location.hash.replace(/^#\/?/, '')
+  const r = location.hash.replace(/^#\/?/, '').replace(/\?.*$/, '')
   return r in routes ? r : 'home'
 }
 

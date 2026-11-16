@@ -146,6 +146,15 @@ export function Home() {
         </a>
       )}
 
+      <a href="#/journal" className="card link-card" style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}>
+        <span className="avatar" style={{ borderRadius: 12, background: 'var(--yj-bg)', color: 'var(--yj-fg)' }}><Icon name="heart" /></span>
+        <span className="col" style={{ gap: 2, flex: 1 }}>
+          <span className="bold">זיכרונות</span>
+          <span className="muted small">תמונה ושורה על היום, שיישארו איתך</span>
+        </span>
+        <Icon name="chevronL" size={18} />
+      </a>
+
       <a href="#/tasks" className="grid3 link-card">
         {counts.map(({ s, n }) => (
           <div key={s} className="card" style={{ alignItems: 'center', gap: 0, padding: 10 }}>

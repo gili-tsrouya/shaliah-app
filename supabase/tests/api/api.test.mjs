@@ -132,8 +132,12 @@ try {
   denied('A cannot call the internal import function directly', await a.client.rpc('import_legacy_snapshot_for', { p_import_id: importId, p_user: b.id }))
 
   // ---- the owner can delete their own file ----
-  works('A can delete their own photo file', await media(a.client).remove([path]))
-  denied('the deleted file is gone', await media(a.client).download(path))
+  const removed = works('A can delete their own photo file', await media(a.client).remove([path]))
+  if (removed.length !== 1) fail('exactly one file was deleted', `${removed.length}`)
+  denied('the deleted file is no longer listed', await media(a.client).list(`${a.id}/${memoryId}/${photoId}`))
+  // a just-deleted file can stay downloadable for a short while from Supabase's cache; report it, don't hide it
+  const after = await media(a.client).download(path)
+  console.log(`note: download right after delete ${after.error ? 'is refused' : 'still answers (served from cache)'}`)
 } finally {
   // remove everything this run created (the two test accounts stay, for the next run)
   for (const u of [a, b]) {

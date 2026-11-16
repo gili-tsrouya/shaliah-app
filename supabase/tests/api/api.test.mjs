@@ -134,6 +134,38 @@ try {
   ok('a token sent inside a snapshot is not stored')
   denied('A cannot call the internal import function directly', await a.client.rpc('import_legacy_snapshot_for', { p_import_id: importId, p_user: b.id }))
 
+  // ---- Google connection functions: who may call what (no Google account is involved here) ----
+  const fn = (name, { token, key = publishable, body, method = 'POST' } = {}) =>
+    fetch(`${url}/functions/v1/${name}`, {
+      method,
+      headers: { apikey: key, 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+      body: method === 'POST' ? JSON.stringify(body ?? {}) : undefined,
+    })
+  const expectStatus = async (label, res, want) => {
+    if (res.status !== want) fail(label, `HTTP ${res.status}: ${(await res.text()).slice(0, 120)}`)
+    ok(label)
+    return res
+  }
+  const tokenA = (await a.client.auth.getSession()).data.session.access_token
+
+  await expectStatus('starting a Google connection needs a signed-in user', await fn('google-connect-start'), 401)
+  const start = await (await expectStatus('a signed-in user can start a Google connection', await fn('google-connect-start', { token: tokenA }), 200)).json()
+  const consent = new URL(start.url)
+  if (consent.hostname !== 'accounts.google.com' || consent.searchParams.get('access_type') !== 'offline'
+    || !consent.searchParams.get('redirect_uri').endsWith('/functions/v1/google-connect-callback')
+    || consent.searchParams.get('scope').split(' ').some((sc) => sc.endsWith('/auth/calendar'))) fail('the consent address is well formed', start.url.slice(0, 80))
+  ok('the consent address goes to Google, asks for a lasting permission and not for full calendar control')
+  denied('a user cannot read the connect-flow states', await a.client.from('google_oauth_states').select('*'))
+  await expectStatus('a made-up state is refused by the callback', await fn('google-connect-callback?state=made-up&code=x', { method: 'GET' }), 400)
+  await expectStatus('the sender refuses a call without a server key', await fn('google-sync'), 401)
+  await expectStatus('the sender refuses a signed-in user', await fn('google-sync', { token: tokenA }), 401)
+  const run = await (await expectStatus('the sender accepts a server key', await fn('google-sync', { key: secret }), 200)).json()
+  if (typeof run.processed !== 'number') fail('the sender reports what it processed')
+  await expectStatus('the calendar list needs a signed-in user', await fn('google-calendars'), 401)
+  await expectStatus('the calendar list says so when Google is not connected', await fn('google-calendars', { token: tokenA }), 409)
+  await expectStatus('disconnecting needs a signed-in user', await fn('google-disconnect'), 401)
+  await expectStatus('disconnecting when nothing is connected is harmless', await fn('google-disconnect', { token: tokenA }), 200)
+
   // ---- the owner can delete their own file ----
   const removed = works('A can delete their own photo file', await media(a.client).remove([path]))
   if (removed.length !== 1) fail('exactly one file was deleted', `${removed.length}`)
@@ -155,6 +187,7 @@ try {
     }
     await walk(u.id)
     if (files.length) await media(admin).remove(files)
+    await admin.from('google_oauth_states').delete().eq('user_id', u.id)
     for (const t of ['photos', 'memories', 'tasks', 'calendar_categories', 'agent_preferences', 'user_item_state', 'legacy_imports', 'change_log', 'profiles']) {
       await admin.from(t).delete().eq('user_id', u.id)
     }

@@ -1,0 +1,18 @@
+# Used by the Supabase CLI when deploying functions. Each function checks its caller itself
+# (a signed-in user's token, or a server key), so the platform's own token check is off.
+project_id = "shaliah"
+
+[functions.google-connect-start]
+verify_jwt = false
+
+[functions.google-connect-callback]
+verify_jwt = false
+
+[functions.google-calendars]
+verify_jwt = false
+
+[functions.google-sync]
+verify_jwt = false
+
+[functions.google-disconnect]
+verify_jwt = false

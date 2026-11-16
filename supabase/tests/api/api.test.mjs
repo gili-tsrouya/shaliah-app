@@ -1,13 +1,13 @@
-// API-level access tests against the Supabase TEST project: two synthetic users sign in for real and
+// API-level access tests against a throwaway local backend: two synthetic users sign in for real and
 // try to reach each other's rows and photo files through the same API the app will use.
-// Everything created here is removed at the end. Never run against a project with real data.
+// Everything created here is removed at the end. It refuses to run against a hosted project.
 import { createClient } from '@supabase/supabase-js'
 import { randomBytes, randomUUID } from 'node:crypto'
 
 const url = process.env.SUPABASE_URL
 const publishable = process.env.SUPABASE_PUBLISHABLE_KEY
 const secret = process.env.SUPABASE_SECRET_KEY
-if (!url.includes('iidxjorwnsvtlhivymuv')) throw new Error('refusing to run: not the test project')
+if (!/^http:\/\/(127\.0\.0\.1|localhost)[:/]/.test(url)) throw new Error('refusing to run: only a local throwaway backend is allowed')
 
 const opts = { auth: { persistSession: false, autoRefreshToken: false } }
 const admin = createClient(url, secret, opts)

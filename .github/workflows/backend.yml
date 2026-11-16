@@ -1,0 +1,153 @@
+# Backend checks and release for the `migration` branch.
+# 1. "test" starts a throwaway copy of the whole backend inside this run, applies every database change
+#    to it and runs all tests there. It never touches the real project, and is discarded afterwards.
+# 2. "release" runs only when every test passed: it applies the same changes to the real project and
+#    deploys the server functions. It never deploys the app; the live site deploys only from `main`.
+# Prints no secrets: tokens and passwords come from GitHub secrets and are masked.
+name: Backend (test, then release)
+
+on:
+  push:
+    branches: [migration]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: backend
+  cancel-in-progress: false
+
+env:
+  PROJECT_REF: iidxjorwnsvtlhivymuv
+
+jobs:
+  test:
+    name: Test everything on a throwaway copy
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      PGHOST: 127.0.0.1
+      PGPORT: "54322"
+      PGUSER: postgres
+      PGPASSWORD: postgres
+      PGDATABASE: postgres
+    steps:
+      - uses: actions/checkout@v4
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Function unit tests and type check
+        env:
+          DENO_NO_PACKAGE_JSON: "1"
+        run: |
+          set -euo pipefail
+          cd supabase/functions
+          deno test _shared/ | tee "$RUNNER_TEMP/unit.txt"
+          deno check google-*/index.ts
+          grep -E "passed" "$RUNNER_TEMP/unit.txt" | sed 's/\x1b\[[0-9;]*m//g' >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Start the throwaway backend (applies every migration from scratch)
+        run: |
+          set -euo pipefail
+          # made-up values: the tests check who may call what, they never reach Google
+          printf 'GOOGLE_CALENDAR_CLIENT_ID=test-client.apps.googleusercontent.com\nGOOGLE_CALENDAR_CLIENT_SECRET=test-secret\nTOKEN_ENCRYPTION_KEY=%s\n' "$(openssl rand -base64 32)" > supabase/functions/.env
+          supabase start -x studio,imgproxy,logflare,vector,realtime,postgres-meta
+          supabase status -o env > "$RUNNER_TEMP/local.env"
+          sed 's/=.*//' "$RUNNER_TEMP/local.env" | tr '\n' ' '
+
+      - name: Access tests (two synthetic users; rolled back afterwards)
+        run: |
+          set -euo pipefail
+          psql -v ON_ERROR_STOP=1 -f supabase/tests/access.sql | tee "$RUNNER_TEMP/access.txt"
+          grep "ACCESS TESTS PASSED" "$RUNNER_TEMP/access.txt" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Import tests (synthetic snapshot in the app's backup format; rolled back afterwards)
+        run: |
+          set -euo pipefail
+          psql -v ON_ERROR_STOP=1 -f supabase/tests/import.sql | tee "$RUNNER_TEMP/import.txt"
+          grep "IMPORT TESTS PASSED" "$RUNNER_TEMP/import.txt" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: API tests (two synthetic users sign in for real)
+        run: |
+          set -euo pipefail
+          set -a; . "$RUNNER_TEMP/local.env"; set +a
+          export SUPABASE_URL="$API_URL" SUPABASE_PUBLISHABLE_KEY="$ANON_KEY" SUPABASE_SECRET_KEY="$SERVICE_ROLE_KEY"
+          cd supabase/tests/api
+          npm install --no-audit --no-fund
+          node api.test.mjs | tee "$RUNNER_TEMP/api.txt"
+          grep "API TESTS PASSED" "$RUNNER_TEMP/api.txt" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Function logs (only when something failed)
+        if: failure()
+        run: docker logs --tail 80 "$(docker ps --format '{{.Names}}' | grep edge_runtime | head -1)" 2>&1 || true
+
+  release:
+    name: Apply to the real project (only after every test passed)
+    needs: test
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Look up the session-pooler address (not secret)
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        run: |
+          set -euo pipefail
+          curl -fsS -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+            "https://api.supabase.com/v1/projects/$PROJECT_REF/config/database/pooler" > "$RUNNER_TEMP/pooler.json"
+          echo "PGHOST=$(jq -r '.[0].db_host' "$RUNNER_TEMP/pooler.json")" >> "$GITHUB_ENV"
+          echo "PGUSER=$(jq -r '.[0].db_user' "$RUNNER_TEMP/pooler.json")" >> "$GITHUB_ENV"
+          echo "PGPORT=5432" >> "$GITHUB_ENV"
+          echo "PGDATABASE=postgres" >> "$GITHUB_ENV"
+          echo "PGSSLMODE=require" >> "$GITHUB_ENV"
+
+      - name: Apply migrations
+        env:
+          PGPASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+        run: |
+          set -euo pipefail
+          encoded=$(jq -rn --arg p "$PGPASSWORD" '$p | @uri')
+          supabase db push --yes --db-url "postgresql://$PGUSER:$encoded@$PGHOST:$PGPORT/$PGDATABASE"
+
+      - name: Store the project address and a server key in the database Vault (for the every-minute sync)
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          PGPASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+        run: |
+          set -euo pipefail
+          key=$(curl -fsS -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+            "https://api.supabase.com/v1/projects/$PROJECT_REF/api-keys?reveal=true" \
+            | jq -r '[.[] | select(.type == "secret" and .name == "default")][0].api_key // empty')
+          [ -n "$key" ] || { echo "no default secret key found"; exit 1; }
+          echo "::add-mask::$key"
+          psql -v ON_ERROR_STOP=1 -q -v url="https://$PROJECT_REF.supabase.co" -v key="$key" > /dev/null <<'SQL'
+          select case when exists (select 1 from vault.secrets where name = 'project_url')
+            then vault.update_secret((select id from vault.secrets where name = 'project_url'), :'url')::text
+            else vault.create_secret(:'url', 'project_url')::text end;
+          select case when exists (select 1 from vault.secrets where name = 'secret_key')
+            then vault.update_secret((select id from vault.secrets where name = 'secret_key'), :'key')::text
+            else vault.create_secret(:'key', 'secret_key')::text end;
+          SQL
+          echo "vault entries: $(psql -tA -c "select string_agg(name, ', ' order by name) from vault.secrets")"
+
+      - name: Remove the accounts the old tests used to create here (tests no longer run in this project)
+        env:
+          PGPASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+        run: psql -v ON_ERROR_STOP=1 -tA -c "delete from auth.users where email in ('api-test-a@example.test', 'api-test-b@example.test') returning 'removed ' || email"
+
+      - name: Deploy the server functions
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        run: supabase functions deploy --project-ref "$PROJECT_REF" --use-api --yes

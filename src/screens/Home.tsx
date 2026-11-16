@@ -155,6 +155,15 @@ export function Home() {
         <Icon name="chevronL" size={18} />
       </a>
 
+      <a href="#/recap" className="card link-card" style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}>
+        <span className="avatar" style={{ borderRadius: 12, background: 'var(--tzofim-bg)', color: 'var(--primary)' }}><Icon name="calendar" /></span>
+        <span className="col" style={{ gap: 2, flex: 1 }}>
+          <span className="bold">מבט לאחור</span>
+          <span className="muted small">השבוע והחודש שלך בקצרה</span>
+        </span>
+        <Icon name="chevronL" size={18} />
+      </a>
+
       <a href="#/tasks" className="grid3 link-card">
         {counts.map(({ s, n }) => (
           <div key={s} className="card" style={{ alignItems: 'center', gap: 0, padding: 10 }}>

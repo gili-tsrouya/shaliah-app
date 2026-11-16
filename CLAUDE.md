@@ -46,6 +46,8 @@ Match its colors, spacing and copy.
 - `.env.production` holds the project address and the publishable key (public by design). No other key may ever be in the app or the repo.
 - Google Calendar on the server: refresh tokens are encrypted in `google_connections`; events go out through `sync_outbox` and the `google-sync` function.
 - Journal (`#/journal`, `src/screens/Journal.tsx`, `src/lib/journal.ts`): notes with photos, kept in the account (tables `memories`, `photos`; files in the private bucket `media` at `<user>/<memory>/<photo>/display.jpg`, shown only through short-lived signed links). Needs a signed-in device and a connection; only the text being written is kept locally as a draft. Photos of a shlichut memory are flagged `may_show_minors` by the database and must never be offered for sharing or export.
+- Look back (`#/recap`, `src/screens/Recap.tsx`): the last week or a month, computed on the phone from events, expenses, people talked to and kept deck items, plus journal memories and photos when signed in. It only counts things with a real date; it has no share or export.
+- The deck orders new items by what she tends to keep (`tastes` in `src/lib/drop.ts`); nothing is hidden.
 - Backups and health checks of the project run from the private repo `shaliah-data`.
 
 ## Agents

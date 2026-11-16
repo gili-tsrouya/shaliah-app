@@ -39,8 +39,27 @@ export function allItems(shlichut: FeedItem[], deals: FeedItem[], a: AgentSettin
   return out
 }
 
+// How much she tends to keep each category, from her own choices in the deck: +1 for kept, -1 for skipped
+export function tastes(all: DropItem[], seen: Record<string, DropSeen>) {
+  const score = new Map<string, number>()
+  for (const { item, type } of all) {
+    const s = seen[item.id]
+    if (!s) continue
+    const key = `${type}:${item.category}`
+    score.set(key, (score.get(key) ?? 0) + (s.did === 'skip' ? -1 : 1))
+  }
+  return score
+}
+
 export function newItems(all: DropItem[], seen: Record<string, DropSeen>): DropItem[] {
-  return all
+  const score = tastes(all, seen)
+  const fresh = all
     .filter(({ item }) => !seen[item.id] || seen[item.id].mark !== markOf(item))
     .map((d) => ({ ...d, changed: !!seen[d.item.id] }))
+  // Categories she usually keeps come first; the sort is stable, so equal ones stay in the feeds' order.
+  // Nothing is hidden: skipped categories only move to the end.
+  return fresh
+    .map((d, i) => ({ d, i, s: score.get(`${d.type}:${d.item.category}`) ?? 0 }))
+    .sort((a, b) => b.s - a.s || a.i - b.i)
+    .map((x) => x.d)
 }

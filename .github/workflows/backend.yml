@@ -147,6 +147,21 @@ jobs:
           PGPASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
         run: psql -v ON_ERROR_STOP=1 -tA -c "delete from auth.users where email in ('api-test-a@example.test', 'api-test-b@example.test') returning 'removed ' || email"
 
+      - name: Tell the sign-in service which app address may receive a signed-in person
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        run: |
+          set -euo pipefail
+          app="https://gili-tsrouya.github.io/shaliah-app/"
+          curl -fsS -X PATCH -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" -H "Content-Type: application/json" \
+            "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
+            -d "$(jq -n --arg app "$app" '{site_url: $app, uri_allow_list: $app}')" \
+            | jq '{site_url, uri_allow_list, external_google_enabled, external_email_enabled, mailer_otp_length, smtp_host: (.smtp_host // "built-in")}'
+          # The publishable key is public by design (it ships inside the app); what a person may read is
+          # decided by the database rules. Printed so it can be written into the app's build settings.
+          curl -fsS -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" "https://api.supabase.com/v1/projects/$PROJECT_REF/api-keys?reveal=true" \
+            | jq -r '[.[] | select(.type == "publishable")][0] | "publishable key: " + .api_key'
+
       - name: Deploy the server functions
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}

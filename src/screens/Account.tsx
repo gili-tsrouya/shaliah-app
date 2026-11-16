@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import type { Session } from '@supabase/supabase-js'
-import { cloudAvailable, emailSignIn, copyPhoneToAccount, currentSession, lastAccountCopy, onSession, sendEmailCode, signInWithGoogle, signOut, verifyEmailCode, type CopyReport } from '../lib/cloud'
+import { cloudAvailable, emailSignIn, copyPhoneToAccount, currentSession, lastAccountCopy, lastCopySource, onSession, sendEmailCode, signInWithGoogle, signOut, verifyEmailCode, type CopyReport, type CopySource } from '../lib/cloud'
 import { formatDay } from '../lib/dates'
 import { Icon } from '../components/Icon'
 
@@ -16,7 +16,7 @@ function Counts({ report }: { report: CopyReport }) {
   const skipped = Object.values(report.skipped ?? {}).reduce((a, b) => a + (Number(b) || 0), 0)
   return (
     <div className="col" style={{ gap: 4 }}>
-      <div className="between small muted"><span /><span>בטלפון ← בחשבון</span></div>
+      <div className="between small muted"><span /><span>במכשיר ← בחשבון</span></div>
       {rows.map(([k, label]) => (
         <div key={k} className="between small">
           <span>{label}</span>
@@ -24,9 +24,9 @@ function Counts({ report }: { report: CopyReport }) {
         </div>
       ))}
       <span className="small bold" style={{ color: differ.length ? 'var(--warn)' : 'var(--ok)' }}>
-        {differ.length ? `יש הבדל ב: ${differ.map(([, l]) => l).join(', ')}. המידע בטלפון נשאר שלם.` : 'הכול תואם.'}
+        {differ.length ? `יש הבדל ב: ${differ.map(([, l]) => l).join(', ')}. המידע במכשיר נשאר שלם.` : 'הכול תואם.'}
       </span>
-      {skipped > 0 && <span className="small muted">{skipped} פריטים בלי תאריך לא הועתקו ונשארו בטלפון.</span>}
+      {skipped > 0 && <span className="small muted">{skipped} פריטים בלי תאריך לא הועתקו ונשארו במכשיר.</span>}
       <span className="small muted">תמונות של אנשים נשמרות בתוך העותק, ויוצגו מהחשבון בשלב הבא.</span>
     </div>
   )
@@ -42,6 +42,15 @@ export function Account() {
   const [msg, setMsg] = useState('')
   const [report, setReport] = useState<CopyReport | null>(null)
   const [last, setLast] = useState(lastAccountCopy)
+  // which device the copy in the account came from; undefined while it is being looked up
+  const [source, setSource] = useState<CopySource | null | undefined>(undefined)
+  const [confirmReplace, setConfirmReplace] = useState(false)
+  const userId = session?.user.id
+  useEffect(() => {
+    if (!userId) return
+    lastCopySource().then(setSource).catch(() => setSource(null))
+  }, [userId])
+  const otherDevice = source ? !source.thisDevice : false
 
   useEffect(() => {
     if (!cloudAvailable) return
@@ -120,13 +129,25 @@ export function Account() {
           <section className="card" style={{ gap: 12 }}>
             <h2>עותק בחשבון</h2>
             <p className="muted">
-              שולח לחשבון עותק של כל מה ששמור בטלפון. שום דבר בטלפון לא משתנה, והאפליקציה ממשיכה לעבוד מהטלפון כרגיל.
+              שולח לחשבון עותק של כל מה ששמור במכשיר הזה. שום דבר במכשיר לא משתנה, והאפליקציה ממשיכה לעבוד ממנו כרגיל.
               אפשר ללחוץ שוב בכל זמן כדי לעדכן את העותק.
             </p>
-            {last && <p className="small bold" style={{ color: 'var(--ok)' }}>עותק אחרון: {formatDay(last.slice(0, 10))}</p>}
-            <button className="btn block" disabled={busy}
-              onClick={() => run(async () => { setReport(await copyPhoneToAccount()); setLast(lastAccountCopy()) }, 'ההעתקה נכשלה. המידע בטלפון לא השתנה. אפשר לנסות שוב.')}>
-              {busy ? 'מעתיק…' : 'העתקה לחשבון'}
+            {last && !otherDevice && <p className="small bold" style={{ color: 'var(--ok)' }}>עותק אחרון מהמכשיר הזה: {formatDay(last.slice(0, 10))}</p>}
+            {otherDevice && source && (
+              <div className="card" style={{ borderColor: 'var(--warn)', gap: 8 }}>
+                <span className="bold">העותק שבחשבון הגיע ממכשיר אחר ({source.label}, {formatDay(source.at.slice(0, 10))}).</span>
+                <span className="small muted">העתקה מכאן תחליף אותו במה ששמור במכשיר הזה. כדאי להעתיק רק מהמכשיר שבו נמצא המידע האמיתי.</span>
+                {!confirmReplace && <button className="btn light" onClick={() => setConfirmReplace(true)}>המידע האמיתי נמצא כאן</button>}
+              </div>
+            )}
+            <button className="btn block" disabled={busy || source === undefined || (otherDevice && !confirmReplace)}
+              onClick={() => run(async () => {
+                setReport(await copyPhoneToAccount())
+                setLast(lastAccountCopy())
+                setConfirmReplace(false)
+                setSource(await lastCopySource())
+              }, 'ההעתקה נכשלה. המידע במכשיר לא השתנה. אפשר לנסות שוב.')}>
+              {busy ? 'מעתיק…' : otherDevice ? 'להחליף את העותק במה שיש כאן' : 'העתקה לחשבון'}
             </button>
             {report && (
               <div className="card" style={{ gap: 8 }}>

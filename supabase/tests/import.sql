@@ -127,11 +127,12 @@ select test_helpers.must_equal($$ select (b = row((select count(*) from public.t
   (select count(*) from public.calendar_categories), (select count(*) from public.user_item_state))::text)::text
   from (select row(t, e, x, c, h, l, cc, s)::text b from before_again) q $$, 'true', 'importing the same snapshot again creates no duplicates');
 
--- ---------- a newer snapshot: one title changed, one task and one expense removed on the phone ----------
+-- ---------- a newer snapshot: one title changed, one task and one expense removed and one find un-saved on the phone ----------
 insert into public.legacy_imports (id, user_id, snapshot)
 select '11111111-0000-4000-8000-000000000002', user_id,
-  jsonb_set(jsonb_set(jsonb_set(snapshot, '{data,tasks}', (snapshot #> '{data,tasks}') - 1),
-    '{data,tasks,0,title}', '"להכין פעולה לחנוכה"'), '{data,expenses}', (snapshot #> '{data,expenses}') - 1)
+  jsonb_set(jsonb_set(jsonb_set(jsonb_set(snapshot, '{data,tasks}', (snapshot #> '{data,tasks}') - 1),
+    '{data,tasks,0,title}', '"להכין פעולה לחנוכה"'), '{data,expenses}', (snapshot #> '{data,expenses}') - 1),
+    '{data,savedDeals}', (snapshot #> '{data,savedDeals}') - 0)
 from public.legacy_imports where id = '11111111-0000-4000-8000-000000000001';
 
 select public.import_legacy_snapshot_for('11111111-0000-4000-8000-000000000002', 'aaaaaaaa-0000-4000-8000-000000000001');
@@ -148,6 +149,9 @@ select test_helpers.must_equal($$ select string_agg(legacy_id, ',' order by lega
   'a mirror import marks what was deleted on the phone as deleted (kept, not erased)');
 select test_helpers.must_equal($$ select (report -> 'account' ->> 'expenses_total') || ' = ' || (report -> 'phone' ->> 'expenses_total') from public.legacy_imports where id = '11111111-0000-4000-8000-000000000002' $$,
   '37.15 = 37.15', 'after a mirror import the expense totals match again');
+select test_helpers.must_equal($$ select (report -> 'account' ->> 'saved_finds') || ' = ' || (report -> 'phone' ->> 'saved_finds') from public.legacy_imports where id = '11111111-0000-4000-8000-000000000002' $$,
+  '1 = 1',
+  'after a mirror import the saved finds match the device, also when it has fewer');
 reset role;
 select public.import_legacy_snapshot_for('11111111-0000-4000-8000-000000000001', 'aaaaaaaa-0000-4000-8000-000000000001', true);
 set local role authenticated;

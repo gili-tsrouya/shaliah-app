@@ -62,8 +62,45 @@ export interface CopyReport {
   skipped: Record<string, number>
 }
 
-// Sends a copy of what is on the phone to the account. Nothing on the phone changes, and until the
-// account is made the main copy this can be repeated: each run brings the account in line with the phone.
+// Each browser or installed app gets a random name of its own, so the account can tell which device a
+// copy came from. Kept outside the `shaliach:` keys so it never travels in a backup to another phone.
+function deviceId() {
+  try {
+    let id = localStorage.getItem('shaliach-device')
+    if (!id) {
+      id = crypto.randomUUID()
+      localStorage.setItem('shaliach-device', id)
+    }
+    return id
+  } catch {
+    return 'unknown'
+  }
+}
+
+function deviceLabel() {
+  const ua = navigator.userAgent
+  if (/iPhone|iPad/.test(ua)) return 'iPhone'
+  if (/Android/.test(ua)) return 'Android'
+  if (/Windows/.test(ua)) return 'מחשב Windows'
+  if (/Macintosh/.test(ua)) return 'Mac'
+  return 'מכשיר אחר'
+}
+
+export interface CopySource { thisDevice: boolean; label: string; at: string }
+
+// Where the copy in the account came from. A copy replaces the previous one, so the screen warns
+// before a second device overwrites what the first one sent.
+export async function lastCopySource(): Promise<CopySource | null> {
+  const { data, error } = await (await cloud()).from('legacy_imports')
+    .select('device:snapshot->>deviceId, label:snapshot->>deviceLabel, created_at')
+    .not('converted_at', 'is', null).order('created_at', { ascending: false }).limit(1)
+  if (error || !data?.length) return null
+  const row = data[0] as { device: string | null; label: string | null; created_at: string }
+  return { thisDevice: row.device === deviceId(), label: row.label ?? 'מכשיר אחר', at: row.created_at }
+}
+
+// Sends a copy of what is on this device to the account. Nothing on the device changes, and until the
+// account is made the main copy this can be repeated: each run brings the account in line with the device.
 // Tokens never travel: the backup leaves the GitHub ones out and the database drops the Google one.
 export async function copyPhoneToAccount(): Promise<CopyReport> {
   const db = await cloud()
@@ -73,7 +110,8 @@ export async function copyPhoneToAccount(): Promise<CopyReport> {
   const data = { ...backup.data }
   delete data.googleToken
   delete data.googleEvents // a cache of Google's own events; it is fetched again
-  const { data: row, error } = await db.from('legacy_imports').insert({ user_id: session.user.id, snapshot: { ...backup, data } }).select('id').single()
+  const snapshot = { ...backup, data, deviceId: deviceId(), deviceLabel: deviceLabel() }
+  const { data: row, error } = await db.from('legacy_imports').insert({ user_id: session.user.id, snapshot }).select('id').single()
   if (error) throw error
   const { data: report, error: failed } = await db.rpc('import_legacy_snapshot', { p_import_id: row.id, p_mirror: true })
   if (failed) throw failed

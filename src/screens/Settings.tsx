@@ -3,6 +3,7 @@ import { useStore } from '../lib/store'
 import { exportBackup, lastBackup, readBackup, restoreBackup } from '../lib/backup'
 import { daysBetween, formatDay, todayISO } from '../lib/dates'
 import { Icon } from '../components/Icon'
+import { cloudAvailable } from '../lib/cloud'
 
 export function Settings() {
   const { settings } = useStore()
@@ -36,6 +37,17 @@ export function Settings() {
         </span>
         <Icon name="chevronL" size={18} />
       </a>
+
+      {cloudAvailable && (
+        <a href="#/account" className="card link-card row" style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+          <span className="avatar"><Icon name="user" size={20} /></span>
+          <span className="col" style={{ gap: 0, flex: 1 }}>
+            <span className="bold">החשבון שלי</span>
+            <span className="muted small">כניסה, ועותק של המידע מחוץ לטלפון</span>
+          </span>
+          <Icon name="chevronL" size={18} />
+        </a>
+      )}
 
       <section className="card" style={{ gap: 12 }}>
         <h2>גיבוי</h2>

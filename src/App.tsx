@@ -10,6 +10,7 @@ import { Calendar } from './screens/Calendar'
 import { Tasks } from './screens/Tasks'
 import { Settings } from './screens/Settings'
 import { Profile } from './screens/Profile'
+import { Account } from './screens/Account'
 import { ErrorBoundary } from './components/ErrorBoundary'
 
 const routes: Record<string, () => React.JSX.Element> = {
@@ -22,6 +23,7 @@ const routes: Record<string, () => React.JSX.Element> = {
   tasks: Tasks,
   settings: Settings,
   profile: Profile,
+  account: Account,
 }
 
 const currentRoute = () => {
@@ -31,6 +33,14 @@ const currentRoute = () => {
 
 export default function App() {
   const [route, setRoute] = useState(currentRoute)
+  useEffect(() => {
+    // After a Google sign-in the browser comes back to the start page: go to the screen that asked for it
+    const back = sessionStorage.getItem('shaliach-return')
+    if (back) {
+      sessionStorage.removeItem('shaliach-return')
+      location.hash = back
+    }
+  }, [])
   useEffect(() => {
     const onHash = () => {
       setRoute(currentRoute())

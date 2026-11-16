@@ -9,6 +9,8 @@ const URL_ = import.meta.env.VITE_SUPABASE_URL as string | undefined
 const KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string | undefined
 
 export const cloudAvailable = Boolean(URL_ && KEY)
+// Codes by email need a mail service connected to the project; until then only Google sign-in is offered
+export const emailSignIn = import.meta.env.VITE_EMAIL_SIGNIN === '1'
 
 let client: Promise<SupabaseClient> | null = null
 // Loaded on first use, so phones that never open the account screen do not download it

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import type { Session } from '@supabase/supabase-js'
-import { cloudAvailable, copyPhoneToAccount, currentSession, lastAccountCopy, onSession, sendEmailCode, signInWithGoogle, signOut, verifyEmailCode, type CopyReport } from '../lib/cloud'
+import { cloudAvailable, emailSignIn, copyPhoneToAccount, currentSession, lastAccountCopy, onSession, sendEmailCode, signInWithGoogle, signOut, verifyEmailCode, type CopyReport } from '../lib/cloud'
 import { formatDay } from '../lib/dates'
 import { Icon } from '../components/Icon'
 
@@ -77,28 +77,32 @@ export function Account() {
           <h2>כניסה</h2>
           <p className="muted">חשבון שומר עותק של המידע שלך מחוץ לטלפון, כך שהוא לא הולך לאיבוד אם הטלפון מוחלף או נמחק.</p>
           <button className="btn block" disabled={busy} onClick={() => run(signInWithGoogle, 'הכניסה עם Google נכשלה. נסי שוב.')}>כניסה עם Google</button>
-          <p className="muted small" style={{ textAlign: 'center' }}>או קוד במייל</p>
-          <label className="field">מייל
-            <input className="ltr" type="email" inputMode="email" autoComplete="email" placeholder="name@example.com" value={email}
-              onChange={(e) => { setEmail(e.target.value); setSent(false) }} />
-          </label>
-          {!sent && (
-            <button className="btn light block" disabled={busy || !/^\S+@\S+\.\S+$/.test(email)}
-              onClick={() => run(async () => { await sendEmailCode(email.trim()); setSent(true) }, 'לא הצלחתי לשלוח קוד. אפשר לנסות שוב בעוד דקה.')}>
-              שלחו לי קוד
-            </button>
-          )}
-          {sent && (
+          {emailSignIn && (
             <>
-              <p className="small">שלחנו קוד למייל. הוא תקף לשעה.</p>
-              <label className="field">קוד
-                <input className="ltr" inputMode="numeric" autoComplete="one-time-code" placeholder="123456" value={code}
-                  onChange={(e) => setCode(e.target.value.replace(/\D/g, ''))} />
-              </label>
-              <button className="btn block" disabled={busy || code.length < 6}
-                onClick={() => run(() => verifyEmailCode(email.trim(), code), 'הקוד לא נכון או שפג תוקפו.')}>
-                כניסה
+            <p className="muted small" style={{ textAlign: 'center' }}>או קוד במייל</p>
+            <label className="field">מייל
+              <input className="ltr" type="email" inputMode="email" autoComplete="email" placeholder="name@example.com" value={email}
+                onChange={(e) => { setEmail(e.target.value); setSent(false) }} />
+            </label>
+            {!sent && (
+              <button className="btn light block" disabled={busy || !/^\S+@\S+\.\S+$/.test(email)}
+                onClick={() => run(async () => { await sendEmailCode(email.trim()); setSent(true) }, 'לא הצלחתי לשלוח קוד. אפשר לנסות שוב בעוד דקה.')}>
+                שלחו לי קוד
               </button>
+            )}
+            {sent && (
+              <>
+                <p className="small">שלחנו קוד למייל. הוא תקף לשעה.</p>
+                <label className="field">קוד
+                  <input className="ltr" inputMode="numeric" autoComplete="one-time-code" placeholder="123456" value={code}
+                    onChange={(e) => setCode(e.target.value.replace(/\D/g, ''))} />
+                </label>
+                <button className="btn block" disabled={busy || code.length < 6 || code.length > 8}
+                  onClick={() => run(() => verifyEmailCode(email.trim(), code), 'הקוד לא נכון או שפג תוקפו.')}>
+                  כניסה
+                </button>
+              </>
+            )}
             </>
           )}
           {msg && <p className="small" style={{ color: 'var(--danger)' }}>{msg}</p>}

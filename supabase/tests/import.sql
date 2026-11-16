@@ -158,6 +158,22 @@ set local role authenticated;
 select set_config('request.jwt.claims', '{"sub":"aaaaaaaa-0000-4000-8000-000000000001","role":"authenticated"}', true);
 select test_helpers.must_equal($$ select count(*)::text from public.tasks where deleted_at is null $$, '3', 'a row that is back in the snapshot is restored');
 
+-- ---------- another device's copy replaces the account's, then the first device copies again ----------
+reset role;
+insert into public.legacy_imports (id, user_id, snapshot)
+select '11111111-0000-4000-8000-000000000003', user_id,
+  snapshot || jsonb_build_object('data', (snapshot -> 'data') || '{"people": [], "owed": [], "partnerships": [], "categories": [], "tasks": [], "events": [], "expenses": []}')
+from public.legacy_imports where id = '11111111-0000-4000-8000-000000000001';
+select public.import_legacy_snapshot_for('11111111-0000-4000-8000-000000000003', 'aaaaaaaa-0000-4000-8000-000000000001', true);
+select public.import_legacy_snapshot_for('11111111-0000-4000-8000-000000000001', 'aaaaaaaa-0000-4000-8000-000000000001', true);
+set local role authenticated;
+select set_config('request.jwt.claims', '{"sub":"aaaaaaaa-0000-4000-8000-000000000001","role":"authenticated"}', true);
+select test_helpers.must_equal($$ select string_agg(k || ':' || (report -> 'account' ->> k), ' ' order by k) from public.legacy_imports,
+    unnest(array['people', 'owed', 'partnerships', 'budget_categories', 'calendar_categories', 'tasks', 'expenses']) k where id = '11111111-0000-4000-8000-000000000001' $$,
+  (select string_agg(k || ':' || (report -> 'phone' ->> k), ' ' order by k) from public.legacy_imports,
+    unnest(array['people', 'owed', 'partnerships', 'budget_categories', 'calendar_categories', 'tasks', 'expenses']) k where id = '11111111-0000-4000-8000-000000000001'),
+  'after another device replaced the copy, copying again from the first brings everything back (people, owed, partnerships, categories too)');
+
 -- ---------- after the switch, importing phone data is refused ----------
 reset role;
 update public.profiles set data_source = 'account' where user_id = 'aaaaaaaa-0000-4000-8000-000000000001';

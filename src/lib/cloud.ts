@@ -99,26 +99,86 @@ export async function lastCopySource(): Promise<CopySource | null> {
   return { thisDevice: row.device === deviceId(), label: row.label ?? 'מכשיר אחר', at: row.created_at }
 }
 
-// Sends a copy of what is on this device to the account. Nothing on the device changes, and until the
-// account is made the main copy this can be repeated: each run brings the account in line with the device.
-// Tokens never travel: the backup leaves the GitHub ones out and the database drops the Google one.
-export async function copyPhoneToAccount(): Promise<CopyReport> {
-  const db = await cloud()
-  const session = await currentSession()
-  if (!session) throw new Error('not signed in')
+// What travels to the account: the same content as the backup file, without caches and tokens.
+function snapshotOfThisDevice() {
   const backup = buildBackup()
   const data = { ...backup.data }
   delete data.googleToken
   delete data.googleEvents // a cache of Google's own events; it is fetched again
+  delete data.lastAccountCopy // bookkeeping of the copy itself
+  return { backup, data }
+}
+
+// a short fingerprint of the content, to skip a backup when nothing changed
+function fingerprint(data: unknown) {
+  const text = JSON.stringify(data)
+  let h = 5381
+  for (let i = 0; i < text.length; i++) h = ((h << 5) + h + text.charCodeAt(i)) | 0
+  return `${text.length}:${h}`
+}
+
+const SYNCED = 'shaliach-synced' // fingerprint of what the account already has from this device
+const CLAIM = 'shaliach-claim' // set by a restore: this device takes over as the one that backs up
+const read = (k: string) => { try { return localStorage.getItem(k) } catch { return null } }
+const write = (k: string, v: string | null) => { try { if (v === null) localStorage.removeItem(k); else localStorage.setItem(k, v) } catch { /* ignore */ } }
+
+// Sends a copy of what is on this device to the account. Nothing on the device changes; each run brings
+// the account in line with the device. Tokens never travel: the backup leaves the GitHub ones out and
+// the database drops the Google one.
+export async function copyPhoneToAccount(): Promise<CopyReport> {
+  const db = await cloud()
+  if (!(await currentSession())) throw new Error('not signed in')
+  const { backup, data } = snapshotOfThisDevice()
   const snapshot = { ...backup, data, deviceId: deviceId(), deviceLabel: deviceLabel() }
-  const { data: row, error } = await db.from('legacy_imports').insert({ user_id: session.user.id, snapshot }).select('id').single()
+  const { data: report, error } = await db.rpc('sync_phone_snapshot', { p_snapshot: snapshot })
   if (error) throw error
-  const { data: report, error: failed } = await db.rpc('import_legacy_snapshot', { p_import_id: row.id, p_mirror: true })
-  if (failed) throw failed
-  try {
-    localStorage.setItem('shaliach:lastAccountCopy', new Date().toISOString())
-  } catch { /* the copy itself succeeded */ }
+  write(SYNCED, fingerprint(data))
+  write('shaliach:lastAccountCopy', new Date().toISOString())
   return report as CopyReport
+}
+
+export type BackupState = 'off' | 'other-device' | 'up-to-date' | 'saved' | 'failed'
+
+// Whether a signed-in session is stored on this device, without loading the account library
+export const maybeSignedIn = () => cloudAvailable && !!read('shaliach-account')
+
+let running: Promise<BackupState> | null = null
+// The automatic backup: called by the app from time to time. It sends a copy only when this device is
+// the one the account's copy comes from (or there is no copy yet) and something has changed.
+export function backupIfNeeded(): Promise<BackupState> {
+  running ??= (async (): Promise<BackupState> => {
+    try {
+      if (!maybeSignedIn() || !navigator.onLine) return 'off'
+      const { data } = snapshotOfThisDevice()
+      const claim = read(CLAIM) === '1'
+      if (!claim && read(SYNCED) === fingerprint(data)) return 'up-to-date'
+      if (!(await currentSession())) return 'off'
+      if (!claim) {
+        const source = await lastCopySource()
+        if (source && !source.thisDevice) return 'other-device'
+      }
+      await copyPhoneToAccount()
+      write(CLAIM, null)
+      return 'saved'
+    } catch {
+      return 'failed'
+    } finally {
+      running = null
+    }
+  })()
+  return running
+}
+
+// Brings the account's latest copy onto this device, replacing what is here, and makes this device the
+// one that backs up from now on. Used on a new or reset phone.
+export async function restoreFromAccount(restore: (b: { app: 'shaliach'; version: 1; createdAt: string; data: Record<string, unknown> }) => void) {
+  const { data, error } = await (await cloud()).from('legacy_imports').select('snapshot').order('created_at', { ascending: false }).limit(1)
+  if (error) throw error
+  const snap = data?.[0]?.snapshot as { app?: string; version?: number; createdAt?: string; data?: Record<string, unknown> } | undefined
+  if (!snap || snap.app !== 'shaliach' || !snap.data) throw new Error('no copy in the account')
+  write(CLAIM, '1')
+  write(SYNCED, null)
+  restore({ app: 'shaliach', version: 1, createdAt: snap.createdAt ?? new Date().toISOString(), data: snap.data })
 }
 
 export const lastAccountCopy = () => {

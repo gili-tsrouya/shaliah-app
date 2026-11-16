@@ -174,6 +174,18 @@ select test_helpers.must_equal($$ select string_agg(k || ':' || (report -> 'acco
     unnest(array['people', 'owed', 'partnerships', 'budget_categories', 'calendar_categories', 'tasks', 'expenses']) k where id = '11111111-0000-4000-8000-000000000001'),
   'after another device replaced the copy, copying again from the first brings everything back (people, owed, partnerships, categories too)');
 
+-- ---------- automatic backup: one call stores, mirrors and keeps the history small ----------
+select test_helpers.must_equal($$ select (public.sync_phone_snapshot((select snapshot from public.legacy_imports where id = '11111111-0000-4000-8000-000000000001')) -> 'account' ->> 'people') $$,
+  '2', 'the automatic backup stores the snapshot and returns the comparison');
+select test_helpers.must_fail($$ select public.sync_phone_snapshot('{"app": "other", "data": {}}') $$, 'something that is not a snapshot of the app is refused');
+do $$ begin
+  for i in 1..14 loop
+    perform public.sync_phone_snapshot((select snapshot from public.legacy_imports where id = '11111111-0000-4000-8000-000000000001'));
+  end loop;
+end $$;
+select test_helpers.must_equal($$ select (count(*) <= 11)::text from public.legacy_imports $$, 'true', 'after many backups only the newest snapshots are kept');
+select test_helpers.must_equal($$ select count(*)::text from public.contacts where deleted_at is null $$, '2', 'repeated backups create no duplicates');
+
 -- ---------- after the switch, importing phone data is refused ----------
 reset role;
 update public.profiles set data_source = 'account' where user_id = 'aaaaaaaa-0000-4000-8000-000000000001';

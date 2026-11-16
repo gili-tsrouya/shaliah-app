@@ -12,6 +12,7 @@ import { Settings } from './screens/Settings'
 import { Profile } from './screens/Profile'
 import { Account } from './screens/Account'
 import { Drop } from './screens/Drop'
+import { backupIfNeeded, maybeSignedIn } from './lib/cloud'
 import { ErrorBoundary } from './components/ErrorBoundary'
 
 const routes: Record<string, () => React.JSX.Element> = {
@@ -41,6 +42,21 @@ export default function App() {
     if (back) {
       sessionStorage.removeItem('shaliach-return')
       location.hash = back
+    }
+  }, [])
+  // Automatic backup to the account, for a signed-in device: shortly after opening, every few minutes
+  // while the app is open, and when it is put away. It does nothing when nothing changed.
+  useEffect(() => {
+    if (!maybeSignedIn()) return
+    const run = () => { backupIfNeeded().catch(() => {}) }
+    const first = setTimeout(run, 8000)
+    const every = setInterval(run, 3 * 60_000)
+    const onHide = () => { if (document.visibilityState === 'hidden') run() }
+    document.addEventListener('visibilitychange', onHide)
+    return () => {
+      clearTimeout(first)
+      clearInterval(every)
+      document.removeEventListener('visibilitychange', onHide)
     }
   }, [])
   useEffect(() => {

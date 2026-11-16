@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
 import type { Session } from '@supabase/supabase-js'
-import { cloudAvailable, emailSignIn, copyPhoneToAccount, currentSession, lastAccountCopy, lastCopySource, onSession, sendEmailCode, signInWithGoogle, signOut, verifyEmailCode, type CopyReport, type CopySource } from '../lib/cloud'
+import { backupIfNeeded, cloudAvailable, emailSignIn, copyPhoneToAccount, restoreFromAccount, currentSession, lastAccountCopy, lastCopySource, onSession, sendEmailCode, signInWithGoogle, signOut, verifyEmailCode, type CopyReport, type CopySource } from '../lib/cloud'
 import { formatDay } from '../lib/dates'
+import { restoreBackup } from '../lib/backup'
 import { Icon } from '../components/Icon'
 
 const ROWS: [string, string][] = [
@@ -51,6 +52,17 @@ export function Account() {
     lastCopySource().then(setSource).catch(() => setSource(null))
   }, [userId])
   const otherDevice = source ? !source.thisDevice : false
+  const [confirmRestore, setConfirmRestore] = useState(false)
+  // signing in on the device that owns the copy (or the first device) starts the automatic backup right away
+  useEffect(() => {
+    if (!userId || source === undefined || otherDevice) return
+    backupIfNeeded().then((state) => {
+      if (state === 'saved') {
+        setLast(lastAccountCopy())
+        lastCopySource().then(setSource).catch(() => {})
+      }
+    })
+  }, [userId, source, otherDevice])
 
   useEffect(() => {
     if (!cloudAvailable) return
@@ -127,12 +139,13 @@ export function Account() {
           </section>
 
           <section className="card" style={{ gap: 12 }}>
-            <h2>עותק בחשבון</h2>
+            <h2>גיבוי בחשבון</h2>
             <p className="muted">
-              שולח לחשבון עותק של כל מה ששמור במכשיר הזה. שום דבר במכשיר לא משתנה, והאפליקציה ממשיכה לעבוד ממנו כרגיל.
-              אפשר ללחוץ שוב בכל זמן כדי לעדכן את העותק.
+              {otherDevice
+                ? 'הגיבוי האוטומטי פועל מהמכשיר שממנו הגיע העותק. המכשיר הזה לא שולח כלום עד שתבחרי בו.'
+                : 'מהמכשיר הזה, כל שינוי נשמר בחשבון אוטומטית תוך כמה דקות. שום דבר במכשיר לא משתנה, והאפליקציה ממשיכה לעבוד גם בלי אינטרנט.'}
             </p>
-            {last && !otherDevice && <p className="small bold" style={{ color: 'var(--ok)' }}>עותק אחרון מהמכשיר הזה: {formatDay(last.slice(0, 10))}</p>}
+            {last && !otherDevice && <p className="small bold" style={{ color: 'var(--ok)' }}>גיבוי אחרון מהמכשיר הזה: {formatDay(last.slice(0, 10))}</p>}
             {otherDevice && source && (
               <div className="card" style={{ borderColor: 'var(--warn)', gap: 8 }}>
                 <span className="bold">העותק שבחשבון הגיע ממכשיר אחר ({source.label}, {formatDay(source.at.slice(0, 10))}).</span>
@@ -147,7 +160,7 @@ export function Account() {
                 setConfirmReplace(false)
                 setSource(await lastCopySource())
               }, 'ההעתקה נכשלה. המידע במכשיר לא השתנה. אפשר לנסות שוב.')}>
-              {busy ? 'מעתיק…' : otherDevice ? 'להחליף את העותק במה שיש כאן' : 'העתקה לחשבון'}
+              {busy ? 'שומר…' : otherDevice ? 'להחליף את העותק במה שיש כאן' : 'לגבות עכשיו'}
             </button>
             {report && (
               <div className="card" style={{ gap: 8 }}>
@@ -157,6 +170,24 @@ export function Account() {
             )}
             {msg && <p className="small" style={{ color: 'var(--danger)' }}>{msg}</p>}
           </section>
+
+          {source && (
+            <section className="card" style={{ gap: 10 }}>
+              <h2>שחזור למכשיר הזה</h2>
+              <p className="muted">לטלפון חדש או אחרי מחיקה: מביא לכאן את הגיבוי האחרון שבחשבון ({source.label}, {formatDay(source.at.slice(0, 10))}), והמכשיר הזה הופך למכשיר שמגבה.</p>
+              {!confirmRestore && <button className="btn light" disabled={busy} onClick={() => setConfirmRestore(true)}>שחזור מהחשבון</button>}
+              {confirmRestore && (
+                <div className="card" style={{ borderColor: 'var(--danger)', gap: 10 }}>
+                  <span className="bold">לשחזר? כל מה שיש עכשיו במכשיר הזה יוחלף בגיבוי.</span>
+                  <div className="row">
+                    <button className="btn danger" style={{ flex: 1 }} disabled={busy}
+                      onClick={() => run(() => restoreFromAccount(restoreBackup), 'השחזור נכשל. שום דבר במכשיר לא השתנה.')}>כן, לשחזר</button>
+                    <button className="btn light" onClick={() => setConfirmRestore(false)}>ביטול</button>
+                  </div>
+                </div>
+              )}
+            </section>
+          )}
         </>
       )}
     </main>

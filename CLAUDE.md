@@ -42,7 +42,7 @@ Match its colors, spacing and copy.
 ## Account and backend (in progress)
 - Supabase project `iidxjorwnsvtlhivymuv` (one project, real data). Schema in `supabase/migrations/`, server functions in `supabase/functions/`, tests in `supabase/tests/`.
 - `.github/workflows/backend.yml` (branch `migration`): tests everything on a throwaway local copy, then applies migrations and deploys functions. Never run tests against the hosted project.
-- `#/account` (`src/screens/Account.tsx`, `src/lib/cloud.ts`): sign in with Google and copy the phone's data to the account. The phone stays the source of truth; the copy never changes `localStorage`.
+- `#/account` (`src/screens/Account.tsx`, `src/lib/cloud.ts`): sign in with Google. The phone stays the source of truth and works offline; a signed-in device backs up automatically (`backupIfNeeded` in `App.tsx`, RPC `sync_phone_snapshot`) when something changed, but only the device the account's copy came from, so two devices cannot overwrite each other silently. "שחזור מהחשבון" brings the latest snapshot onto a new phone through `restoreBackup` and makes that phone the one that backs up. Keys without the `shaliach:` prefix (`shaliach-device`, `shaliach-synced`, `shaliach-claim`, `shaliach-account`) are per device and never travel in a backup.
 - `.env.production` holds the project address and the publishable key (public by design). No other key may ever be in the app or the repo.
 - Google Calendar on the server: refresh tokens are encrypted in `google_connections`; events go out through `sync_outbox` and the `google-sync` function.
 - Backups and health checks of the project run from the private repo `shaliah-data`.

@@ -43,7 +43,7 @@ export function Settings() {
           <span className="avatar"><Icon name="user" size={20} /></span>
           <span className="col" style={{ gap: 0, flex: 1 }}>
             <span className="bold">החשבון שלי</span>
-            <span className="muted small">כניסה, ועותק של המידע מחוץ לטלפון</span>
+            <span className="muted small">גיבוי אוטומטי של המידע מחוץ לטלפון, ושחזור</span>
           </span>
           <Icon name="chevronL" size={18} />
         </a>

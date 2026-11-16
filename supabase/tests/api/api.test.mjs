@@ -174,6 +174,9 @@ try {
   if (typeof run.processed !== 'number') fail('the sender reports what it processed')
   await expectStatus('the calendar list needs a signed-in user', await fn('google-calendars'), 401)
   await expectStatus('the calendar list says so when Google is not connected', await fn('google-calendars', { token: tokenA }), 409)
+  await expectStatus('a Google access token needs a signed-in user', await fn('google-token'), 401)
+  await expectStatus('a server key alone gets no Google access token', await fn('google-token', { key: secret }), 401)
+  await expectStatus('no access token when Google is not connected', await fn('google-token', { token: tokenA }), 409)
   await expectStatus('disconnecting needs a signed-in user', await fn('google-disconnect'), 401)
   await expectStatus('disconnecting when nothing is connected is harmless', await fn('google-disconnect', { token: tokenA }), 200)
 

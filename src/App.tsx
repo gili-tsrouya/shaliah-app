@@ -42,6 +42,8 @@ export default function App() {
   const [route, setRoute] = useState(currentRoute)
   useEffect(() => {
     // After a Google sign-in the browser comes back to the start page: go to the screen that asked for it
+    // returning from connecting Google Calendar: drop the marker from the address
+    if (new URLSearchParams(location.search).has('google')) history.replaceState(null, '', location.pathname + location.hash)
     const back = sessionStorage.getItem('shaliach-return')
     if (back) {
       sessionStorage.removeItem('shaliach-return')

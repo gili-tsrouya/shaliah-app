@@ -4,6 +4,7 @@ import { colorOf, eventsOn } from '../lib/derive'
 import { DAY_LETTERS, MONTHS, addDays, formatDay, formatLongDay, fromISO, toISO, todayISO, weekStart } from '../lib/dates'
 import { COLORS, type CalCategory, type CalEvent, type EventKind, type Work } from '../lib/types'
 import * as G from '../lib/google'
+import { cloudAvailable, maybeSignedIn } from '../lib/cloud'
 import { Fab, Sheet } from '../components/ui'
 import { Icon } from '../components/Icon'
 
@@ -22,6 +23,19 @@ export function Calendar() {
   const [token, setToken] = useState<string | null>(G.storedToken)
   const [sync, setSync] = useState<SyncState>(settings.googleClientId ? 'idle' : 'off')
   const [error, setError] = useState('')
+  // A lasting connection through the account renews the token by itself, at most a few times per visit
+  const serverTries = useRef(0)
+  const [lasting, setLasting] = useState(false)
+  useEffect(() => {
+    if (token || serverTries.current >= 3) return
+    serverTries.current++
+    G.serverToken().then((t) => {
+      if (!t) return
+      setLasting(true)
+      setToken(t)
+      setSync((cur) => (cur === 'off' ? 'idle' : cur))
+    })
+  }, [token])
   const visible = Object.fromEntries(calCategories.map((c) => [c.id, !hidden[c.id]]))
   const [view, setView] = useState<'week' | 'month'>(() => {
     try {
@@ -91,6 +105,11 @@ export function Calendar() {
 
   const ensureToken = async () => {
     if (token) return token
+    const fromServer = await G.serverToken()
+    if (fromServer) {
+      setToken(fromServer)
+      return fromServer
+    }
     if (!settings.googleClientId) throw new Error('nocid')
     const t = await G.connect(settings.googleClientId)
     setToken(t)
@@ -143,7 +162,7 @@ export function Calendar() {
         </button>
       </div>
       {error && <p className="small" style={{ color: 'var(--danger)' }}>{error}</p>}
-      {!token && linked.length > 0 && settings.googleClientId && (
+      {!token && !lasting && linked.length > 0 && settings.googleClientId && (
         <button className="card" style={{ textAlign: 'start', borderColor: 'var(--primary)', color: 'var(--primary)', fontWeight: 700 }}
           onClick={async () => {
             try {
@@ -353,6 +372,9 @@ function SyncSheet({ token, onClose, onConnected, onDisconnect, onEditCategory }
     }).catch(() => setMsg('לא הצלחתי לקרוא את רשימת היומנים.'))
   }, [token, setCalCategories])
 
+  const [lasting, setLasting] = useState<boolean | null>(null)
+  useEffect(() => { G.serverToken().then((t) => setLasting(!!t)) }, [])
+
   const connect = async () => {
     if (!settings.googleClientId) return setMsg('קודם הדביקו את ה-Client ID.')
     try {
@@ -365,6 +387,26 @@ function SyncSheet({ token, onClose, onConnected, onDisconnect, onEditCategory }
 
   return (
     <Sheet title="קטגוריות וסנכרון Google" onClose={onClose}>
+      {cloudAvailable && (
+        <div className="card" style={{ gap: 8, borderColor: lasting ? 'var(--ok)' : 'var(--primary)' }}>
+          {lasting ? (
+            <>
+              <span className="bold" style={{ color: 'var(--ok)' }}>חיבור קבוע פעיל</span>
+              <span className="muted small">החיבור ל-Google מתחדש לבד, בלי להתחבר שוב כל שעה.</span>
+              <button className="btn light" onClick={async () => { await G.disconnectServer(); setLasting(false); onDisconnect() }}>ביטול החיבור הקבוע</button>
+            </>
+          ) : maybeSignedIn() ? (
+            <>
+              <span className="bold">חיבור קבוע ל-Google</span>
+              <span className="muted small">מאשרים פעם אחת ב-Google, ומאז הסנכרון ממשיך לבד בלי "החיבור פג" כל שעה. היומן ממשיך לעבוד בדיוק כמו היום.</span>
+              <button className="btn" disabled={lasting === null}
+                onClick={() => G.startServerConnect().catch(() => setMsg('לא הצלחתי להתחיל את החיבור. נסי שוב.'))}>חיבור קבוע</button>
+            </>
+          ) : (
+            <a href="#/account" className="small bold" style={{ textDecoration: 'none' }}>כניסה לחשבון מאפשרת חיבור קבוע ל-Google, בלי להתחבר שוב כל שעה</a>
+          )}
+        </div>
+      )}
       <label className="field">Google Client ID
         <input dir="ltr" defaultValue={settings.googleClientId} placeholder="xxxx.apps.googleusercontent.com"
           onBlur={(e) => setSettings((s) => ({ ...s, googleClientId: e.target.value.trim() || undefined }))} />

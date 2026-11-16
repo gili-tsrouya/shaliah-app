@@ -2,6 +2,7 @@
 // Uses Google Identity Services for a short-lived access token and the Calendar REST API.
 import type { CalEvent, EventKind, Work } from './types'
 import { addDays } from './dates'
+import { cloud, maybeSignedIn } from './cloud'
 
 const SCOPE = 'https://www.googleapis.com/auth/calendar'
 const API = 'https://www.googleapis.com/calendar/v3'
@@ -37,6 +38,46 @@ export function storedToken() {
   } catch {
     return null
   }
+}
+
+// The lasting connection: when Google was connected through the account, the server keeps the
+// permission and hands out a fresh one-hour token whenever the app needs one, with no Google window.
+// Returns null when there is no such connection (or no account); the app then works as before.
+let noServerUntil = 0
+export async function serverToken(): Promise<string | null> {
+  if (!maybeSignedIn() || Date.now() < noServerUntil) return null
+  try {
+    const { data, error } = await (await cloud()).functions.invoke('google-token', { body: {} })
+    const token = (data as { access_token?: string; expires_in?: number } | null)?.access_token
+    if (error || !token) {
+      noServerUntil = Date.now() + 10 * 60_000 // not connected this way: do not ask again for a while
+      return null
+    }
+    try {
+      localStorage.setItem(TOKEN_KEY, JSON.stringify({ token, exp: Date.now() + ((data as { expires_in?: number }).expires_in ?? 3600) * 1000 }))
+    } catch {
+      // token stays in memory only
+    }
+    return token
+  } catch {
+    return null
+  }
+}
+
+// Sends the browser to Google once to grant the lasting permission; Google returns to the app's calendar
+export async function startServerConnect() {
+  const { data, error } = await (await cloud()).functions.invoke('google-connect-start', { body: {} })
+  const url = (data as { url?: string } | null)?.url
+  if (error || !url) throw new Error('could not start')
+  noServerUntil = 0
+  sessionStorage.setItem('shaliach-return', '#/calendar')
+  location.href = url
+}
+
+export async function disconnectServer() {
+  if (!maybeSignedIn()) return
+  await (await cloud()).functions.invoke('google-disconnect', { body: {} }).catch(() => {})
+  noServerUntil = 0
 }
 
 // prompt '' = reuse the existing Google session silently when possible

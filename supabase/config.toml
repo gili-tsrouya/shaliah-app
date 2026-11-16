@@ -16,3 +16,6 @@ verify_jwt = false
 
 [functions.google-disconnect]
 verify_jwt = false
+
+[functions.google-token]
+verify_jwt = false

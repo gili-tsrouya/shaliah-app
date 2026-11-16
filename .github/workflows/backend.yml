@@ -162,6 +162,11 @@ jobs:
           curl -fsS -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" "https://api.supabase.com/v1/projects/$PROJECT_REF/api-keys?reveal=true" \
             | jq -r '[.[] | select(.type == "publishable")][0] | "publishable key: " + .api_key'
 
+      - name: Tell the functions where the app lives (not secret)
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        run: supabase secrets set APP_RETURN_URL="https://gili-tsrouya.github.io/shaliah-app/" --project-ref "$PROJECT_REF" > /dev/null
+
       - name: Deploy the server functions
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}

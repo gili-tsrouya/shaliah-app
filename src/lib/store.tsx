@@ -4,7 +4,7 @@ import { DEFAULT_CATEGORIES } from './types'
 import { addDays, todayISO } from './dates'
 import { mirrorPeople } from './push'
 import { callEvents as callOccurrences, syncCallEvents, type SyncedCall } from './calls'
-import { createRawEvent, deleteEvent, storedToken, updateRawEvent } from './google'
+import { createRawEvent, deleteEvent, serverToken, storedToken, updateRawEvent } from './google'
 import { loadAgentSettings, loadShlichutSettings, saveAgentSettings, saveShlichutSettings } from './github'
 
 const PREFIX = 'shaliach:'
@@ -135,8 +135,11 @@ function useAppState() {
   // Whenever the list changes and Google is connected, update the calendar too
   useEffect(() => {
     const token = storedToken()
-    if (!token) return
-    const t = setTimeout(() => syncCalls(token).catch(() => {}), 1000)
+    // without a valid token, a lasting connection through the account can supply one silently
+    const t = setTimeout(() => {
+      const ready = token ? Promise.resolve<string | null>(token) : serverToken()
+      ready.then((tok) => (tok ? syncCalls(tok) : undefined)).catch(() => {})
+    }, 1000)
     return () => clearTimeout(t)
   }, [syncCalls])
 

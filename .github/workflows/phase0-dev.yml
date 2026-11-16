@@ -20,7 +20,7 @@ env:
 
 jobs:
   database:
-    name: Apply the schema and run the access tests
+    name: Apply the schema and run the tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -59,3 +59,11 @@ jobs:
           psql -v ON_ERROR_STOP=1 -f supabase/tests/access.sql | tee "$RUNNER_TEMP/access.txt"
           grep -q "ACCESS TESTS PASSED" "$RUNNER_TEMP/access.txt"
           grep "ACCESS TESTS PASSED" "$RUNNER_TEMP/access.txt" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Import tests (synthetic snapshot in the app's backup format; rolled back afterwards)
+        env:
+          PGPASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+        run: |
+          set -euo pipefail
+          psql -v ON_ERROR_STOP=1 -f supabase/tests/import.sql | tee "$RUNNER_TEMP/import.txt"
+          grep "IMPORT TESTS PASSED" "$RUNNER_TEMP/import.txt" >> "$GITHUB_STEP_SUMMARY"

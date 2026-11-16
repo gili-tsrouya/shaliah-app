@@ -113,7 +113,7 @@ jobs:
       - name: Deploy to the test project
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-        run: supabase functions deploy --project-ref "$PROJECT_REF" --use-api
+        run: supabase functions deploy --project-ref "$PROJECT_REF" --use-api --yes
 
   api:
     name: Sign in for real and test access through the API

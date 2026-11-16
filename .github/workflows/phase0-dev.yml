@@ -67,3 +67,38 @@ jobs:
           set -euo pipefail
           psql -v ON_ERROR_STOP=1 -f supabase/tests/import.sql | tee "$RUNNER_TEMP/import.txt"
           grep "IMPORT TESTS PASSED" "$RUNNER_TEMP/import.txt" >> "$GITHUB_STEP_SUMMARY"
+
+  api:
+    name: Sign in for real and test access through the API
+    needs: database
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm install --no-audit --no-fund
+        working-directory: supabase/tests/api
+
+      - name: Fetch the project's API keys for this run (masked, never printed)
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        run: |
+          set -euo pipefail
+          curl -fsS -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+            "https://api.supabase.com/v1/projects/$PROJECT_REF/api-keys?reveal=true" > "$RUNNER_TEMP/keys.json"
+          secret=$(jq -r '[.[] | select(.type == "secret" and .name == "default")][0].api_key // empty' "$RUNNER_TEMP/keys.json")
+          publishable=$(jq -r '[.[] | select(.type == "publishable")][0].api_key // empty' "$RUNNER_TEMP/keys.json")
+          rm "$RUNNER_TEMP/keys.json"
+          [ -n "$secret" ] && [ -n "$publishable" ] || { echo "could not find a secret and a publishable key"; exit 1; }
+          echo "::add-mask::$secret"
+          echo "SUPABASE_SECRET_KEY=$secret" >> "$GITHUB_ENV"
+          echo "SUPABASE_PUBLISHABLE_KEY=$publishable" >> "$GITHUB_ENV"
+          echo "SUPABASE_URL=https://$PROJECT_REF.supabase.co" >> "$GITHUB_ENV"
+
+      - name: API tests (two synthetic users; cleaned up afterwards)
+        working-directory: supabase/tests/api
+        run: |
+          set -euo pipefail
+          node api.test.mjs | tee "$RUNNER_TEMP/api.txt"
+          grep "API TESTS PASSED" "$RUNNER_TEMP/api.txt" >> "$GITHUB_STEP_SUMMARY"

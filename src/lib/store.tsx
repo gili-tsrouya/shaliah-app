@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from 'react'
-import type { AgentSettings, CalCategory, CalEvent, Category, Expense, Owed, Partnership, Person, Profile, Settings, Task } from './types'
+import type { AgentSettings, CalCategory, CalEvent, Category, DropSeen, Expense, Owed, Partnership, Person, Profile, Settings, Task } from './types'
 import { DEFAULT_CATEGORIES } from './types'
 import { addDays, todayISO } from './dates'
 import { mirrorPeople } from './push'
@@ -76,6 +76,9 @@ function useAppState() {
   const [callEvents, setCallEvents] = usePersistent<Record<string, SyncedCall>>('callEvents', () => ({}))
   const [savedDeals, setSavedDeals] = usePersistent<string[]>('savedDeals', () => [])
   const [agentSettings, setAgentSettings] = usePersistent<AgentSettings>('agentSettings', () => DEFAULT_AGENT_SETTINGS)
+  // The daily deck: shlichut ideas kept for later, and which items were already gone through
+  const [savedIdeas, setSavedIdeas] = usePersistent<string[]>('savedIdeas', () => [])
+  const [dropSeen, setDropSeen] = usePersistent<Record<string, DropSeen>>('dropSeen', () => ({}))
 
   const [profile, setProfile] = usePersistent<Profile>('profile', () => ({
     home: { name: DEFAULT_AGENT_SETTINGS.home, lat: DEFAULT_AGENT_SETTINGS.lat, lng: DEFAULT_AGENT_SETTINGS.lng },
@@ -149,6 +152,8 @@ function useAppState() {
     people, setPeople,
     callEvents, syncCalls,
     savedDeals, setSavedDeals,
+    savedIdeas, setSavedIdeas,
+    dropSeen, setDropSeen,
     agentSettings, setAgentSettings, publishAgentSettings,
     profile, setProfile,
     partnerships, publishPartnerships,

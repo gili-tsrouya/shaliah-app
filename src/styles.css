@@ -172,3 +172,45 @@ a { color: var(--primary); }
 /* Calendar month grid: smaller cells than the week strip */
 .week.month button { min-height: 48px; border-radius: 10px; }
 .week.month .num { font-size: 15px; }
+
+/* The daily deck */
+.segmented button {
+  border: 0; background: transparent; text-align: center; color: var(--muted); border-radius: 9px; padding: 10px 0; font-size: 15px;
+}
+.segmented button.on { background: var(--surface); color: var(--ink); font-weight: 700; }
+.drop-segs { display: flex; gap: 4px; }
+.drop-segs span { flex: 1; height: 4px; border-radius: 2px; background: #D5DAE3; }
+.drop-segs span.past { background: var(--ink); }
+.drop-segs span.now { background: var(--primary); }
+.drop-card {
+  position: relative; background: var(--surface); border: 1px solid var(--border); border-radius: 24px; overflow: hidden;
+  display: flex; flex-direction: column; min-height: 52vh; touch-action: pan-y; user-select: none;
+}
+.drop-band { padding: 18px; min-height: 150px; display: flex; flex-direction: column; justify-content: space-between; gap: 12px; }
+.drop-band.shl { background: var(--primary); color: #fff; }
+.drop-band.deal { background: var(--personal-bg); color: var(--personal-fg); }
+.drop-pill { font-size: 13px; font-weight: 700; background: #fff; color: var(--ink); border-radius: 8px; padding: 3px 10px; }
+.drop-big { font-family: Rubik, sans-serif; font-size: 40px; font-weight: 700; line-height: 1.1; }
+.drop-body { padding: 18px; display: flex; flex-direction: column; gap: 10px; flex: 1; }
+.drop-body h2 { font-family: Rubik, sans-serif; font-size: 22px; line-height: 1.3; }
+.drop-body p { font-size: 15px; line-height: 1.5; color: #3D4757; display: -webkit-box; -webkit-line-clamp: 6; -webkit-box-orient: vertical; overflow: hidden; }
+.drop-hint { position: absolute; top: 16px; font-weight: 700; border-radius: 10px; padding: 6px 12px; background: #fff; }
+.drop-hint.keep { inset-inline-end: 16px; color: var(--ok); }
+.drop-hint.skip { inset-inline-start: 16px; color: var(--muted); }
+.drop-round {
+  width: 56px; height: 56px; border-radius: 28px; border: 1px solid var(--border); background: var(--surface); color: var(--muted);
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.drop-round.keep { color: var(--primary); }
+.drop-act { flex: 1; height: 56px; border-radius: 28px; font-size: 16px; }
+.drop-done { display: flex; flex-direction: column; align-items: center; gap: 14px; text-align: center; padding: 48px 12px; }
+.drop-done h2 { font-family: Rubik, sans-serif; font-size: 26px; }
+.drop-done p { font-size: 15px; color: #3D4757; line-height: 1.5; }
+.drop-check { width: 88px; height: 88px; border-radius: 44px; background: var(--personal-bg); color: #15803D; display: flex; align-items: center; justify-content: center; }
+.drop-link { min-height: 44px; border: 0; background: transparent; color: var(--primary); font-size: 14px; font-weight: 700; }
+.drop-row { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 10px 12px; display: flex; gap: 10px; align-items: center; }
+.drop-badge { width: 40px; height: 40px; border-radius: 12px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-family: Rubik, sans-serif; font-size: 14px; font-weight: 700; }
+.drop-badge.shl { background: var(--tzofim-bg); color: var(--tzofim-fg); }
+.drop-badge.deal { background: var(--personal-bg); color: var(--personal-fg); }
+.drop-gpt { width: 44px; height: 44px; border-radius: 12px; background: #EEF3FE; color: var(--primary); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+@media (prefers-reduced-motion: reduce) { .drop-card { transition: none !important; } }

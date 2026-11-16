@@ -1,6 +1,7 @@
 import { useAllEvents, useCategory, useStore } from '../lib/store'
 import { SKY_TEXT, skyOf, toF, useWeather, whatToWear } from '../lib/weather'
 import { useFeed } from '../lib/feeds'
+import { allItems, newItems } from '../lib/drop'
 import { budgetSummary, colorOf, daysUntilDue, eventsOn } from '../lib/derive'
 import { addDays, daysBetween, formatLongDay, todayISO } from '../lib/dates'
 import { STATUSES, type TaskStatus } from '../lib/types'
@@ -17,15 +18,21 @@ const greeting = () => {
 }
 
 export function Home() {
-  const { settings, expenses, tasks, people, agentSettings, profile } = useStore()
+  const { settings, expenses, tasks, people, agentSettings, profile, dropSeen } = useStore()
   const events = useAllEvents()
   const cat = useCategory()
   const place = currentPlace(agentSettings)
   const weather = useWeather(place.lat, place.lng)
   const wear = weather && whatToWear(weather)
   const sky = weather && skyOf(weather.code)
-  const deals = useFeed('deals').feed?.items.slice(0, 2) ?? []
-  const topic = useFeed('shlichut').feed?.items[0]
+  const dealsFeed = useFeed('deals').feed
+  const shlichutFeed = useFeed('shlichut').feed
+  const deals = dealsFeed?.items.slice(0, 2) ?? []
+  const topic = shlichutFeed?.items[0]
+  // How many items are waiting in the daily deck: new, or changed since she last saw them
+  const waiting = dealsFeed && shlichutFeed
+    ? newItems(allItems(shlichutFeed.items, dealsFeed.items, agentSettings, todayISO()), dropSeen).length
+    : null
   const today = todayISO()
   const b = budgetSummary(expenses, settings.monthlyBudget, today, profile.savingGoal)
   const upcoming = [today, addDays(today, 1)].flatMap((d) => eventsOn(events, d).map((e) => ({ ...e, day: d })))
@@ -72,6 +79,17 @@ export function Home() {
             <span className="bold" style={{ fontSize: 14 }}>{wear.text}</span>
           </div>
         </div>
+      )}
+
+      {waiting !== null && (
+        <a href="#/drop" className="card blue link-card" style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}>
+          <span className="big-num ltr" style={{ fontSize: 34, minWidth: 40, textAlign: 'center' }}>{waiting}</span>
+          <span className="col" style={{ gap: 2, flex: 1 }}>
+            <span className="bold" style={{ fontSize: 16 }}>{waiting > 0 ? 'חדש מאז הביקור האחרון' : 'עברת על הכול'}</span>
+            <span style={{ fontSize: 14, color: '#DBE6FD' }}>{waiting > 0 ? 'רעיונות לשליחות וגילויים לעצמך' : 'כל התוכן נמצא כאן במקום אחד'}</span>
+          </span>
+          <Icon name="chevronL" size={20} />
+        </a>
       )}
 
       <a href="#/self/budget" className="card dark link-card" style={{ gap: 12 }}>

@@ -185,3 +185,11 @@ export interface Feed {
   updatedAt: string | null
   items: FeedItem[]
 }
+
+// What Gili did with an item in the daily deck, and what the item looked like then.
+// When the agent later changes the time, place or price, the item comes back marked as updated.
+export interface DropSeen {
+  at: string // yyyy-mm-dd
+  did: 'skip' | 'save' | 'act'
+  mark: string
+}

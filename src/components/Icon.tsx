@@ -5,6 +5,7 @@ const paths = {
   calendar: <><rect x="3" y="5" width="18" height="16" rx="2" /><path d="M3 10h18M8 3v4M16 3v4" /></>,
   board: <><rect x="3" y="4" width="5" height="16" rx="1.5" /><rect x="10" y="4" width="5" height="11" rx="1.5" /><rect x="17" y="4" width="4" height="7" rx="1.5" /></>,
   plus: <path d="M12 5v14M5 12h14" />,
+  x: <path d="M6 6l12 12M18 6 6 18" />,
   check: <path d="m5 12 5 5L20 7" />,
   bookmark: <path d="M6 3h12v18l-6-4-6 4z" />,
   search: <><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></>,

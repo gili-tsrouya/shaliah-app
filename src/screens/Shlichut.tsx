@@ -5,18 +5,7 @@ import { Icon } from '../components/Icon'
 import { NextRunNote } from '../components/NextRunNote'
 import { Sheet } from '../components/ui'
 import { COMMUNITIES, type FeedItem, type Partnership } from '../lib/types'
-
-const audienceText = (p: Partnership) =>
-  `${p.community.length ? `קהילה ${p.community.join(' / ')}` : 'נוער יהודי בתפוצות'}, גילאי ${p.ageFrom}–${p.ageTo}` +
-  (p.notes ? ` (${p.notes})` : '')
-
-// Opens ChatGPT with the request already typed in; Gili only presses send
-const chatGptUrl = (i: FeedItem, idea: string | undefined, p: Partnership | undefined) =>
-  'https://chatgpt.com/?q=' + encodeURIComponent(
-    `כתוב לי פעילות בנושא: ${i.title}. הקהל: ${p ? audienceText(p) : 'נוער יהודי בתפוצות (גילאי 13–18)'}.` +
-    (idea ? ` כיוון אפשרי: ${idea}.` : '') +
-    ' התאם את התוכן והשפה לקהל הזה. כלול מטרות, פתיחה, משחק או דיון, שאלות לשיחה, סיכום, משך כולל של כשעה ורשימת ציוד.',
-  )
+import { audienceText, chatGptUrl } from '../lib/ideas'
 
 const FILTERS = ['הכל', 'פרשת השבוע', 'חגים ומועדים', 'ישראל', 'העולם היהודי']
 

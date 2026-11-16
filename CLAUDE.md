@@ -33,6 +33,7 @@ Match its colors, spacing and copy.
 - Calendar: user-defined categories with colors; each category can be linked to a Google calendar for two-way sync (`src/lib/google.ts`, Google Identity Services token in the browser; Client ID pasted in the app).
 - Shlichut: feed + "בנה פעילות ב-ChatGPT" link + create task.
 - Tasks board.
+- Daily deck (`#/drop`, `src/screens/Drop.tsx`, `src/lib/drop.ts`): items from both feeds that are new or changed since they were last gone through, one card at a time (swipe right or bookmark keeps, left skips), and a "כל התוכן" tab listing everything with filters. `dropSeen` records what was seen and the item's date/time/place/price then, so a changed item comes back marked "עודכן"; `savedIdeas` holds kept shlichut items (deals keep using `savedDeals`). Home shows the count. The Deals and Shlichut screens stay as they are.
 - Profile (`#/profile`): name, age, home town, budget + saving goal, interests. Age/home/interests go to `public/agent-settings.json` (`age`, `interests`, `homeBase`); the התאמה panel can set a temporary place with `awayUntil`.
 - Shlichut partnerships (community types + age range) saved to `public/shlichut-settings.json`; the agent tags items with `forPartnerships`.
 - No on-demand run: the agents update every morning (claude.ai routines); screens say changes apply the next morning.

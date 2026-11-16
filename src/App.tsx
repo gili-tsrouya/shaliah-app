@@ -11,6 +11,7 @@ import { Tasks } from './screens/Tasks'
 import { Settings } from './screens/Settings'
 import { Profile } from './screens/Profile'
 import { Account } from './screens/Account'
+import { Drop } from './screens/Drop'
 import { ErrorBoundary } from './components/ErrorBoundary'
 
 const routes: Record<string, () => React.JSX.Element> = {
@@ -24,6 +25,7 @@ const routes: Record<string, () => React.JSX.Element> = {
   settings: Settings,
   profile: Profile,
   account: Account,
+  drop: Drop,
 }
 
 const currentRoute = () => {

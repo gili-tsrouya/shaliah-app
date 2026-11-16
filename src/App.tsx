@@ -14,6 +14,7 @@ import { Account } from './screens/Account'
 import { Drop } from './screens/Drop'
 import { Journal } from './screens/Journal'
 import { Recap } from './screens/Recap'
+import { Wrapped } from './screens/Wrapped'
 import { backupIfNeeded, maybeSignedIn } from './lib/cloud'
 import { ErrorBoundary } from './components/ErrorBoundary'
 
@@ -31,6 +32,7 @@ const routes: Record<string, () => React.JSX.Element> = {
   drop: Drop,
   journal: Journal,
   recap: Recap,
+  wrapped: Wrapped,
 }
 
 const currentRoute = () => {

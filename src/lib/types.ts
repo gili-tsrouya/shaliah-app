@@ -118,6 +118,8 @@ export interface AgentSettings {
   topics: string[]
   extra: string
   updatedAt?: string // when it was last saved from the app
+  // Learned from the daily deck: find categories she tends to keep, and ones she tends to skip
+  taste?: { more: string[]; less: string[] }
   // From the profile page. home/lat/lng above stay "where to search now"; homeBase is where Gili lives.
   age?: number
   interests?: string[]

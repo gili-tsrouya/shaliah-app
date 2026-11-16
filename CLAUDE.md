@@ -48,7 +48,9 @@ Match its colors, spacing and copy.
 - `google_connections.sync_mode`: `browser` (default) means the app writes the calendar; `server` means the `sync_outbox` / `google-sync` path writes it. Never let both write one user's events: Google would get each event twice. The outbox refuses rows for `browser` connections.
 - Journal (`#/journal`, `src/screens/Journal.tsx`, `src/lib/journal.ts`): notes with photos, kept in the account (tables `memories`, `photos`; files in the private bucket `media` at `<user>/<memory>/<photo>/display.jpg`, shown only through short-lived signed links). Needs a signed-in device and a connection; only the text being written is kept locally as a draft. Photos of a shlichut memory are flagged `may_show_minors` by the database and must never be offered for sharing or export.
 - Look back (`#/recap`, `src/screens/Recap.tsx`): the last week or a month, computed on the phone from events, expenses, people talked to and kept deck items, plus journal memories and photos when signed in. It only counts things with a real date; it has no share or export.
-- The deck orders new items by what she tends to keep (`tastes` in `src/lib/drop.ts`); nothing is hidden.
+- The deck orders new items by what she tends to keep (`tastes` in `src/lib/drop.ts`); nothing is hidden. When a round is finished and a GitHub token is set, `dealTaste` (category names only) is written to `public/agent-settings.json` as `taste`, which `agents/deals-agent.md` uses.
+- Monthly summary (`#/wrapped?back=N`, `src/screens/Wrapped.tsx`): full-screen slides for a month, opened from the look-back screen. A slide appears only when there is dated data for it.
+- `src/components/Celebrate.tsx`: shown after the explicit "we talked" button in Stay in touch. It has no streak: the app keeps no dated call log, so it shows the next due date and the on-time share of the recorded history.
 - Backups and health checks of the project run from the private repo `shaliah-data`.
 
 ## Agents

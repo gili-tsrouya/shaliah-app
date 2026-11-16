@@ -4,6 +4,7 @@ import { FREQUENCIES, GRADE_COLORS, daysUntilDue, freqLabel, gradeNow, scoreColo
 import { agoText, daysBetween, inDaysText, israelTime, todayISO } from '../lib/dates'
 import { Fab, SelfTabs, Sheet } from '../components/ui'
 import { Icon } from '../components/Icon'
+import { Celebrate } from '../components/Celebrate'
 import type { Person } from '../lib/types'
 import { disablePush, enablePush, pushSupport, updatePushTime } from '../lib/push'
 import { DEFAULT_CALL_TIME, WEEKDAYS, WEEKDAY_NAMES, callDaysLabel } from '../lib/calls'
@@ -67,10 +68,15 @@ export function Contacts() {
   const sorted = sortByPriority(people, today)
   const due = sorted.filter((p) => daysUntilDue(p) <= 0)
 
-  const talked = (id: string) =>
-    setPeople((ps) => ps.map((p) => (p.id === id && p.lastTalk !== today
-      ? { ...p, lastTalk: today, history: [...(p.history ?? []), gradeNow(p, today)].slice(-8) }
-      : p)))
+  const [celebrate, setCelebrate] = useState<Person | null>(null)
+  // `cheer`: only the explicit "we talked" button celebrates; opening WhatsApp or FaceTime just records it
+  const talked = (id: string, cheer = false) => {
+    const p = people.find((x) => x.id === id)
+    if (!p || p.lastTalk === today) return
+    const updated = { ...p, lastTalk: today, history: [...(p.history ?? []), gradeNow(p, today)].slice(-8) }
+    setPeople((ps) => ps.map((x) => (x.id === id ? updated : x)))
+    if (cheer) setCelebrate(updated)
+  }
 
   return (
     <main className="screen">
@@ -138,7 +144,7 @@ export function Contacts() {
                 ) : null}
                 <span className="small bold" style={{ color }}>{status}{p.history?.length ? ` · ${score}% בזמן` : ''}</span>
               </div>
-              <button className={`icon-btn ${left <= 0 ? 'solid' : ''}`} aria-label={`דיברתי עם ${p.name}`} onClick={() => talked(p.id)}>
+              <button className={`icon-btn ${left <= 0 ? 'solid' : ''}`} aria-label={`דיברתי עם ${p.name}`} onClick={() => talked(p.id, true)}>
                 <Icon name="check" size={20} stroke={2.5} />
               </button>
             </div>
@@ -166,6 +172,7 @@ export function Contacts() {
         )
       })}
 
+      {celebrate && <Celebrate person={celebrate} onClose={() => setCelebrate(null)} />}
       <Fab label="אדם" onClick={() => setEditing({ id: '', name: '', everyDays: 7, lastTalk: today })} />
 
       {imported && <ImportSheet contacts={imported} people={people} onClose={() => setImported(null)}

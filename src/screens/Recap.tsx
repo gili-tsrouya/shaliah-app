@@ -64,6 +64,16 @@ export function Recap() {
         <button className="icon-btn" aria-label="הבא" disabled={back === 0} style={{ opacity: back === 0 ? 0.35 : 1 }} onClick={() => setBack(Math.max(0, back - 1))}><Icon name="chevronL" size={18} /></button>
       </div>
 
+      {span === 'month' && (
+        <a href={`#/wrapped?back=${back}`} className="card blue link-card" style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+          <span className="col" style={{ gap: 2, flex: 1 }}>
+            <span className="bold" style={{ fontSize: 16 }}>הסיכום של {title}</span>
+            <span style={{ fontSize: 14, color: '#DBE6FD' }}>החודש שלך בכמה מסכים</span>
+          </span>
+          <Icon name="chevronL" size={20} />
+        </a>
+      )}
+
       {empty && <p className="empty">אין עדיין מה להראות על התקופה הזאת.</p>}
 
       {photos.length > 0 && (

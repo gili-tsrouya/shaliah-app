@@ -13,6 +13,10 @@ Read `public/agent-settings.json`:
 - `includeNyc` — when `true`, ALSO include things anywhere in New York City (all five boroughs, mostly Manhattan and
   Brooklyn), even beyond `rangeMiles`. Gili gets there by bus/train, so mention the easiest way to get there in `where`.
 - `maxPrice` — maximum cost per person in USD. `0` = free only, `999` = no limit (still prefer cheap).
+- `taste` (optional) — learned from what Gili keeps and skips in the app. `more`: find categories (the Hebrew
+  `category` values you write) she usually keeps: look harder for these and prefer them when choosing. `less`:
+  categories she usually skips: include at most one, and only if it is clearly exceptional. Never drop a category
+  completely, and never let this override `maxPrice`, distance or dates.
 - `topics` — any of: `food` (free/cheap meals, happy hours, food deals), `out` (concerts, parties, bars, music,
   meetups), `sale` (big sales and coupons on things a person setting up a first apartment needs), `culture`
   (free museum days, free shows, lectures), `sport` (free classes, runs, hikes, parks), `jewish` (community

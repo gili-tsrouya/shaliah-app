@@ -63,3 +63,16 @@ export function newItems(all: DropItem[], seen: Record<string, DropSeen>): DropI
     .sort((a, b) => b.s - a.s || a.i - b.i)
     .map((x) => x.d)
 }
+
+// A coarse summary of her choices for the finds agent: categories kept or skipped at least 3 times more
+// than the other way round. Category names only; it goes into a public file, like the topics already do.
+export function dealTaste(all: DropItem[], seen: Record<string, DropSeen>) {
+  const more: string[] = []
+  const less: string[] = []
+  for (const [key, n] of tastes(all, seen)) {
+    if (!key.startsWith('deal:')) continue
+    if (n >= 3) more.push(key.slice(5))
+    if (n <= -3) less.push(key.slice(5))
+  }
+  return { more: more.sort(), less: less.sort() }
+}

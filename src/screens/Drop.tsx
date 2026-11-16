@@ -1,7 +1,7 @@
-import { useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useStore, newId } from '../lib/store'
 import { useFeed } from '../lib/feeds'
-import { allItems, isFree, markOf, newItems, type DropItem } from '../lib/drop'
+import { allItems, dealTaste, isFree, markOf, newItems, type DropItem } from '../lib/drop'
 import { chatGptUrl } from '../lib/ideas'
 import { todayISO } from '../lib/dates'
 import { Icon } from '../components/Icon'
@@ -11,7 +11,7 @@ type Filter = 'all' | 'saved' | 'shl' | 'deal'
 export function Drop() {
   const shl = useFeed('shlichut')
   const deals = useFeed('deals')
-  const { agentSettings, dropSeen, setDropSeen, savedDeals, setSavedDeals, savedIdeas, setSavedIdeas, setEvents, calCategories, partnerships } = useStore()
+  const { agentSettings, publishAgentSettings, settings, dropSeen, setDropSeen, savedDeals, setSavedDeals, savedIdeas, setSavedIdeas, setEvents, calCategories, partnerships } = useStore()
   const [mode, setMode] = useState<'drop' | 'all'>(location.hash.includes('all') ? 'all' : 'drop')
   const [filter, setFilter] = useState<Filter>('all')
   const [savedNow, setSavedNow] = useState(0)
@@ -34,6 +34,17 @@ export function Drop() {
   const deck = again ?? frozen ?? []
   const cur = deck[pos]
   const done = loaded && pos >= deck.length
+
+  // When a round is finished, tell the finds agent what she tends to keep, if that changed.
+  // Needs the GitHub token already used for the agent settings; without it nothing is sent.
+  useEffect(() => {
+    if (!done || !settings.githubToken) return
+    const taste = dealTaste(all, dropSeen)
+    const same = JSON.stringify(taste) === JSON.stringify(agentSettings.taste ?? { more: [], less: [] })
+    if (!same) publishAgentSettings({ ...agentSettings, taste }).catch(() => {})
+    // once per finished round
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [done])
 
   const isSaved = (d: DropItem) => (d.type === 'deal' ? savedDeals : savedIdeas).includes(d.item.id)
   const setSaved = (d: DropItem, on: boolean) => {

@@ -95,6 +95,9 @@ try {
   const mine = works('A can still download their photo after B\'s attempts', await media(a.client).download(path))
   if (!Buffer.from(await mine.arrayBuffer()).equals(jpeg('a'))) fail('A\'s photo file was changed')
   ok('A\'s photo file is byte-for-byte unchanged')
+  // A has just downloaded the file, so any cache in front of storage is warm: B must still be refused
+  denied('B is still refused right after A viewed the photo (no cache leak)', await media(b.client).download(path))
+  denied('a visitor is still refused right after A viewed the photo', await media(createClient(url, publishable, opts)).download(path))
 
   // ---- nobody signed in ----
   denied('a visitor who is not signed in cannot read memories', await anon.from('memories').select('*'))
@@ -137,7 +140,8 @@ try {
   denied('the deleted file is no longer listed', await media(a.client).list(`${a.id}/${memoryId}/${photoId}`))
   // a just-deleted file can stay downloadable for a short while from Supabase's cache; report it, don't hide it
   const after = await media(a.client).download(path)
-  console.log(`note: download right after delete ${after.error ? 'is refused' : 'still answers (served from cache)'}`)
+  console.log(`note: for the owner, download right after delete ${after.error ? 'is refused' : 'still answers (served from cache)'}`)
+  denied('B cannot download the deleted file either', await media(b.client).download(path))
 } finally {
   // remove everything this run created (the two test accounts stay, for the next run)
   for (const u of [a, b]) {

@@ -61,6 +61,13 @@ $json$);
 select test_helpers.must_equal($$ select (snapshot::text like '%SHOULD-BE-STRIPPED%')::text from public.legacy_imports $$, 'false',
   'tokens are stripped from a snapshot before it is stored');
 
+create function test_helpers.report_matches() returns text language sql as $$
+  select coalesce(string_agg(k, ', '), 'match')
+  from public.legacy_imports i, lateral jsonb_object_keys(i.report -> 'account') k
+  where i.id = '11111111-0000-4000-8000-000000000001' and k not in ('events', 'expenses', 'expenses_total', 'expenses_by_month')
+    and (i.report -> 'account' -> k) is distinct from (i.report -> 'phone' -> k)
+$$;
+
 -- ---------- first import, as the signed-in user ----------
 set local role authenticated;
 select set_config('request.jwt.claims', '{"sub":"bbbbbbbb-0000-4000-8000-000000000002","role":"authenticated"}', true);
@@ -71,16 +78,10 @@ select test_helpers.must_fail($$ select public.import_legacy_snapshot_for('11111
   'the internal import function cannot be called through the API');
 select test_helpers.must_equal($$ select (public.import_legacy_snapshot('11111111-0000-4000-8000-000000000001') ->> 'mirror') $$, 'false',
   'the owner can import their own snapshot');
-reset role;
+-- the checks below run as user A: row-level security shows only A's rows, whatever else the project holds
 
-create function test_helpers.report_matches() returns text language sql as $$
-  select coalesce(string_agg(k, ', '), 'match')
-  from public.legacy_imports i, lateral jsonb_object_keys(i.report -> 'account') k
-  where i.id = '11111111-0000-4000-8000-000000000001' and k not in ('events', 'expenses', 'expenses_total', 'expenses_by_month')
-    and (i.report -> 'account' -> k) is distinct from (i.report -> 'phone' -> k)
-$$;
 select test_helpers.must_equal('select test_helpers.report_matches()', 'match', 'the account''s numbers match the phone''s (tasks, people, categories, links, saved finds)');
-select test_helpers.must_equal($$ select report -> 'skipped' ->> 'events_without_date' from public.legacy_imports $$, '1',
+select test_helpers.must_equal($$ select report -> 'skipped' ->> 'events_without_date' from public.legacy_imports where id = '11111111-0000-4000-8000-000000000001' $$, '1',
   'an event without a date is reported, not silently dropped');
 select test_helpers.must_equal($$ select count(*)::text from public.events where user_id = 'aaaaaaaa-0000-4000-8000-000000000001' $$, '3', '3 of 4 events imported');
 select test_helpers.must_equal($$ select (report -> 'account' ->> 'expenses_total') || ' = ' || (report -> 'phone' ->> 'expenses_total') from public.legacy_imports $$,
@@ -115,6 +116,7 @@ select test_helpers.must_equal($$ select name || ' ' || community::text || ' ' |
 select test_helpers.must_equal($$ select who || ' ' || what || ' ' || amount from public.owed_items $$, 'נועה פיצה 9.00', 'an owed item is kept');
 
 -- ---------- importing again changes nothing ----------
+reset role;
 create temp table before_again as
   select (select count(*) from public.tasks) t, (select count(*) from public.events) e, (select count(*) from public.expenses) x,
          (select count(*) from public.contacts) c, (select count(*) from public.contact_touches) h, (select count(*) from public.event_external_links) l,
@@ -133,18 +135,27 @@ select '11111111-0000-4000-8000-000000000002', user_id,
 from public.legacy_imports where id = '11111111-0000-4000-8000-000000000001';
 
 select public.import_legacy_snapshot_for('11111111-0000-4000-8000-000000000002', 'aaaaaaaa-0000-4000-8000-000000000001');
+set local role authenticated;
+select set_config('request.jwt.claims', '{"sub":"aaaaaaaa-0000-4000-8000-000000000001","role":"authenticated"}', true);
 select test_helpers.must_equal($$ select title from public.tasks where legacy_id = 't1' $$, 'להכין פעולה לחנוכה', 'a newer snapshot updates the row it already imported');
 select test_helpers.must_equal($$ select count(*)::text from public.tasks where deleted_at is null $$, '3', 'a plain import never deletes anything');
 
+reset role;
 select public.import_legacy_snapshot_for('11111111-0000-4000-8000-000000000002', 'aaaaaaaa-0000-4000-8000-000000000001', true);
+set local role authenticated;
+select set_config('request.jwt.claims', '{"sub":"aaaaaaaa-0000-4000-8000-000000000001","role":"authenticated"}', true);
 select test_helpers.must_equal($$ select string_agg(legacy_id, ',' order by legacy_id) from public.tasks where deleted_at is not null $$, 't2',
   'a mirror import marks what was deleted on the phone as deleted (kept, not erased)');
 select test_helpers.must_equal($$ select (report -> 'account' ->> 'expenses_total') || ' = ' || (report -> 'phone' ->> 'expenses_total') from public.legacy_imports where id = '11111111-0000-4000-8000-000000000002' $$,
   '37.15 = 37.15', 'after a mirror import the expense totals match again');
+reset role;
 select public.import_legacy_snapshot_for('11111111-0000-4000-8000-000000000001', 'aaaaaaaa-0000-4000-8000-000000000001', true);
+set local role authenticated;
+select set_config('request.jwt.claims', '{"sub":"aaaaaaaa-0000-4000-8000-000000000001","role":"authenticated"}', true);
 select test_helpers.must_equal($$ select count(*)::text from public.tasks where deleted_at is null $$, '3', 'a row that is back in the snapshot is restored');
 
 -- ---------- after the switch, importing phone data is refused ----------
+reset role;
 update public.profiles set data_source = 'account' where user_id = 'aaaaaaaa-0000-4000-8000-000000000001';
 select test_helpers.must_fail($$ select public.import_legacy_snapshot_for('11111111-0000-4000-8000-000000000001', 'aaaaaaaa-0000-4000-8000-000000000001') $$,
   'once the account is the source of truth, a phone import is refused');

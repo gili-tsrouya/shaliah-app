@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-11-16T11:16:18.052Z",
+  "updatedAt": "2026-11-17T11:15:38.431Z",
   "items": [
     {
       "id": "bergen-edu-2026-11-20-public-viewing-night",
@@ -78,6 +78,18 @@
       "lat": 40.9488,
       "lng": -74.0587,
       "url": "https://www.fairsandfestivals.net/events/details/2026-paramus-thanksgiving-craft-fair"
+    },
+    {
+      "id": "ikea-2026-12-24-billy-bookcase",
+      "title": "ספרייה BILLY ב-IKEA במחיר מבצע",
+      "summary": "ספריית BILLY לבנה ב-$65 במקום $79 (מחיר IKEA Family), פריט בסיס זול לדירה חדשה.",
+      "category": "מבצעים",
+      "when": "עד 24 בדצמבר",
+      "date": "2026-12-24",
+      "where": "IKEA · אונליין או בחנות",
+      "price": "$65",
+      "priceValue": 65,
+      "url": "https://www.ikea.com/us/en/offers/"
     },
     {
       "id": "today-2026-11-24-target-holiday-price-match",

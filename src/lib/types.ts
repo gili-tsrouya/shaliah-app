@@ -95,6 +95,7 @@ export interface Person {
   history?: TouchGrade[] // oldest first, last 8
   callDays?: number[] // fixed call days, 0 = Sunday … 6 = Saturday (e.g. Grandma on Fridays)
   callTime?: string // HH:mm, for the calendar event on those days
+  talks?: string[] // yyyy-mm-dd of each day with a logged call, oldest first (from Nov 2026 on, see lib/talks.ts)
 }
 
 export interface Settings {

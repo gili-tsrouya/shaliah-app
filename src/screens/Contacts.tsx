@@ -5,6 +5,7 @@ import { agoText, daysBetween, inDaysText, israelTime, todayISO } from '../lib/d
 import { Fab, SelfTabs, Sheet } from '../components/ui'
 import { Icon } from '../components/Icon'
 import { Celebrate } from '../components/Celebrate'
+import { weekStreak, withTalk } from '../lib/talks'
 import type { Person } from '../lib/types'
 import { disablePush, enablePush, pushSupport, updatePushTime } from '../lib/push'
 import { DEFAULT_CALL_TIME, WEEKDAYS, WEEKDAY_NAMES, callDaysLabel } from '../lib/calls'
@@ -67,15 +68,16 @@ export function Contacts() {
   }
   const sorted = sortByPriority(people, today)
   const due = sorted.filter((p) => daysUntilDue(p) <= 0)
+  const streak = weekStreak(people, today)
 
-  const [celebrate, setCelebrate] = useState<Person | null>(null)
+  const [celebrate, setCelebrate] = useState<{ person: Person; streak: number } | null>(null)
   // `cheer`: only the explicit "we talked" button celebrates; opening WhatsApp or FaceTime just records it
   const talked = (id: string, cheer = false) => {
     const p = people.find((x) => x.id === id)
     if (!p || p.lastTalk === today) return
-    const updated = { ...p, lastTalk: today, history: [...(p.history ?? []), gradeNow(p, today)].slice(-8) }
+    const updated = withTalk({ ...p, lastTalk: today, history: [...(p.history ?? []), gradeNow(p, today)].slice(-8) }, today)
     setPeople((ps) => ps.map((x) => (x.id === id ? updated : x)))
-    if (cheer) setCelebrate(updated)
+    if (cheer) setCelebrate({ person: updated, streak: weekStreak(people.map((x) => (x.id === id ? updated : x)), today) })
   }
 
   return (
@@ -84,6 +86,9 @@ export function Contacts() {
       <SelfTabs active="contacts" />
 
       <ReminderCard due={due.map((p) => p.name)} />
+      {streak >= 2 && (
+        <span className="small bold" style={{ color: '#9A3412' }}>רצף של {streak} שבועות עם לפחות שיחה אחת בכל שבוע</span>
+      )}
 
       <div className="row small muted" style={{ flexWrap: 'wrap', gap: 12 }}>
         <span className="bold">כל נקודה = שיחה:</span>
@@ -172,7 +177,7 @@ export function Contacts() {
         )
       })}
 
-      {celebrate && <Celebrate person={celebrate} onClose={() => setCelebrate(null)} />}
+      {celebrate && <Celebrate person={celebrate.person} streak={celebrate.streak} onClose={() => setCelebrate(null)} />}
       <Fab label="אדם" onClick={() => setEditing({ id: '', name: '', everyDays: 7, lastTalk: today })} />
 
       {imported && <ImportSheet contacts={imported} people={people} onClose={() => setImported(null)}
@@ -201,8 +206,11 @@ function PersonSheet({ person, today, onClose, onSave, onDelete }: {
       <form className="col" style={{ gap: 14 }} onSubmit={(ev) => {
         ev.preventDefault()
         const f = new FormData(ev.currentTarget)
+        const last = String(f.get('last'))
+        // moving the last talk to a later day means a call happened that day
+        const logged = person.id && last > person.lastTalk ? withTalk(person, last) : person
         onSave({
-          ...person, name: String(f.get('name')), everyDays: every, lastTalk: String(f.get('last')),
+          ...logged, name: String(f.get('name')), everyDays: every, lastTalk: last,
           phone: String(f.get('phone') || '').trim() || undefined, photo,
           callDays: fixedDays.length ? fixedDays : undefined, callTime: fixedDays.length ? time : undefined,
         })

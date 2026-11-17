@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useAllEvents, useCategory, useStore } from '../lib/store'
 import { maybeSignedIn } from '../lib/cloud'
 import { loadMemories, type Memory } from '../lib/journal'
+import { callsBetween } from '../lib/talks'
 import { colorOf } from '../lib/derive'
 import { addDays, todayISO } from '../lib/dates'
 import { money } from '../components/ui'
@@ -43,7 +44,8 @@ export function Recap() {
   const mine = memories.filter((m) => within(m.date))
   const photos = mine.flatMap((m) => m.photos).filter((p) => p.url)
   const kept = Object.values(dropSeen).filter((s) => within(s.at) && s.did !== 'skip').length
-  const talked = people.filter((p) => within(p.lastTalk)).map((p) => p.name)
+  const calls = callsBetween(people, from, to < today ? to : today)
+  const talked = calls.byPerson.map((x) => x.name)
   const empty = happened.length === 0 && spentRows.length === 0 && mine.length === 0 && kept === 0 && talked.length === 0
   const monthShare = span === 'month' && settings.monthlyBudget > 0 ? Math.round((spent / settings.monthlyBudget) * 100) : null
 
@@ -117,8 +119,8 @@ export function Recap() {
         <div className="grid2">
           {talked.length > 0 && (
             <div className="card" style={{ gap: 4 }}>
-              <span className="big-num" style={{ fontSize: 24 }}>{talked.length}</span>
-              <span className="bold small">דיברת עם</span>
+              <span className="big-num" style={{ fontSize: 24 }}>{calls.total}</span>
+              <span className="bold small">{calls.total === 1 ? 'שיחה' : 'שיחות'} · דיברת עם</span>
               <span className="muted small">{talked.slice(0, 4).join(', ')}{talked.length > 4 ? '…' : ''}</span>
             </div>
           )}

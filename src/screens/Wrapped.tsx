@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useAllEvents, useCategory, useStore } from '../lib/store'
 import { maybeSignedIn } from '../lib/cloud'
 import { loadMemories, type Memory } from '../lib/journal'
+import { callsBetween } from '../lib/talks'
 import { addDays, daysBetween, todayISO } from '../lib/dates'
 import { money } from '../components/ui'
 import { Icon } from '../components/Icon'
@@ -28,10 +29,12 @@ export function Wrapped() {
     const daysSoFar = back === 0 ? Number(today.slice(8)) : new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate()
     const out: Slide[] = [{ kicker: `${name} שלך`, big: String(daysSoFar), title: back === 0 ? `ימים של ${name} עד עכשיו` : `ימים של ${name}`, body: 'בואי נראה מה היה בהם.', bg: '#1D4ED8', fg: '#FFFFFF' }]
 
-    const talked = people.filter((p) => inMonth(p.lastTalk))
-    if (talked.length) {
-      out.push({ kicker: 'שומרים קשר', big: String(talked.length), title: talked.length === 1 ? 'אדם אחד שדיברת איתו החודש' : 'אנשים שדיברת איתם החודש',
-        body: talked.slice(0, 5).map((p) => p.name).join(', ') + '.', bg: '#15803D', fg: '#FFFFFF' })
+    const monthEnd = `${key}-${String(new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate()).padStart(2, '0')}`
+    const calls = callsBetween(people, `${key}-01`, monthEnd < today ? monthEnd : today)
+    if (calls.total) {
+      const top = calls.byPerson[0]
+      out.push({ kicker: 'שומרים קשר', big: String(calls.total), title: calls.total === 1 ? 'שיחה אחת החודש' : 'שיחות החודש',
+        body: `עם ${calls.byPerson.length === 1 ? top.name : `${calls.byPerson.length} אנשים`}.${calls.byPerson.length > 1 && top.n > 1 ? ` הכי הרבה עם ${top.name} (${top.n}).` : ''}`, bg: '#15803D', fg: '#FFFFFF' })
     }
 
     const rows = expenses.filter((x) => inMonth(x.date))

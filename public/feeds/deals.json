@@ -1,14 +1,14 @@
 {
-  "updatedAt": "2026-11-17T11:15:38.431Z",
+  "updatedAt": "2026-11-18T11:16:14.056Z",
   "items": [
     {
       "id": "bergen-edu-2026-11-20-public-viewing-night",
       "title": "ערב צפייה בכוכבים במצפה של Bergen CC",
-      "summary": "צפייה בכוכבים בטלסקופים במצפה של המכללה, חינם (מתבטל בגשם או עננים) (מתבטל בגשם או עננות).",
+      "summary": "צפייה בכוכבים בטלסקופים במצפה של המכללה; חינם (מתבטל בגשם או בעננים).",
       "category": "תרבות",
       "when": "שישי 19:00-22:00",
       "date": "2026-11-20",
-      "where": "Bergen Community College, Paramus · כ-10 דק׳ נסיעה",
+      "where": "Bergen Community College, 400 Paramus Rd, Paramus · כ-10 דק׳ נסיעה",
       "price": "חינם",
       "priceValue": 0,
       "lat": 40.9361,
@@ -16,26 +16,14 @@
       "url": "https://bergen.edu/event/public-viewing-night-fall-2026-12/"
     },
     {
-      "id": "hip2save-2026-11-22-wayfair-early-black-friday",
-      "title": "מבצע Black Friday מוקדם ב-Wayfair",
-      "summary": "עד 75% הנחה על ריהוט ובית, למשל מדף מטבח ב-$57.99 ושולחן עבודה מ-$85.99, עם משלוח חינם מעל $35.",
-      "category": "מבצעים",
-      "when": "עד יום א׳ 22 בנובמבר",
-      "date": "2026-11-22",
-      "where": "Wayfair · אונליין",
-      "price": "עד -75%",
-      "priceValue": 58,
-      "url": "https://hip2save.com/deals/wayfair-black-friday/"
-    },
-    {
       "id": "today-2026-11-23-walmart-black-friday",
       "title": "Walmart: Black Friday Deals",
-      "summary": "אירוע Black Friday של Walmart בין 23 ל-29 בנובמבר (ואחריו Cyber Monday עד 2 בדצמבר) - הזדמנות לציוד לדירה.",
+      "summary": "Black Friday של Walmart בין 23 ל-29 בנובמבר, למשל סט סכינים Carote ב-$39.99 (במקום $79.99).",
       "category": "מבצעים",
       "when": "23-29 בנובמבר",
       "date": "2026-11-23",
       "where": "Walmart · אונליין ובסניפים",
-      "price": "מבצעים",
+      "price": "עד -50%",
       "url": "https://www.today.com/shop/black-friday-sales-2026-rcna605702"
     },
     {
@@ -94,12 +82,13 @@
     {
       "id": "today-2026-11-24-target-holiday-price-match",
       "title": "Target: התאמת מחיר לחגים",
-      "summary": "Target מתאימה מחיר אם מוצר יורד אחרי הקנייה (1 בנובמבר עד 24 בדצמבר) - נוח לקניות לדירה בלי לחשוש מהמחיר.",
+      "summary": "Target: מבצעי Black Friday בין 22 ל-29 בנובמבר (עד 50% הנחה), והבטחת מחיר נמוך לרכישות עד 24 בדצמבר, למשל Crock-Pot 4.5 ב-$19.99.",
       "category": "מבצעים",
       "when": "עד 24 בדצמבר",
       "where": "Target · אונליין ובסניפים",
-      "price": "מבצעים",
-      "url": "https://www.today.com/shop/target-early-black-friday-sale-2026-rcna607288"
+      "price": "עד -50%",
+      "url": "https://www.today.com/shop/target-early-black-friday-sale-2026-rcna607288",
+      "priceValue": 20
     }
   ]
 }

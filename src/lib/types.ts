@@ -61,6 +61,7 @@ export interface CalEvent {
   meet?: boolean // ask Google for a Google Meet link when saving
   meetLink?: string // the Meet link Google created
   invitedBy?: string // set when someone else organized the event: its guest list is theirs and read-only here
+  myStatus?: Guest['status'] // her own reply, on an event someone else invited her to
 }
 
 export interface Guest {

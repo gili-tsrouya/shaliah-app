@@ -146,6 +146,7 @@ function peopleOf(g: GEvent) {
     guests,
     meetLink: g.hangoutLink,
     invitedBy: g.organizer && !g.organizer.self ? g.organizer.email : undefined,
+    myStatus: g.organizer && !g.organizer.self ? (g.attendees ?? []).find((a) => a.self)?.responseStatus : undefined,
   }
 }
 
@@ -226,3 +227,13 @@ export const updateRawEvent = (token: string, calendarId: string, googleId: stri
 // Deleting an event she invited people to sends them a cancellation
 export const deleteEvent = (token: string, calendarId: string, googleId: string, e?: CalEvent) =>
   api<void>(token, `/calendars/${encodeURIComponent(calendarId)}/events/${googleId}?sendUpdates=${notify(e)}`, { method: 'DELETE' })
+
+// Her reply to someone else's invitation. Google takes the whole guest list back, so the event is read
+// first and only her own answer is changed; the organizer is told.
+export async function respond(token: string, calendarId: string, googleId: string, status: 'accepted' | 'declined' | 'tentative') {
+  const path = `/calendars/${encodeURIComponent(calendarId)}/events/${googleId}`
+  const g = await api<GEvent>(token, path)
+  const attendees = (g.attendees ?? []).map((a) => (a.self ? { ...a, responseStatus: status } : a))
+  if (!attendees.some((a) => a.self)) throw new Error('not invited')
+  return api<GEvent>(token, `${path}?sendUpdates=all`, { method: 'PATCH', body: JSON.stringify({ attendees }) })
+}

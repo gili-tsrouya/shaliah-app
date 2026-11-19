@@ -138,6 +138,18 @@ export function Calendar() {
     }
   }
 
+  const rsvp = async (e: CalEvent, status: 'accepted' | 'declined' | 'tentative') => {
+    try {
+      const tok = await ensureToken()
+      await G.respond(tok, e.googleCalendarId!, e.googleId!, status)
+      // show the answer at once; the next sync confirms it from Google
+      setGoogleEvents((es) => es.map((x) => (x.id === e.id ? { ...x, myStatus: status } : x)))
+      await refresh(tok)
+    } catch {
+      setError('לא הצלחתי לשלוח את התשובה ל-Google. נסי שוב.')
+    }
+  }
+
   const removeEvent = async (e: CalEvent) => {
     if (e.googleId && e.googleCalendarId) {
       try {
@@ -251,7 +263,9 @@ export function Calendar() {
               <span className="col" style={{ gap: 2, flex: 1 }}>
                 <span className="title">{e.title}</span>
                 <span className="small bold">{cat(e.work).label}{e.kind === 'deadline' ? ' · דדליין' : e.kind === 'vacation' ? ' · חופשה' : ''}{e.googleId ? ' · Google' : ''}</span>
-                {e.guests && e.guests.length > 0 && <span className="small">{guestSummary(e.guests)}</span>}
+                {e.invitedBy
+                  ? <span className="small bold">{e.myStatus === 'needsAction' || !e.myStatus ? 'הזמנה: עוד לא ענית' : `ענית: ${MY_REPLY[e.myStatus]}`}</span>
+                  : e.guests && e.guests.length > 0 && <span className="small">{guestSummary(e.guests)}</span>}
               </span>
             </button>
           )
@@ -276,7 +290,7 @@ export function Calendar() {
 
       <Fab label="אירוע" onClick={() => setEditing({ id: '', title: '', work: calCategories[0]?.id ?? 'personal', kind: 'event', date: day })} />
 
-      {editing && <EventSheet event={editing} categories={calCategories} known={knownGuests} onClose={() => setEditing(null)}
+      {editing && <EventSheet event={editing} categories={calCategories} known={knownGuests} onRsvp={(st) => rsvp(editing, st)} onClose={() => setEditing(null)}
         onSave={(e) => saveEvent(e, editing.id ? editing : null)}
         onDelete={() => removeEvent(editing)} />}
 
@@ -292,6 +306,8 @@ export function Calendar() {
   )
 }
 
+const MY_REPLY: Record<string, string> = { accepted: 'מגיעה', declined: 'לא מגיעה', tentative: 'אולי' }
+
 const STATUS: Record<string, string> = { accepted: 'מגיע/ה', declined: 'לא מגיע/ה', tentative: 'אולי', needsAction: 'עוד לא ענה/תה' }
 
 function guestSummary(guests: Guest[]) {
@@ -302,8 +318,9 @@ function guestSummary(guests: Guest[]) {
 
 const validEmail = (s: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s)
 
-function EventSheet({ event, categories, known, onClose, onSave, onDelete }: {
-  event: CalEvent; categories: CalCategory[]; known: string[]; onClose: () => void; onSave: (e: CalEvent) => void; onDelete: () => void
+function EventSheet({ event, categories, known, onRsvp, onClose, onSave, onDelete }: {
+  event: CalEvent; categories: CalCategory[]; known: string[]; onRsvp: (s: 'accepted' | 'declined' | 'tentative') => void
+  onClose: () => void; onSave: (e: CalEvent) => void; onDelete: () => void
 }) {
   const [kind, setKind] = useState<EventKind>(event.kind)
   const [work, setWork] = useState(event.work)
@@ -348,6 +365,18 @@ function EventSheet({ event, categories, known, onClose, onSave, onDelete }: {
         })
         onClose()
       }}>
+        {event.invitedBy && event.googleId && (
+          <div className="card" style={{ gap: 10 }}>
+            <span className="bold">{event.invitedBy} הזמין/ה אותך</span>
+            <div className="row" style={{ gap: 8 }} role="group" aria-label="התשובה שלך">
+              {([['accepted', 'מגיעה'], ['tentative', 'אולי'], ['declined', 'לא מגיעה']] as const).map(([st, label]) => (
+                <button type="button" key={st} className={`chip ${event.myStatus === st ? 'on' : ''}`} aria-pressed={event.myStatus === st} style={{ flex: 1 }}
+                  onClick={() => { onRsvp(st); onClose() }}>{label}</button>
+              ))}
+            </div>
+            <span className="small muted">התשובה נשלחת למי שהזמין/ה, והאירוע נשאר ביומן שלך.</span>
+          </div>
+        )}
         <div className="chips" role="radiogroup" aria-label="סוג">
           {([['event', 'אירוע'], ['deadline', 'דדליין'], ['vacation', 'חופשה']] as const).map(([k, l]) => (
             <button type="button" key={k} role="radio" aria-checked={kind === k} className={`chip ${kind === k ? 'on' : ''}`} onClick={() => setKind(k)}>{l}</button>

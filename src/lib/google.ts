@@ -1,6 +1,6 @@
 // Two-way Google Calendar sync straight from the browser (no server).
 // Uses Google Identity Services for a short-lived access token and the Calendar REST API.
-import type { CalEvent, EventKind, Work } from './types'
+import type { CalEvent, EventKind, Guest, Work } from './types'
 import { addDays } from './dates'
 import { cloud, maybeSignedIn } from './cloud'
 
@@ -134,6 +134,19 @@ interface GEvent {
   start: { date?: string; dateTime?: string }
   end: { date?: string; dateTime?: string }
   extendedProperties?: { private?: { shaliachKind?: EventKind } }
+  attendees?: { email: string; responseStatus?: Guest['status']; self?: boolean; organizer?: boolean; resource?: boolean }[]
+  organizer?: { email?: string; self?: boolean }
+  hangoutLink?: string
+}
+
+// Guests other than Gili herself, and who organized the event if it was not her
+function peopleOf(g: GEvent) {
+  const guests = (g.attendees ?? []).filter((a) => !a.self && !a.resource).map((a) => ({ email: a.email, status: a.responseStatus }))
+  return {
+    guests,
+    meetLink: g.hangoutLink,
+    invitedBy: g.organizer && !g.organizer.self ? g.organizer.email : undefined,
+  }
 }
 
 const localDate = (dt: string) => {
@@ -150,14 +163,14 @@ function fromGoogle(g: GEvent, calendarId: string, work: Work): CalEvent {
     return {
       id: `g_${calendarId}_${g.id}`, googleId: g.id, googleCalendarId: calendarId, work, title: g.summary || '(ללא כותרת)',
       kind: kind ?? (endDate > g.start.date ? 'vacation' : 'event'), date: g.start.date,
-      endDate: endDate > g.start.date ? endDate : undefined,
+      endDate: endDate > g.start.date ? endDate : undefined, ...peopleOf(g),
     }
   }
   const s = localDate(g.start.dateTime!)
   const e = localDate(g.end.dateTime ?? g.start.dateTime!)
   return {
     id: `g_${calendarId}_${g.id}`, googleId: g.id, googleCalendarId: calendarId, work, title: g.summary || '(ללא כותרת)',
-    kind: kind ?? 'event', date: s.date, start: s.time, end: kind === 'deadline' ? undefined : e.time,
+    kind: kind ?? 'event', date: s.date, start: s.time, end: kind === 'deadline' ? undefined : e.time, ...peopleOf(g),
   }
 }
 
@@ -172,8 +185,15 @@ function toGoogle(e: CalEvent) {
     body.start = { dateTime: `${e.date}T${e.start}:00`, timeZone: tz }
     body.end = { dateTime: `${e.date}T${end < e.start ? e.start : end}:00`, timeZone: tz }
   }
+  // The guest list is sent only for her own events, and only when the app knows it (left out, Google keeps it)
+  if (e.guests && !e.invitedBy) body.attendees = e.guests.map((g) => ({ email: g.email }))
+  if (e.meet && !e.meetLink) body.conferenceData = { createRequest: { requestId: crypto.randomUUID(), conferenceSolutionKey: { type: 'hangoutsMeet' } } }
   return JSON.stringify(body)
 }
+
+// Google emails guests only when asked to: invitations, changes and cancellations
+const notify = (e: CalEvent | undefined) => (e?.guests?.length && !e.invitedBy ? 'all' : 'none')
+const query = (e: CalEvent) => `?sendUpdates=${notify(e)}${e.meet ? '&conferenceDataVersion=1' : ''}`
 
 // Events of one calendar between two dates (inclusive)
 export async function fetchEvents(token: string, calendarId: string, work: Work, from: string, to: string) {
@@ -187,10 +207,14 @@ export async function fetchEvents(token: string, calendarId: string, work: Work,
 }
 
 export const createEvent = (token: string, calendarId: string, e: CalEvent) =>
-  api<GEvent>(token, `/calendars/${encodeURIComponent(calendarId)}/events`, { method: 'POST', body: toGoogle(e) })
+  api<GEvent>(token, `/calendars/${encodeURIComponent(calendarId)}/events${query(e)}`, { method: 'POST', body: toGoogle(e) })
 
-export const updateEvent = (token: string, calendarId: string, googleId: string, e: CalEvent) =>
-  api<GEvent>(token, `/calendars/${encodeURIComponent(calendarId)}/events/${googleId}`, { method: 'PATCH', body: toGoogle(e) })
+// `before` is the event as it was: guests who were removed also get a cancellation
+export const updateEvent = (token: string, calendarId: string, googleId: string, e: CalEvent, before?: CalEvent) => {
+  const tell = notify(e) === 'all' || notify(before) === 'all'
+  const q = `?sendUpdates=${tell ? 'all' : 'none'}${e.meet ? '&conferenceDataVersion=1' : ''}`
+  return api<GEvent>(token, `/calendars/${encodeURIComponent(calendarId)}/events/${googleId}${q}`, { method: 'PATCH', body: toGoogle(e) })
+}
 
 // Events built elsewhere (e.g. repeating calls, see src/lib/calls.ts)
 export const createRawEvent = (token: string, calendarId: string, body: object) =>
@@ -199,5 +223,6 @@ export const createRawEvent = (token: string, calendarId: string, body: object) 
 export const updateRawEvent = (token: string, calendarId: string, googleId: string, body: object) =>
   api<GEvent>(token, `/calendars/${encodeURIComponent(calendarId)}/events/${googleId}`, { method: 'PUT', body: JSON.stringify(body) })
 
-export const deleteEvent = (token: string, calendarId: string, googleId: string) =>
-  api<void>(token, `/calendars/${encodeURIComponent(calendarId)}/events/${googleId}`, { method: 'DELETE' })
+// Deleting an event she invited people to sends them a cancellation
+export const deleteEvent = (token: string, calendarId: string, googleId: string, e?: CalEvent) =>
+  api<void>(token, `/calendars/${encodeURIComponent(calendarId)}/events/${googleId}?sendUpdates=${notify(e)}`, { method: 'DELETE' })

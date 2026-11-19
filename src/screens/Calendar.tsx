@@ -2,7 +2,7 @@ import { useCallback, useRef, useEffect, useState } from 'react'
 import { useAllEvents, useCategory, useStore, newId } from '../lib/store'
 import { colorOf, eventsOn } from '../lib/derive'
 import { DAY_LETTERS, MONTHS, addDays, formatDay, formatLongDay, fromISO, toISO, todayISO, weekStart } from '../lib/dates'
-import { COLORS, type CalCategory, type CalEvent, type EventKind, type Work } from '../lib/types'
+import { COLORS, type CalCategory, type CalEvent, type EventKind, type Guest, type Work } from '../lib/types'
 import * as G from '../lib/google'
 import { cloudAvailable, maybeSignedIn } from '../lib/cloud'
 import { Fab, Sheet } from '../components/ui'
@@ -122,9 +122,9 @@ export function Calendar() {
     try {
       if (target || wasGoogle) {
         const tok = await ensureToken()
-        if (wasGoogle && before!.googleCalendarId === target) await G.updateEvent(tok, target!, before!.googleId!, e)
+        if (wasGoogle && before!.googleCalendarId === target) await G.updateEvent(tok, target!, before!.googleId!, e, before!)
         else {
-          if (wasGoogle) await G.deleteEvent(tok, before!.googleCalendarId!, before!.googleId!)
+          if (wasGoogle) await G.deleteEvent(tok, before!.googleCalendarId!, before!.googleId!, before!)
           if (target) await G.createEvent(tok, target, e)
         }
         if (before && !wasGoogle) setEvents((es) => es.filter((x) => x.id !== before.id))
@@ -142,13 +142,16 @@ export function Calendar() {
     if (e.googleId && e.googleCalendarId) {
       try {
         const tok = await ensureToken()
-        await G.deleteEvent(tok, e.googleCalendarId, e.googleId)
+        await G.deleteEvent(tok, e.googleCalendarId, e.googleId, e)
         setGoogleEvents((es) => es.filter((x) => x.id !== e.id))
       } catch {
         setError('לא הצלחתי למחוק ב-Google Calendar.')
       }
     } else setEvents((es) => es.filter((x) => x.id !== e.id))
   }
+
+  // emails she invited before, offered as suggestions
+  const knownGuests = [...new Set(all.flatMap((e) => (e.guests ?? []).map((g) => g.email)))].sort()
 
   const syncLabel = sync === 'off' ? 'Google — לא מחובר' : sync === 'syncing' ? 'מסנכרן…' : token && linked.length ? 'מסונכרן עם Google' : 'סנכרן עם Google'
 
@@ -248,10 +251,16 @@ export function Calendar() {
               <span className="col" style={{ gap: 2, flex: 1 }}>
                 <span className="title">{e.title}</span>
                 <span className="small bold">{cat(e.work).label}{e.kind === 'deadline' ? ' · דדליין' : e.kind === 'vacation' ? ' · חופשה' : ''}{e.googleId ? ' · Google' : ''}</span>
+                {e.guests && e.guests.length > 0 && <span className="small">{guestSummary(e.guests)}</span>}
               </span>
             </button>
           )
         })}
+        {dayEvents.filter((e) => e.meetLink).map((e) => (
+          <a key={`meet_${e.id}`} className="btn light row" style={{ justifyContent: 'center', gap: 8 }} href={e.meetLink} target="_blank" rel="noreferrer">
+            <Icon name="video" size={18} /> להצטרף ל-Meet: {e.title}
+          </a>
+        ))}
       </section>
 
       {vacations.length > 0 && (
@@ -267,7 +276,7 @@ export function Calendar() {
 
       <Fab label="אירוע" onClick={() => setEditing({ id: '', title: '', work: calCategories[0]?.id ?? 'personal', kind: 'event', date: day })} />
 
-      {editing && <EventSheet event={editing} categories={calCategories} onClose={() => setEditing(null)}
+      {editing && <EventSheet event={editing} categories={calCategories} known={knownGuests} onClose={() => setEditing(null)}
         onSave={(e) => saveEvent(e, editing.id ? editing : null)}
         onDelete={() => removeEvent(editing)} />}
 
@@ -283,15 +292,50 @@ export function Calendar() {
   )
 }
 
-function EventSheet({ event, categories, onClose, onSave, onDelete }: {
-  event: CalEvent; categories: CalCategory[]; onClose: () => void; onSave: (e: CalEvent) => void; onDelete: () => void
+const STATUS: Record<string, string> = { accepted: 'מגיע/ה', declined: 'לא מגיע/ה', tentative: 'אולי', needsAction: 'עוד לא ענה/תה' }
+
+function guestSummary(guests: Guest[]) {
+  const yes = guests.filter((g) => g.status === 'accepted').length
+  const no = guests.filter((g) => g.status === 'declined').length
+  return `${guests.length === 1 ? 'מוזמן אחד' : `${guests.length} מוזמנים`}${yes ? `, ${yes} אישרו` : ''}${no ? `, ${no} לא מגיעים` : ''}`
+}
+
+const validEmail = (s: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s)
+
+function EventSheet({ event, categories, known, onClose, onSave, onDelete }: {
+  event: CalEvent; categories: CalCategory[]; known: string[]; onClose: () => void; onSave: (e: CalEvent) => void; onDelete: () => void
 }) {
   const [kind, setKind] = useState<EventKind>(event.kind)
+  const [work, setWork] = useState(event.work)
+  const [guests, setGuests] = useState<Guest[]>(event.guests ?? [])
+  const [typed, setTyped] = useState('')
+  const [meet, setMeet] = useState(!!event.meet || !!event.meetLink)
+  const [bad, setBad] = useState('')
+  const toGoogle = !!categories.find((c) => c.id === work)?.googleCalendarId
+  const readOnly = !!event.invitedBy
+  // adds whatever was typed; several addresses can be pasted at once, separated by commas or spaces
+  const addTyped = () => {
+    const parts = typed.split(/[\s,;]+/).map((x) => x.trim().toLowerCase()).filter(Boolean)
+    if (!parts.length) return true
+    const wrong = parts.filter((x) => !validEmail(x))
+    if (wrong.length) {
+      setBad(`זו לא כתובת מייל: ${wrong.join(', ')}`)
+      return false
+    }
+    setGuests((gs) => [...gs, ...parts.filter((x) => !gs.some((g) => g.email === x)).map((email) => ({ email }))])
+    setTyped('')
+    setBad('')
+    return true
+  }
   return (
     <Sheet title={event.id ? 'עריכת אירוע' : 'אירוע חדש'} onClose={onClose}>
       <form className="col" style={{ gap: 14 }} onSubmit={(ev) => {
         ev.preventDefault()
+        if (toGoogle && !readOnly && !addTyped()) return
         const f = new FormData(ev.currentTarget)
+        // an address typed but not yet added counts too
+        const pending = toGoogle && !readOnly ? typed.split(/[\s,;]+/).map((x) => x.trim().toLowerCase()).filter(validEmail) : []
+        const all = [...guests, ...pending.filter((x) => !guests.some((g) => g.email === x)).map((email) => ({ email }))]
         const s = (k: string) => String(f.get(k) || '') || undefined
         onSave({
           ...event, id: event.id || newId(), title: String(f.get('title')), work: String(f.get('work')), kind,
@@ -299,6 +343,8 @@ function EventSheet({ event, categories, onClose, onSave, onDelete }: {
           endDate: kind === 'vacation' ? s('endDate') : undefined,
           start: kind === 'vacation' ? undefined : s('start'),
           end: kind === 'event' ? s('end') : undefined,
+          guests: toGoogle ? (readOnly ? event.guests : all) : event.guests,
+          meet: toGoogle && kind === 'event' && meet ? true : undefined,
         })
         onClose()
       }}>
@@ -309,7 +355,7 @@ function EventSheet({ event, categories, onClose, onSave, onDelete }: {
         </div>
         <label className="field">כותרת<input name="title" defaultValue={event.title} required autoFocus={!event.id} /></label>
         <label className="field">שייך ל
-          <select name="work" defaultValue={event.work}>{categories.map((c) => <option key={c.id} value={c.id}>{c.label}{c.googleCalendarId ? ' (Google)' : ''}</option>)}</select>
+          <select name="work" value={work} onChange={(ev) => setWork(ev.target.value)}>{categories.map((c) => <option key={c.id} value={c.id}>{c.label}{c.googleCalendarId ? ' (Google)' : ''}</option>)}</select>
         </label>
         <div className="grid2">
           <label className="field">{kind === 'vacation' ? 'מתאריך' : 'תאריך'}<input name="date" type="date" defaultValue={event.date} required /></label>
@@ -318,8 +364,53 @@ function EventSheet({ event, categories, onClose, onSave, onDelete }: {
             : <label className="field">{kind === 'deadline' ? 'עד שעה' : 'משעה'}<input name="start" type="time" defaultValue={event.start} /></label>}
         </div>
         {kind === 'event' && <label className="field">עד שעה<input name="end" type="time" defaultValue={event.end} /></label>}
-        <button className="btn block" type="submit">שמור</button>
-        {event.id && <button type="button" className="btn danger block" onClick={() => { onDelete(); onClose() }}>מחק</button>}
+
+        {kind !== 'vacation' && (
+          <div className="field">
+            מוזמנים
+            {!toGoogle && <span className="small muted">כדי להזמין אנשים במייל, בחרי קטגוריה שמחוברת ל-Google. Google שולח את ההזמנות.</span>}
+            {readOnly && <span className="small muted">האירוע נשלח אלייך מ-{event.invitedBy}, ורשימת המוזמנים שלו.</span>}
+            {guests.length > 0 && (
+              <div className="col" style={{ gap: 6 }}>
+                {guests.map((g) => (
+                  <div key={g.email} className="between" style={{ gap: 8 }}>
+                    <span className="col" style={{ gap: 0, minWidth: 0 }}>
+                      <span dir="ltr" style={{ textAlign: 'right', overflow: 'hidden', textOverflow: 'ellipsis' }}>{g.email}</span>
+                      {g.status && <span className="small muted">{STATUS[g.status]}</span>}
+                    </span>
+                    {toGoogle && !readOnly && (
+                      <button type="button" className="icon-btn" style={{ width: 36, height: 36, border: 'none' }} aria-label={`להסיר את ${g.email}`}
+                        onClick={() => setGuests((gs) => gs.filter((x) => x.email !== g.email))}><Icon name="x" size={16} /></button>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+            {toGoogle && !readOnly && (
+              <div className="row" style={{ gap: 8 }}>
+                <input className="ltr" type="email" inputMode="email" autoComplete="off" list="known-guests" placeholder="name@example.com" style={{ flex: 1 }}
+                  value={typed} onChange={(ev) => { setTyped(ev.target.value); setBad('') }}
+                  onKeyDown={(ev) => { if (ev.key === 'Enter') { ev.preventDefault(); addTyped() } }} />
+                <button type="button" className="btn light" disabled={!typed.trim()} onClick={addTyped}>הוספה</button>
+                <datalist id="known-guests">{known.filter((k) => !guests.some((g) => g.email === k)).map((k) => <option key={k} value={k} />)}</datalist>
+              </div>
+            )}
+            {bad && <span className="small" style={{ color: 'var(--danger)' }}>{bad}</span>}
+            {toGoogle && !readOnly && guests.length > 0 && <span className="small muted">בשמירה Google ישלח להם הזמנה במייל, ועדכון אם משהו ישתנה.</span>}
+          </div>
+        )}
+        {toGoogle && !readOnly && kind === 'event' && (
+          event.meetLink
+            ? <a className="small bold" href={event.meetLink} target="_blank" rel="noreferrer">קישור ל-Google Meet</a>
+            : (
+              <label className="row" style={{ gap: 10, alignItems: 'center' }}>
+                <input type="checkbox" checked={meet} onChange={(ev) => setMeet(ev.target.checked)} style={{ width: 22, height: 22 }} />
+                להוסיף קישור לשיחת Google Meet
+              </label>
+            )
+        )}
+        <button className="btn block" type="submit">{toGoogle && !readOnly && guests.length > 0 && !event.id ? 'שמירה ושליחת הזמנות' : 'שמור'}</button>
+        {event.id && <button type="button" className="btn danger block" onClick={() => { onDelete(); onClose() }}>{event.guests?.length && !readOnly ? 'מחק ושלח ביטול למוזמנים' : 'מחק'}</button>}
       </form>
     </Sheet>
   )

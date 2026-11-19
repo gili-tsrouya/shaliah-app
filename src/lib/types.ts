@@ -56,6 +56,16 @@ export interface CalEvent {
   end?: string
   googleId?: string
   googleCalendarId?: string
+  // People invited by email. Only for events in a category linked to Google: Google sends the invitations.
+  guests?: Guest[]
+  meet?: boolean // ask Google for a Google Meet link when saving
+  meetLink?: string // the Meet link Google created
+  invitedBy?: string // set when someone else organized the event: its guest list is theirs and read-only here
+}
+
+export interface Guest {
+  email: string
+  status?: 'needsAction' | 'accepted' | 'declined' | 'tentative'
 }
 
 export interface Category {

@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-11-18T11:16:14.056Z",
+  "updatedAt": "2026-11-19T11:16:12.950Z",
   "items": [
     {
       "id": "bergen-edu-2026-11-20-public-viewing-night",
@@ -14,6 +14,31 @@
       "lat": 40.9361,
       "lng": -74.0689,
       "url": "https://bergen.edu/event/public-viewing-night-fall-2026-12/"
+    },
+    {
+      "id": "today-2026-11-24-target-holiday-price-match",
+      "title": "Target: התאמת מחיר לחגים",
+      "summary": "Target: מבצעי Black Friday בין 22 ל-29 בנובמבר (עד 50% הנחה), והבטחת מחיר נמוך לרכישות עד 24 בדצמבר, למשל Crock-Pot 4.5 ב-$19.99.",
+      "category": "מבצעים",
+      "when": "עד 24 בדצמבר",
+      "where": "Target · אונליין ובסניפים",
+      "price": "עד -50%",
+      "url": "https://www.today.com/shop/target-early-black-friday-sale-2026-rcna607288",
+      "priceValue": 20,
+      "date": "2026-11-22"
+    },
+    {
+      "id": "jfnnj-2026-11-22-mitzvah-day",
+      "title": "Mitzvah Day בפדרציה היהודית של צפון ג׳רזי",
+      "summary": "פרויקטי התנדבות קהילתיים משותפים - דרך נעימה להכיר אנשים בקהילה היהודית (ההרשמה מראש).",
+      "category": "קהילה",
+      "when": "ראשון 12:30-15:00",
+      "date": "2026-11-22",
+      "where": "Jewish Federation of Northern NJ, 50 Eisenhower Dr, Paramus · כ-10 דק׳ נסיעה",
+      "price": "הרשמה מראש",
+      "lat": 40.9276,
+      "lng": -74.0697,
+      "url": "https://jfnnj.org/calendar"
     },
     {
       "id": "today-2026-11-23-walmart-black-friday",
@@ -38,6 +63,18 @@
       "lat": 40.9137,
       "lng": -74.0745,
       "url": "https://www.ikea.com/us/en/offers/black-friday"
+    },
+    {
+      "id": "fox5ny-2026-11-25-aldi-thanksgiving-meal",
+      "title": "ארוחת חג ההודיה ב-Aldi לעשרה אנשים",
+      "summary": "סל ארוחת חג שלם (כולל הודו 16 פאונד) בפחות מ-$39, בלי קופונים או מועדון - זול גם לארוחה עם חברים.",
+      "category": "אוכל",
+      "when": "עד 25 בנובמבר",
+      "date": "2026-11-25",
+      "where": "Aldi · סניפים באזור",
+      "price": "$39",
+      "priceValue": 39,
+      "url": "https://www.fox5ny.com/news/thanksgiving-meal-deals-2026-where-get-dinner-what-costs-when-order"
     },
     {
       "id": "thelocalgirl-2026-11-27-record-store-day-black-friday",
@@ -68,6 +105,18 @@
       "url": "https://www.fairsandfestivals.net/events/details/2026-paramus-thanksgiving-craft-fair"
     },
     {
+      "id": "fox5ny-2026-11-29-target-thanksgiving-meal",
+      "title": "Target: ארוחת חג הודיה לשישה ב-$30",
+      "summary": "סל ארוחה כולל הודו Butterball עד 10 פאונד בכ-$5 לאדם.",
+      "category": "אוכל",
+      "when": "עד 29 בנובמבר",
+      "date": "2026-11-29",
+      "where": "Target · Paramus ואונליין",
+      "price": "$30",
+      "priceValue": 30,
+      "url": "https://www.fox5ny.com/news/thanksgiving-meal-deals-2026-where-get-dinner-what-costs-when-order"
+    },
+    {
       "id": "ikea-2026-12-24-billy-bookcase",
       "title": "ספרייה BILLY ב-IKEA במחיר מבצע",
       "summary": "ספריית BILLY לבנה ב-$65 במקום $79 (מחיר IKEA Family), פריט בסיס זול לדירה חדשה.",
@@ -80,15 +129,16 @@
       "url": "https://www.ikea.com/us/en/offers/"
     },
     {
-      "id": "today-2026-11-24-target-holiday-price-match",
-      "title": "Target: התאמת מחיר לחגים",
-      "summary": "Target: מבצעי Black Friday בין 22 ל-29 בנובמבר (עד 50% הנחה), והבטחת מחיר נמוך לרכישות עד 24 בדצמבר, למשל Crock-Pot 4.5 ב-$19.99.",
-      "category": "מבצעים",
+      "id": "fox5ny-2026-12-24-walmart-holiday-basket",
+      "title": "Walmart: סל ארוחת חג ל-10 ב-$35",
+      "summary": "Holiday Meal Basket בכ-$3.50 לאדם, בחנות או אונליין.",
+      "category": "אוכל",
       "when": "עד 24 בדצמבר",
-      "where": "Target · אונליין ובסניפים",
-      "price": "עד -50%",
-      "url": "https://www.today.com/shop/target-early-black-friday-sale-2026-rcna607288",
-      "priceValue": 20
+      "date": "2026-12-24",
+      "where": "Walmart · סניפים באזור",
+      "price": "$35",
+      "priceValue": 35,
+      "url": "https://www.fox5ny.com/news/thanksgiving-meal-deals-2026-where-get-dinner-what-costs-when-order"
     }
   ]
 }

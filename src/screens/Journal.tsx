@@ -4,7 +4,7 @@ import { cloudAvailable, maybeSignedIn } from '../lib/cloud'
 import { deleteMemory, loadMemories, MOODS, saveMemory, type Memory, type MemoryKind } from '../lib/journal'
 import { formatLongDay, todayISO } from '../lib/dates'
 import { Icon } from '../components/Icon'
-import { Fab, Sheet } from '../components/ui'
+import { SelfTabs, Sheet } from '../components/ui'
 
 const DRAFT = 'shaliach-journal-draft' // text being written, so a closed app does not lose it
 
@@ -31,13 +31,13 @@ export function Journal() {
 
   return (
     <main className="screen">
-      <header className="row">
-        <a href="#/home" className="icon-btn" aria-label="חזרה"><Icon name="chevronR" /></a>
-        <div className="col" style={{ gap: 0 }}>
-          <h1>זיכרונות</h1>
-          <span className="muted small">רגעים ותמונות מהשליחות ומהחיים כאן</span>
-        </div>
-      </header>
+      <SelfTabs active="journal" />
+      <div className="title-row">
+        <h1>זיכרונות</h1>
+        {signedIn && list && list.length > 0 && (
+          <button className="icon-btn solid" aria-label="רגע חדש" onClick={() => setAdding(true)}><Icon name="plus" size={20} stroke={2.2} /></button>
+        )}
+      </div>
 
       {(!cloudAvailable || !signedIn) && (
         <a href="#/account" className="card link-card" style={{ gap: 6 }}>
@@ -107,7 +107,6 @@ export function Journal() {
         </section>
       ))}
 
-      {signedIn && list && list.length > 0 && <Fab label="רגע חדש" onClick={() => setAdding(true)} />}
       {adding && signedIn && <AddMemory onClose={() => setAdding(false)} onSaved={() => { setAdding(false); reload() }} />}
 
       {open && (

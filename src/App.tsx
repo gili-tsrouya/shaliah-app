@@ -15,6 +15,8 @@ import { Drop } from './screens/Drop'
 import { Journal } from './screens/Journal'
 import { Recap } from './screens/Recap'
 import { Wrapped } from './screens/Wrapped'
+import { Activities } from './screens/Activities'
+import { Activity, ActivityPrint } from './screens/Activity'
 import { backupIfNeeded, maybeSignedIn } from './lib/cloud'
 import { ErrorBoundary } from './components/ErrorBoundary'
 
@@ -33,6 +35,9 @@ const routes: Record<string, () => React.JSX.Element> = {
   journal: Journal,
   recap: Recap,
   wrapped: Wrapped,
+  activities: Activities,
+  activity: Activity,
+  'activity-print': ActivityPrint,
 }
 
 const currentRoute = () => {
@@ -81,7 +86,7 @@ export default function App() {
       <div className="app">
         <ErrorBoundary key={route} where={route}><Screen /></ErrorBoundary>
       </div>
-      <Nav section={route.split('/')[0]} />
+      {route !== 'activity-print' && <Nav route={route} />}
     </StoreProvider>
   )
 }

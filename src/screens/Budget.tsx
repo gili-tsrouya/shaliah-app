@@ -26,8 +26,8 @@ export function Budget() {
 
   return (
     <main className="screen">
-      <h1>לעצמי</h1>
       <SelfTabs active="budget" />
+      <h1>תקציב</h1>
 
       <section className="card" style={{ gap: 10, padding: 16 }}>
         <div className="between">
@@ -178,7 +178,7 @@ function AddSheet({ today, onClose }: { today: string; onClose: () => void }) {
         <label className="field" style={{ alignItems: 'center' }}>{refund ? 'כמה קיבלת? ($)' : 'כמה הוצאת? ($)'}
           <input name="amount" type="number" inputMode="decimal" step="0.01" min="0" required autoFocus value={amount}
             onChange={(e) => setAmount(e.target.value)}
-            style={{ textAlign: 'center', fontFamily: 'Rubik, sans-serif', fontSize: 28, fontWeight: 700, color: refund ? 'var(--ok)' : undefined, width: '100%' }} />
+            style={{ textAlign: 'center', fontSize: 30, fontWeight: 800, color: refund ? 'var(--ok)' : undefined, width: '100%' }} />
         </label>
         <label className="field">{refund ? 'לקזז מקטגוריה' : 'קטגוריה'}
           <select name="cat" defaultValue={fromOwed ? owed.find((o) => o.id === fromOwed)?.categoryId : undefined}

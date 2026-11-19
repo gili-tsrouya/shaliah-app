@@ -24,7 +24,7 @@ export function Celebrate({ person, streak, onClose }: { person: Person; streak:
         {person.photo
           ? <img src={person.photo} alt="" className="celebrate-face" />
           : <span className="celebrate-face">{person.name.slice(0, 1)}</span>}
-        <h2 style={{ fontFamily: 'Rubik, sans-serif', fontSize: 24 }}>דיברת עם {person.name}</h2>
+        <h2 style={{ fontSize: 24, fontWeight: 800 }}>דיברת עם {person.name}</h2>
         <p style={{ fontSize: 15, color: '#3D4757' }}>הטבעת חזרה לירוק. הפעם הבאה: {formatLongDay(nextCallDate(person))}</p>
         {logged >= 2 && since && (
           <span className="small muted">שיחה מספר {logged} עם {person.name} מאז {formatLongDay(since)}</span>

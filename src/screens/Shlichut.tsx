@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { useStore, newId } from '../lib/store'
 import { updatedText, useFeed } from '../lib/feeds'
 import { Icon } from '../components/Icon'
+import { BackLink } from '../components/ui'
+import { fromIdea } from '../lib/activities'
 import { NextRunNote } from '../components/NextRunNote'
 import { Sheet } from '../components/ui'
 import { COMMUNITIES, type FeedItem, type Partnership } from '../lib/types'
@@ -11,7 +13,7 @@ const FILTERS = ['הכל', 'פרשת השבוע', 'חגים ומועדים', 'י
 
 export function Shlichut() {
   const { feed, error } = useFeed('shlichut')
-  const { setTasks, calCategories, partnerships, publishPartnerships } = useStore()
+  const { setTasks, calCategories, partnerships, publishPartnerships, setActivities } = useStore()
   const [filter, setFilter] = useState('הכל')
   const [forId, setForId] = useState<string | null>(null)
   const [editing, setEditing] = useState<Partnership | null>(null)
@@ -23,6 +25,11 @@ export function Shlichut() {
   const tagged = all.some((i) => i.forPartnerships?.length)
   // Older feeds have no partnership tags yet; then show everything
   const fits = (i: FeedItem) => !partner || !tagged || !!i.forPartnerships?.some((f) => f.id === partner.id)
+  const buildActivity = (i: FeedItem) => {
+    const a = fromIdea(i, partner?.id, ideaFor(i))
+    setActivities((as) => [...as, a])
+    location.hash = `#/activity?id=${a.id}`
+  }
   const ideaFor = (i: FeedItem) => (partner && i.forPartnerships?.find((f) => f.id === partner.id)?.idea) || i.idea
   const featured = all.find((i) => i.category === 'פרשת השבוע' && fits(i))
   const items = all.filter((i) => i !== featured && fits(i) && (filter === 'הכל' || i.category === filter))
@@ -60,9 +67,10 @@ export function Shlichut() {
 
   return (
     <main className="screen">
+      <BackLink href="#/drop?all" label="גילויים" />
       <header className="col" style={{ gap: 4 }}>
-        <h1>שליחות</h1>
-        <p className="muted">מה שווה לדבר עליו השבוע עם הנוער · {updatedText(feed?.updatedAt)}</p>
+        <h1>רעיונות לשליחות</h1>
+        <p className="muted">מה שווה לדבר עליו השבוע עם הנוער. {updatedText(feed?.updatedAt)}</p>
       </header>
 
       <section className="col" style={{ gap: 8 }}>
@@ -97,16 +105,17 @@ export function Shlichut() {
       {!error && feed && all.length === 0 && <p className="empty">עוד אין תוכן — הסוכן ימלא כאן ברגע שירוץ.</p>}
 
       {featured && (filter === 'הכל' || filter === 'פרשת השבוע') && (
-        <article className="card blue" style={{ gap: 10 }}>
-          <span className="small bold" style={{ color: '#DBE6FD' }}>{featured.category}{featured.when ? ` · ${featured.when}` : ''}</span>
+        <article className="card hero" style={{ gap: 10 }}>
+          <span className="small bold" style={{ color: '#C9CCD1' }}>{featured.category}{featured.when ? `, ${featured.when}` : ''}</span>
           <h2 style={{ fontSize: 21, lineHeight: 1.3 }}>{featured.title}</h2>
-          {ideaFor(featured) && <p style={{ fontSize: 14, lineHeight: 1.5, color: '#EEF3FE' }}>{ideaFor(featured)}</p>}
+          {ideaFor(featured) && <p style={{ fontSize: 14, lineHeight: 1.5, color: '#E8E9EB' }}>{ideaFor(featured)}</p>}
           {labels(featured, true)}
           <div className="row">
-            <a className="btn white row" style={{ flex: 1, justifyContent: 'center', textDecoration: 'none', gap: 6 }} href={chatGptUrl(featured, ideaFor(featured), partner)} target="_blank" rel="noreferrer">
-              <Icon name="sparkle" size={16} /> בנה פעילות ב-ChatGPT
+            <button className="btn white" style={{ flex: 1 }} onClick={() => buildActivity(featured)}>לבנות פעילות</button>
+            <a className="icon-btn" style={{ borderRadius: 12, background: 'transparent', color: '#fff', borderColor: '#55595F' }} href={chatGptUrl(featured, ideaFor(featured), partner)} target="_blank" rel="noreferrer" aria-label="לבנות ב-ChatGPT">
+              <Icon name="sparkle" size={18} />
             </a>
-            <button className="icon-btn" style={{ borderRadius: 12, background: 'transparent', color: '#fff', borderColor: '#6F95E8' }}
+            <button className="icon-btn" style={{ borderRadius: 12, background: 'transparent', color: '#fff', borderColor: '#55595F' }}
               aria-label={made.includes(featured.id) ? 'נוספה משימה' : 'צור משימה להכנת פעילות'} disabled={made.includes(featured.id)} onClick={() => makeTask(featured)}>
               <Icon name={made.includes(featured.id) ? 'check' : 'board'} size={18} />
             </button>
@@ -122,11 +131,10 @@ export function Shlichut() {
           {ideaFor(i) && <span style={{ fontSize: 14, lineHeight: 1.45 }}><b>רעיון לשיחה{partner ? ` ל${partner.name}` : ''}: </b>{ideaFor(i)}</span>}
           {labels(i)}
           <div className="row">
-            <a className="btn light row" style={{ flex: 1, justifyContent: 'center', textDecoration: 'none', gap: 6, color: 'var(--primary)', fontWeight: 700 }} href={chatGptUrl(i, ideaFor(i), partner)} target="_blank" rel="noreferrer">
-              <Icon name="sparkle" size={16} /> בנה פעילות ב-ChatGPT
-            </a>
-            <button className="btn light" disabled={made.includes(i.id)} onClick={() => makeTask(i)}>
-              {made.includes(i.id) ? 'נוספה משימה' : 'צור משימה'}
+            <button className="btn" style={{ flex: 1 }} onClick={() => buildActivity(i)}>לבנות פעילות</button>
+            <a className="icon-btn" href={chatGptUrl(i, ideaFor(i), partner)} target="_blank" rel="noreferrer" aria-label="לבנות ב-ChatGPT"><Icon name="sparkle" size={18} /></a>
+            <button className="icon-btn" disabled={made.includes(i.id)} onClick={() => makeTask(i)} aria-label={made.includes(i.id) ? 'נוספה משימה' : 'צור משימה'}>
+              <Icon name={made.includes(i.id) ? 'check' : 'tasks'} size={18} />
             </button>
             {i.url && <a className="icon-btn" style={{ borderRadius: 10 }} href={i.url} target="_blank" rel="noreferrer" aria-label="למקור"><Icon name="link" size={18} /></a>}
           </div>

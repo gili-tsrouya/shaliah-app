@@ -1,11 +1,12 @@
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from 'react'
-import type { AgentSettings, CalCategory, CalEvent, Category, DropSeen, Expense, Owed, Partnership, Person, Profile, Settings, Task } from './types'
+import type { Activity, ActivityMethod, AgentSettings, CalCategory, CalEvent, Category, DropSeen, Expense, Owed, Partnership, Person, Profile, Settings, Task } from './types'
 import { DEFAULT_CATEGORIES } from './types'
 import { addDays, todayISO } from './dates'
 import { mirrorPeople } from './push'
 import { callEvents as callOccurrences, syncCallEvents, type SyncedCall } from './calls'
 import { createRawEvent, deleteEvent, serverToken, storedToken, updateRawEvent } from './google'
 import { loadAgentSettings, loadShlichutSettings, saveAgentSettings, saveShlichutSettings } from './github'
+import { adoptBoard } from './tasks'
 
 const PREFIX = 'shaliach:'
 
@@ -29,7 +30,8 @@ function usePersistent<T>(key: string, initial: () => T) {
   return [value, setValue] as const
 }
 
-export const newId = () => Math.random().toString(36).slice(2, 10)
+import { newId } from './ids'
+export { newId }
 
 const defaultCategories = (): Category[] => [
   { id: 'food', name: 'אוכל וסופר', plan: 600 },
@@ -62,6 +64,13 @@ function useAppState() {
     reminderTime: '12:00',
   }))
   const [tasks, setTasks] = usePersistent<Task[]>('tasks', () => [])
+  // The board's "in progress" tasks become today's three the first time the new task model runs
+  const [tasksModel, setTasksModel] = usePersistent<number>('tasksModel', () => 0)
+  useEffect(() => {
+    if (tasksModel >= 1) return
+    setTasks((ts) => adoptBoard(ts, todayISO()))
+    setTasksModel(1)
+  }, [tasksModel, setTasks, setTasksModel])
   const [events, setEvents] = usePersistent<CalEvent[]>('events', () => [])
   // Events mirrored from Google Calendar; replaced on every fetch
   const [googleEvents, setGoogleEvents] = usePersistent<CalEvent[]>('googleEvents', () => [])
@@ -78,6 +87,9 @@ function useAppState() {
   const [agentSettings, setAgentSettings] = usePersistent<AgentSettings>('agentSettings', () => DEFAULT_AGENT_SETTINGS)
   // The daily deck: shlichut ideas kept for later, and which items were already gone through
   const [savedIdeas, setSavedIdeas] = usePersistent<string[]>('savedIdeas', () => [])
+  // Activities she prepares, and methods she saved to reuse
+  const [activities, setActivities] = usePersistent<Activity[]>('activities', () => [])
+  const [methodBank, setMethodBank] = usePersistent<(ActivityMethod & { id: string })[]>('methodBank', () => [])
   const [dropSeen, setDropSeen] = usePersistent<Record<string, DropSeen>>('dropSeen', () => ({}))
 
   const [profile, setProfile] = usePersistent<Profile>('profile', () => ({
@@ -167,6 +179,8 @@ function useAppState() {
     callEvents, syncCalls,
     savedDeals, setSavedDeals,
     savedIdeas, setSavedIdeas,
+    activities, setActivities,
+    methodBank, setMethodBank,
     dropSeen, setDropSeen,
     agentSettings, setAgentSettings, publishAgentSettings,
     profile, setProfile,

@@ -7,7 +7,7 @@ export function Sheet({ title, onClose, children }: { title: string; onClose: ()
       <div className="sheet" role="dialog" aria-modal="true" aria-label={title} onClick={(e) => e.stopPropagation()}>
         <div className="between">
           <h2>{title}</h2>
-          <button className="icon-btn" aria-label="סגור" onClick={onClose}>✕</button>
+          <button className="icon-btn" style={{ border: 0, background: 'var(--ground)' }} aria-label="סגור" onClick={onClose}><Icon name="x" size={18} /></button>
         </div>
         {children}
       </div>
@@ -24,17 +24,33 @@ export function Fab({ label, onClick, icon = 'plus' }: { label: string; onClick:
   )
 }
 
-export function SelfTabs({ active }: { active: 'deals' | 'budget' | 'contacts' }) {
+// לעצמי: three parts under one tab
+export function SelfTabs({ active }: { active: 'contacts' | 'budget' | 'journal' }) {
   const tabs = [
-    { id: 'deals', label: 'גילויים בזול' },
-    { id: 'budget', label: 'תקציב' },
-    { id: 'contacts', label: 'שומרים קשר' },
+    { id: 'contacts', label: 'שומרים קשר', href: '#/self/contacts' },
+    { id: 'budget', label: 'תקציב', href: '#/self/budget' },
+    { id: 'journal', label: 'זיכרונות', href: '#/journal' },
   ] as const
   return (
     <nav className="segmented" aria-label="לעצמי">
       {tabs.map((t) => (
-        <a key={t.id} href={`#/self/${t.id}`} className={t.id === active ? 'on' : ''}
-          aria-current={t.id === active ? 'page' : undefined}>{t.label}</a>
+        <a key={t.id} href={t.href} className={t.id === active ? 'on' : ''} aria-current={t.id === active ? 'page' : undefined}>{t.label}</a>
+      ))}
+    </nav>
+  )
+}
+
+// גילויים: what is new, everything, and the activities built from it
+export function DiscoverTabs({ active, newCount }: { active: 'new' | 'all' | 'activities'; newCount?: number }) {
+  const tabs = [
+    { id: 'new', label: newCount ? `חדש ${newCount}` : 'חדש', href: '#/drop' },
+    { id: 'all', label: 'הכל', href: '#/drop?all' },
+    { id: 'activities', label: 'הפעילויות שלי', href: '#/activities' },
+  ] as const
+  return (
+    <nav className="segmented" aria-label="גילויים">
+      {tabs.map((t) => (
+        <a key={t.id} href={t.href} className={t.id === active ? 'on' : ''} aria-current={t.id === active ? 'page' : undefined}>{t.label}</a>
       ))}
     </nav>
   )
@@ -49,3 +65,10 @@ export function Bar({ pct, color }: { pct: number; color?: string }) {
 }
 
 export const money = (n: number) => '$' + Math.round(n).toLocaleString('en-US')
+
+// "< back" at the top of a screen that is not a tab of its own
+export function BackLink({ href, label }: { href: string; label: string }) {
+  return (
+    <a href={href} className="back-link"><Icon name="chevronR" size={22} stroke={2.2} />{label}</a>
+  )
+}

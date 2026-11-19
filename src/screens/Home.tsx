@@ -1,177 +1,173 @@
+import { useEffect, useState } from 'react'
 import { useAllEvents, useCategory, useStore } from '../lib/store'
 import { SKY_TEXT, skyOf, toF, useWeather, whatToWear } from '../lib/weather'
-import { useFeed } from '../lib/feeds'
-import { allItems, newItems } from '../lib/drop'
-import { budgetSummary, colorOf, daysUntilDue, eventsOn } from '../lib/derive'
-import { addDays, daysBetween, formatLongDay, todayISO } from '../lib/dates'
-import { STATUSES, type TaskStatus } from '../lib/types'
+import { budgetSummary, colorOf, daysUntilDue, eventsOn, sortByPriority } from '../lib/derive'
+import { addDays, daysBetween, formatLongDay, israelTime, todayISO } from '../lib/dates'
 import { lastBackup } from '../lib/backup'
+import { maybeSignedIn } from '../lib/cloud'
 import { currentPlace } from '../lib/places'
+import { todayTasks } from '../lib/tasks'
 import { Bar, money } from '../components/ui'
 import { Icon } from '../components/Icon'
 
-const greeting = () => {
-  const h = new Date().getHours()
-  if (h < 12) return 'בוקר טוב'
-  if (h < 17) return 'צהריים טובים'
-  return 'ערב טוב'
+const ISRAEL = 'Asia/Jerusalem'
+const clock = (d: Date, timeZone?: string) => d.toLocaleTimeString('he-IL', { timeZone, hour: '2-digit', minute: '2-digit', hour12: false })
+// Hebrew day of month in letters (ט׳ בכסלו), as on a Hebrew calendar
+const gematria = (n: number) => {
+  const tens = ['', 'י', 'כ', 'ל'][Math.floor(n / 10)]
+  const ones = ['', 'א', 'ב', 'ג', 'ד', 'ה', 'ו', 'ז', 'ח', 'ט'][n % 10]
+  const letters = n === 15 ? 'טו' : n === 16 ? 'טז' : tens + ones
+  return letters.length === 1 ? `${letters}׳` : `${letters.slice(0, -1)}״${letters.slice(-1)}`
+}
+const hebrewDate = (d: Date) => {
+  try {
+    const parts = new Intl.DateTimeFormat('he-IL-u-ca-hebrew-nu-latn', { day: 'numeric', month: 'long' }).formatToParts(d)
+    const day = Number(parts.find((p) => p.type === 'day')?.value)
+    const month = parts.find((p) => p.type === 'month')?.value
+    return day && month ? `${gematria(day)} ב${month.replace(/^ב/, '')}` : ''
+  } catch {
+    return ''
+  }
+}
+const localZone = () => Intl.DateTimeFormat().resolvedOptions().timeZone
+
+// Two clocks: where she is, and Israel
+function useNow() {
+  const [now, setNow] = useState(() => new Date())
+  useEffect(() => {
+    const t = setInterval(() => setNow(new Date()), 20_000)
+    return () => clearInterval(t)
+  }, [])
+  return now
 }
 
 export function Home() {
-  const { settings, expenses, tasks, people, agentSettings, profile, dropSeen } = useStore()
+  const { settings, expenses, tasks, people, agentSettings, profile } = useStore()
   const events = useAllEvents()
   const cat = useCategory()
+  const now = useNow()
   const place = currentPlace(agentSettings)
   const weather = useWeather(place.lat, place.lng)
   const wear = weather && whatToWear(weather)
   const sky = weather && skyOf(weather.code)
-  const dealsFeed = useFeed('deals').feed
-  const shlichutFeed = useFeed('shlichut').feed
-  const deals = dealsFeed?.items.slice(0, 2) ?? []
-  const topic = shlichutFeed?.items[0]
-  // How many items are waiting in the daily deck: new, or changed since she last saw them
-  const waiting = dealsFeed && shlichutFeed
-    ? newItems(allItems(shlichutFeed.items, dealsFeed.items, agentSettings, todayISO()), dropSeen).length
-    : null
   const today = todayISO()
+  const inIsrael = localZone() === ISRAEL || clock(now) === clock(now, ISRAEL)
   const b = budgetSummary(expenses, settings.monthlyBudget, today, profile.savingGoal)
-  const upcoming = [today, addDays(today, 1)].flatMap((d) => eventsOn(events, d).map((e) => ({ ...e, day: d })))
-  const dueNow = people.filter((p) => daysUntilDue(p) <= 0)
-  const counts = (['todo', 'doing', 'blocked'] as TaskStatus[]).map((s) => ({ s, n: tasks.filter((t) => t.status === s).length }))
+  const todays = eventsOn(events, today).filter((e) => e.kind !== 'vacation')
+  const tomorrow = eventsOn(events, addDays(today, 1)).filter((e) => e.kind !== 'vacation')
+  const chosen = todayTasks(tasks, today)
+  const toCall = sortByPriority(people, today).slice(0, 4)
+  const ring = (d: number) => (d < 0 ? '#C2410C' : d <= 1 ? '#B7791F' : '#2E9A5E')
+  const last = lastBackup()
+  const needsBackup = !maybeSignedIn() && (!last || daysBetween(last, today) > 30)
+  const placeName = place.name.split(',')[0]
 
   return (
-    <main className="screen">
-      <header className="between" style={{ alignItems: 'flex-start' }}>
-        <div className="col" style={{ gap: 4 }}>
-          <p className="muted">{formatLongDay(today)} · {place.name}</p>
-          <h1>{greeting()}, {settings.name}</h1>
+    <main className="screen" style={{ gap: 22 }}>
+      <header className="col" style={{ gap: 10 }}>
+        <div className="between">
+          <span className="muted" style={{ fontWeight: 600 }}>{formatLongDay(today)}{hebrewDate(now) ? `, ${hebrewDate(now)}` : ''}</span>
+          <span className="row" style={{ gap: 4 }}>
+            <a href="#/profile" className="icon-btn" style={{ border: 0, background: 'transparent', width: 40, height: 40 }} aria-label="הפרופיל שלי"><Icon name="user" size={20} /></a>
+            <a href="#/settings" className="icon-btn" style={{ border: 0, background: 'transparent', width: 40, height: 40 }} aria-label="הגדרות וגיבוי"><Icon name="gear" size={20} /></a>
+          </span>
         </div>
-        <span className="row">
-          <a href="#/profile" className="icon-btn" aria-label="הפרופיל שלי"><Icon name="user" size={20} /></a>
-          <a href="#/settings" className="icon-btn" aria-label="הגדרות וגיבוי"><Icon name="gear" size={20} /></a>
-        </span>
+        <div className="clocks">
+          <div>
+            <span className="clock ltr">{clock(now)}</span>
+            <span className="bold" style={{ fontSize: 15 }}>{inIsrael ? 'כאן ובישראל' : placeName}</span>
+          </div>
+          {!inIsrael && (
+            <div className="other">
+              <span className="clock ltr">{clock(now, ISRAEL)}</span>
+              <span className="bold" style={{ fontSize: 15 }}>ישראל</span>
+            </div>
+          )}
+        </div>
+        {weather && wear && sky && (
+          <span className="row muted" style={{ gap: 6 }}>
+            <Icon name={sky} size={20} stroke={1.8} />
+            <span><span className="ltr">{Math.round(weather.temp)}°C ({toF(weather.temp)}°F)</span>, {SKY_TEXT[sky]}{weather.rainChance >= 30 ? `, ${weather.rainChance}% גשם` : ''}. {wear.text}</span>
+          </span>
+        )}
       </header>
 
-      {(() => {
-        const last = lastBackup()
-        return !last || daysBetween(last, today) > 30 ? (
-          <a href="#/settings" className="card link-card small" style={{ borderColor: 'var(--warn)', color: 'var(--warn)' }}>
-            {last ? 'עבר יותר מחודש מהגיבוי האחרון' : 'עוד לא גיבית את המידע שלך'} — לחצו כאן לגיבוי (לוקח כמה שניות)
-          </a>
-        ) : null
-      })()}
-
-      {weather && wear && sky && (
-        <div className="card" style={{ gap: 10, padding: '10px 14px' }}>
-          <div className="row" style={{ gap: 12 }}>
-            <span className="avatar" style={{ borderRadius: 12, background: sky === 'sun' ? '#FEF3C7' : '#E8EEF7', color: sky === 'sun' ? '#B45309' : '#3D5A80' }}>
-              <Icon name={sky} size={26} stroke={1.8} />
-            </span>
-            <span className="row" style={{ alignItems: 'baseline', gap: 6, flex: 1, minWidth: 0 }}>
-              <span className="big-num ltr" style={{ fontSize: 22 }}>{Math.round(weather.temp)}°C</span>
-              <span style={{ fontSize: 14 }}>{SKY_TEXT[sky]}{weather.rainChance >= 30 ? ` · ${weather.rainChance}% גשם` : ''}</span>
-            </span>
-            <span className="muted small ltr" style={{ whiteSpace: 'nowrap' }}>{Math.round(weather.min)}°–{Math.round(weather.max)}° · {toF(weather.temp)}°F</span>
-          </div>
-          <div className="row" style={{ background: 'var(--ground)', borderRadius: 12, padding: '6px 10px', gap: 8 }}>
-            <Icon name={wear.wear} size={24} stroke={1.8} />
-            <span className="muted" style={{ fontSize: 12 }}>מה ללבוש:</span>
-            <span className="bold" style={{ fontSize: 14 }}>{wear.text}</span>
-          </div>
-        </div>
-      )}
-
-      {waiting !== null && (
-        <a href="#/drop" className="card blue link-card" style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}>
-          <span className="big-num ltr" style={{ fontSize: 34, minWidth: 40, textAlign: 'center' }}>{waiting}</span>
-          <span className="col" style={{ gap: 2, flex: 1 }}>
-            <span className="bold" style={{ fontSize: 16 }}>{waiting > 0 ? 'חדש מאז הביקור האחרון' : 'עברת על הכול'}</span>
-            <span style={{ fontSize: 14, color: '#DBE6FD' }}>{waiting > 0 ? 'רעיונות לשליחות וגילויים לעצמך' : 'כל התוכן נמצא כאן במקום אחד'}</span>
+      {needsBackup && (
+        <a href="#/account" className="card link-card" style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+          <Icon name="cloud" size={22} />
+          <span className="col" style={{ gap: 0, flex: 1 }}>
+            <span className="bold">המידע שלך שמור רק בטלפון</span>
+            <span className="muted small">כניסה לחשבון מגבה אותו אוטומטית</span>
           </span>
-          <Icon name="chevronL" size={20} />
+          <Icon name="chevronL" size={18} />
         </a>
       )}
 
-      <a href="#/self/budget" className="card dark link-card" style={{ gap: 12 }}>
-        <div className="between"><span className="muted">נשאר לך החודש</span><span className="muted small">{b.daysLeft} ימים לסוף החודש</span></div>
-        <div className="row" style={{ alignItems: 'baseline' }}>
-          <span className="big-num ltr">{money(b.remaining)}</span>
-          <span className="muted">מתוך {money(settings.monthlyBudget)}</span>
+      <section className="col" style={{ gap: 8 }}>
+        <div className="section-head"><h2>היום</h2><a href="#/calendar">כל היומן</a></div>
+        <div className="group">
+          {todays.length === 0 && <div className="group-row muted">אין אירועים היום{tomorrow.length ? `. מחר: ${tomorrow[0].title}` : ''}</div>}
+          {todays.slice(0, 5).map((e) => (
+            <a key={e.id} href="#/calendar" className="group-row" style={{ minHeight: 60 }}>
+              <span className="ltr bold" style={{ width: 48, flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>{e.start ?? 'כל היום'}</span>
+              <span className="dot8" style={{ background: colorOf(cat(e.work).color).dot }} />
+              <span className="col" style={{ gap: 1, flex: 1, minWidth: 0 }}>
+                <span style={{ fontSize: 17, fontWeight: 600 }}>{e.title}</span>
+                <span className="small muted">{cat(e.work).label}{e.start && !inIsrael && e.id.startsWith('call_') ? `, ${israelTime(e.start)} בישראל` : ''}</span>
+              </span>
+            </a>
+          ))}
         </div>
-        <Bar pct={(b.remaining / settings.monthlyBudget) * 100} color="#7DD3A8" />
-        <span style={{ fontSize: 14 }}>אפשר להוציא בערך {money(b.perDay)} ליום עד סוף החודש</span>
-      </a>
-
-      {dueNow.length > 0 && (
-        <a href="#/self/contacts" className="card link-card row" style={{ flexDirection: 'row', alignItems: 'center' }}>
-          <span className="avatar"><Icon name="bell" size={20} /></span>
-          <span><b>היום כדאי לדבר עם:</b> {dueNow.map((p) => p.name).join(', ')}</span>
-        </a>
-      )}
-
-      <section className="col">
-        <div className="between"><h2>היום ומחר ביומן</h2><a href="#/calendar" className="small bold" style={{ textDecoration: 'none' }}>לכל היומן</a></div>
-        {upcoming.length === 0 && <p className="empty">אין אירועים היום ומחר</p>}
-        {upcoming.slice(0, 4).map((e) => (
-          <div key={e.id + e.day} className="event" style={{ background: colorOf(cat(e.work).color).bg, color: colorOf(cat(e.work).color).fg }}>
-            <span className="time ltr">{e.kind === 'vacation' ? '—' : e.start ?? 'כל היום'}</span>
-            <span className="title" style={{ flex: 1 }}>{e.title}{e.day !== today ? ' (מחר)' : ''}</span>
-            <span className="small bold">{cat(e.work).label}</span>
-          </div>
-        ))}
       </section>
 
-      {deals.length > 0 && (
-        <section className="col">
-          <div className="between"><h2>הסוכן מצא לך</h2><a href="#/self/deals" className="small bold" style={{ textDecoration: 'none' }}>לכל הגילויים</a></div>
-          <div className="grid2">
-            {deals.map((d) => (
-              <div key={d.id} className="card">
-                {d.price && <span className={`tag ${d.price === 'חינם' ? 'free' : 'paid'}`}>{d.price}</span>}
-                <span className="bold">{d.title}</span>
-                <span className="muted small">{[d.when, d.where].filter(Boolean).join(' · ')}</span>
-              </div>
-            ))}
+      <a href="#/tasks" className="card link-card" style={{ gap: 6 }}>
+        <span className="between"><span className="bold" style={{ fontSize: 17 }}>שלוש להיום</span><span className="small muted">{chosen.length} מתוך 3</span></span>
+        {chosen.length === 0
+          ? <span className="muted">עוד לא בחרת משימות להיום</span>
+          : chosen.map((t, i) => <span key={t.id} style={{ fontWeight: i === 0 ? 700 : 400 }}>{i === 0 ? 'קודם כל: ' : ''}{t.title}</span>)}
+      </a>
+
+      {toCall.length > 0 && (
+        <section className="col" style={{ gap: 10 }}>
+          <div className="section-head"><h2>כדאי להתקשר</h2><a href="#/self/contacts">כולם</a></div>
+          <div className="grid4" style={{ gap: 8 }}>
+            {toCall.map((p) => {
+              const d = daysUntilDue(p, today)
+              return (
+                <a key={p.id} href="#/self/contacts" className="call-face" aria-label={`${p.name}, ${d < 0 ? 'באיחור' : d === 0 ? 'היום' : `בעוד ${d} ימים`}`}>
+                  <span className="ring" style={{ borderColor: ring(d) }}>
+                    {p.photo ? <img src={p.photo} alt="" /> : <span>{p.name.slice(0, 1)}</span>}
+                  </span>
+                  <span className="small bold">{p.name}</span>
+                </a>
+              )
+            })}
           </div>
         </section>
       )}
 
-      {topic && (
-        <a href="#/shlichut" className="card link-card" style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}>
-          <span className="avatar" style={{ borderRadius: 12, background: 'var(--tzofim-bg)', color: 'var(--primary)' }}><Icon name="star" /></span>
-          <span className="col" style={{ gap: 2 }}>
-            <span className="small bold" style={{ color: 'var(--primary)' }}>{topic.category}</span>
-            <span>{topic.title}</span>
-          </span>
+      <a href="#/self/budget" className="card link-card" style={{ gap: 8 }}>
+        <span className="between"><span className="muted" style={{ fontWeight: 600 }}>נשארו לך החודש</span><span className="small muted">עוד {b.daysLeft} ימים</span></span>
+        <span className="between" style={{ alignItems: 'baseline' }}>
+          <span className="big-num ltr" style={{ fontSize: 30 }}>{money(b.remaining)}</span>
+          <span className="muted">מתוך <span className="ltr">{money(settings.monthlyBudget)}</span></span>
+        </span>
+        <Bar pct={(b.remaining / Math.max(1, settings.monthlyBudget)) * 100} />
+        <span className="small muted">בערך {money(b.perDay)} ליום עד סוף החודש</span>
+      </a>
+
+      <div className="group">
+        <a href="#/recap" className="group-row">
+          <Icon name="calendar" size={20} />
+          <span style={{ flex: 1, fontWeight: 600 }}>מבט לאחור על השבוע והחודש</span>
+          <Icon name="chevronL" size={18} />
         </a>
-      )}
-
-      <a href="#/journal" className="card link-card" style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}>
-        <span className="avatar" style={{ borderRadius: 12, background: 'var(--yj-bg)', color: 'var(--yj-fg)' }}><Icon name="heart" /></span>
-        <span className="col" style={{ gap: 2, flex: 1 }}>
-          <span className="bold">זיכרונות</span>
-          <span className="muted small">תמונה ושורה על היום, שיישארו איתך</span>
-        </span>
-        <Icon name="chevronL" size={18} />
-      </a>
-
-      <a href="#/recap" className="card link-card" style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}>
-        <span className="avatar" style={{ borderRadius: 12, background: 'var(--tzofim-bg)', color: 'var(--primary)' }}><Icon name="calendar" /></span>
-        <span className="col" style={{ gap: 2, flex: 1 }}>
-          <span className="bold">מבט לאחור</span>
-          <span className="muted small">השבוע והחודש שלך בקצרה</span>
-        </span>
-        <Icon name="chevronL" size={18} />
-      </a>
-
-      <a href="#/tasks" className="grid3 link-card">
-        {counts.map(({ s, n }) => (
-          <div key={s} className="card" style={{ alignItems: 'center', gap: 0, padding: 10 }}>
-            <span className="big-num" style={{ fontSize: 22, color: s === 'blocked' && n > 0 ? 'var(--danger)' : undefined }}>{n}</span>
-            <span className="muted small">{STATUSES[s]}</span>
-          </div>
-        ))}
-      </a>
+        <a href="#/journal" className="group-row">
+          <Icon name="photo" size={20} />
+          <span style={{ flex: 1, fontWeight: 600 }}>רגע מהיום לזיכרונות</span>
+          <Icon name="chevronL" size={18} />
+        </a>
+      </div>
     </main>
   )
 }

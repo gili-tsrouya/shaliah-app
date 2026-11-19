@@ -82,8 +82,8 @@ export function Contacts() {
 
   return (
     <main className="screen">
-      <h1>לעצמי</h1>
       <SelfTabs active="contacts" />
+      <h1>שומרים קשר</h1>
 
       <ReminderCard due={due.map((p) => p.name)} />
       {streak >= 2 && (
@@ -394,11 +394,11 @@ function ReminderCard({ due }: { due: string[] }) {
   }
 
   return (
-    <section className="card dark" style={{ gap: 14, padding: 16, borderRadius: 20 }} aria-label="שומרים על קשר היום">
+    <section className="card hero" style={{ gap: 14, padding: 16 }} aria-label="שומרים על קשר היום">
       <div className="row" style={{ gap: 12, alignItems: 'flex-start' }}>
-        <span className="avatar" style={{ background: '#2A3A55', color: '#fff', width: 40, height: 40, flexShrink: 0 }}><Icon name="bell" size={20} /></span>
+        <span className="avatar" style={{ background: '#2C2F34', color: '#fff', width: 40, height: 40, flexShrink: 0 }}><Icon name="bell" size={20} /></span>
         <div className="col" style={{ gap: 8, flex: 1, minWidth: 0 }}>
-          <span className="small" style={{ color: '#C9D2E3' }}>{due.length ? 'היום כדאי לדבר עם' : 'היום'}</span>
+          <span className="small" style={{ color: '#C9CCD1' }}>{due.length ? 'היום כדאי לדבר עם' : 'היום'}</span>
           {due.length ? (
             <div className="row" style={{ flexWrap: 'wrap', gap: 6 }}>
               {due.map((name) => (
@@ -411,15 +411,15 @@ function ReminderCard({ due }: { due: string[] }) {
         </div>
       </div>
 
-      <div style={{ height: 1, background: '#2A3A55' }} />
+      <div style={{ height: 1, background: '#2C2F34' }} />
 
       <div className="row" style={{ gap: 12 }}>
         <div className="col" style={{ gap: 4, flex: 1, minWidth: 0 }}>
           <span className="bold" style={{ fontSize: 14 }}>תזכורת כל בוקר</span>
-          <span className="row small" style={{ gap: 6, color: '#C9D2E3', flexWrap: 'wrap' }}>
+          <span className="row small" style={{ gap: 6, color: '#C9CCD1', flexWrap: 'wrap' }}>
             <input type="time" value={settings.reminderTime} aria-label="שעת התזכורת"
               onChange={(e) => setSettings((s) => ({ ...s, reminderTime: e.target.value || '09:00' }))}
-              style={{ background: '#2A3A55', border: 'none', borderRadius: 8, color: '#fff', colorScheme: 'dark', padding: '4px 8px', fontSize: 15, fontWeight: 700, minHeight: 32 }} />
+              style={{ background: '#2C2F34', border: 'none', borderRadius: 8, color: '#fff', colorScheme: 'dark', padding: '4px 8px', fontSize: 15, fontWeight: 700, minHeight: 32 }} />
             <span>{israelTime(settings.reminderTime)} בישראל</span>
           </span>
         </div>
@@ -427,22 +427,22 @@ function ReminderCard({ due }: { due: string[] }) {
           <button role="switch" aria-checked={on} aria-label="התראה כל בוקר" disabled={busy}
             onClick={() => (on ? turnOff() : turnOn(settings.dataRepoToken ?? ''))}
             style={{ width: 52, height: 32, borderRadius: 16, border: 'none', padding: 0, flexShrink: 0, position: 'relative', cursor: 'pointer',
-              background: on ? '#34C759' : '#3A4A66', opacity: busy ? 0.6 : 1, transition: 'background .2s' }}>
+              background: on ? '#34C759' : '#4A4E55', opacity: busy ? 0.6 : 1, transition: 'background .2s' }}>
             <span style={{ position: 'absolute', top: 3, insetInlineStart: on ? 23 : 3, width: 26, height: 26, borderRadius: 13, background: '#fff',
               boxShadow: '0 1px 3px rgba(0,0,0,.3)', transition: 'inset-inline-start .2s' }} />
           </button>
         )}
       </div>
 
-      {support === 'install' && <span className="small" style={{ color: '#C9D2E3' }}>כדי לקבל התראה כל בוקר, פתחו את האפליקציה מהמסך הראשי.</span>}
-      {support === 'unsupported' && <span className="small" style={{ color: '#C9D2E3' }}>הדפדפן הזה לא תומך בהתראות.</span>}
+      {support === 'install' && <span className="small" style={{ color: '#C9CCD1' }}>כדי לקבל התראה כל בוקר, פתחו את האפליקציה מהמסך הראשי.</span>}
+      {support === 'unsupported' && <span className="small" style={{ color: '#C9CCD1' }}>הדפדפן הזה לא תומך בהתראות.</span>}
 
       {askToken && !on && (
         <div className="col" style={{ gap: 8, background: '#1B2940', borderRadius: 12, padding: 12 }}>
-          <label className="small" style={{ color: '#C9D2E3', display: 'flex', flexDirection: 'column', gap: 6 }}>
+          <label className="small" style={{ color: '#C9CCD1', display: 'flex', flexDirection: 'column', gap: 6 }}>
             כדי להפעיל צריך פעם אחת טוקן לריפו shaliah-data
             <input type="password" dir="ltr" autoComplete="off" value={token} onChange={(e) => setToken(e.target.value)}
-              style={{ minHeight: 40, borderRadius: 8, border: '1px solid #3A4A66', background: 'transparent', color: '#fff', padding: '0 10px' }} />
+              style={{ minHeight: 40, borderRadius: 8, border: '1px solid #4A4E55', background: 'transparent', color: '#fff', padding: '0 10px' }} />
           </label>
           <button className="btn white" style={{ minHeight: 40 }} disabled={busy || !token.trim()} onClick={() => turnOn(token)}>
             {busy ? 'מפעיל…' : 'הפעלה'}

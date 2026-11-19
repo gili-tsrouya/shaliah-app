@@ -5,7 +5,7 @@ import { inNyc, milesBetween, rangeOf } from '../lib/derive'
 import { loadAgentSettings } from '../lib/github'
 import { currentPlace, isAway } from '../lib/places'
 import { formatDay, todayISO, addDays } from '../lib/dates'
-import { SelfTabs } from '../components/ui'
+import { BackLink } from '../components/ui'
 import { Icon } from '../components/Icon'
 import { DealsMap } from '../components/DealsMap'
 import { PlacePicker } from '../components/PlacePicker'
@@ -92,8 +92,8 @@ export function Deals() {
 
   return (
     <main className="screen">
-      <h1>לעצמי</h1>
-      <SelfTabs active="deals" />
+      <BackLink href="#/drop?all" label="גילויים" />
+      <h1>גילויים בזול</h1>
 
       <div className="card" style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
         <span className="avatar" style={{ width: 32, height: 32, background: 'var(--personal-bg)', color: 'var(--personal-fg)' }}><Icon name="search" size={18} /></span>

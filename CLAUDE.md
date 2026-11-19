@@ -20,7 +20,10 @@ Code updates must keep it readable:
 
 ## Design source
 The approved design is a Claude Design canvas: https://claude.ai/artifact/RQ2ygpVUiZ8viiNRd7VEsP
-Match its colors, spacing and copy.
+The app follows its third row ("גרסה 3 — כמו אפליקציה אמיתית"): Assistant font (bundled via @fontsource), black / grey / white,
+color only for the workplaces, grouped lists (`.group`, `.group-row`), large titles, segmented switchers.
+Tabs: היום (#/home), יומן (#/calendar), משימות (#/tasks), גילויים (#/drop, #/drop?all, #/activities), לעצמי
+(#/self/contacts, #/self/budget, #/journal). `tabOf` in `src/components/Nav.tsx` says which tab a screen belongs to.
 
 ## Built
 - Home: weather (Open-Meteo, location from agent settings) + what-to-wear icon, budget card, who to call, today/tomorrow events, agent picks, task counts.
@@ -34,7 +37,14 @@ Match its colors, spacing and copy.
   Guests: an event in a Google-linked category can have `guests` (emails); Google sends the invitations, updates and cancellations (`sendUpdates=all` only when there are guests). Replies come back as `status`. `meet: true` asks Google for a Meet link (`meetLink`). Events organized by someone else carry `invitedBy` and `myStatus`; their guest list is never sent back, and her reply goes through `respond` in `src/lib/google.ts` (reads the event, changes only her own `responseStatus`, tells the organizer).
 - Shlichut: feed + "בנה פעילות ב-ChatGPT" link + create task.
   Each shlichut item may carry `plan` (goal + methods), built by the agent from the method families in `agents/method-families.md` / `src/lib/methods.ts` (Tzofim "המסע בצופים"). The word in the UI is "מתודה", never "שיטה".
-- Tasks board.
+- Tasks (`src/screens/Tasks.tsx`, `src/lib/tasks.ts`): "write it down, then choose three". Quick capture goes to an inbox
+  (`inbox: true`), at most three tasks are chosen per day (`plannedFor`, `order`; the first is "קודם כל זה"), the rest is
+  "בהמשך" by due date. `status` keeps its meaning (`done` + `doneAt` when completed). A task can reserve time in the
+  calendar (`blockEventId`). The first run moved the old board's "בתהליך" tasks into today (`tasksModel` flag).
+- Activities (`#/activities`, `#/activity?id=`, `src/lib/activities.ts`): activities built from methods (מתודות) of the
+  families in `src/lib/methods.ts`; total length and merged equipment are computed; method bank `methodBank`; built from a
+  shlichut idea (with the agent's `plan`) from the deck or the shlichut screen; "איך היה?" review; export as PDF (print view
+  `#/activity-print`), Word (.doc HTML) and an equipment list, through the share sheet.
 - Daily deck (`#/drop`, `src/screens/Drop.tsx`, `src/lib/drop.ts`): items from both feeds that are new or changed since they were last gone through, one card at a time (swipe right or bookmark keeps, left skips), and a "כל התוכן" tab listing everything with filters. `dropSeen` records what was seen and the item's date/time/place/price then, so a changed item comes back marked "עודכן"; `savedIdeas` holds kept shlichut items (deals keep using `savedDeals`). Home shows the count. The Deals and Shlichut screens stay as they are.
 - Profile (`#/profile`): name, age, home town, budget + saving goal, interests. Age/home/interests go to `public/agent-settings.json` (`age`, `interests`, `homeBase`); the התאמה panel can set a temporary place with `awayUntil`.
 - Shlichut partnerships (community types + age range) saved to `public/shlichut-settings.json`; the agent tags items with `forPartnerships`.

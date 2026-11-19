@@ -67,10 +67,10 @@ export function Recap() {
       </div>
 
       {span === 'month' && (
-        <a href={`#/wrapped?back=${back}`} className="card blue link-card" style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+        <a href={`#/wrapped?back=${back}`} className="card hero link-card" style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
           <span className="col" style={{ gap: 2, flex: 1 }}>
             <span className="bold" style={{ fontSize: 16 }}>הסיכום של {title}</span>
-            <span style={{ fontSize: 14, color: '#DBE6FD' }}>החודש שלך בכמה מסכים</span>
+            <span style={{ fontSize: 14, color: '#C9CCD1' }}>החודש שלך בכמה מסכים</span>
           </span>
           <Icon name="chevronL" size={20} />
         </a>
@@ -107,7 +107,7 @@ export function Recap() {
       )}
 
       {spentRows.length > 0 && (
-        <section className="card dark" style={{ gap: 6 }}>
+        <section className="card hero" style={{ gap: 6 }}>
           <span className="muted">הוצאות</span>
           <span className="big-num ltr">{money(spent)}</span>
           {monthShare !== null && <span style={{ fontSize: 14 }}>{monthShare}% מהתקציב החודשי ({money(settings.monthlyBudget)})</span>}

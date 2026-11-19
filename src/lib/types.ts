@@ -9,9 +9,9 @@ export interface CalCategory {
 }
 
 export const COLORS: Record<string, { dot: string; bg: string; fg: string; name: string }> = {
-  blue: { dot: '#1D4ED8', bg: '#DBE6FD', fg: '#1E3A8A', name: 'כחול' },
-  orange: { dot: '#EA8A2E', bg: '#FDE7CF', fg: '#7C2D12', name: 'כתום' },
-  green: { dot: '#2F9E68', bg: '#D7F2E3', fg: '#14532D', name: 'ירוק' },
+  blue: { dot: '#2F6BE0', bg: '#E6EEFC', fg: '#1B4FB8', name: 'כחול' },
+  orange: { dot: '#E8772E', bg: '#FCEBDD', fg: '#9A4512', name: 'כתום' },
+  green: { dot: '#2E9A5E', bg: '#E1F3E8', fg: '#1C6B40', name: 'ירוק' },
   purple: { dot: '#7C3AED', bg: '#EDE4FB', fg: '#4C1D95', name: 'סגול' },
   pink: { dot: '#DB2777', bg: '#FCE3EF', fg: '#831843', name: 'ורוד' },
   teal: { dot: '#0D9488', bg: '#D5F3EF', fg: '#134E4A', name: 'טורקיז' },
@@ -41,6 +41,12 @@ export interface Task {
   status: TaskStatus
   due?: string // yyyy-mm-dd
   note?: string
+  // "Write it down, then choose three" (since Nov 2026). All optional; `status` keeps its meaning.
+  inbox?: boolean // written down quickly, not sorted yet
+  plannedFor?: string // yyyy-mm-dd: one of the (up to three) tasks chosen for that day
+  order?: number // position among that day's tasks; the first one is "קודם כל זה"
+  doneAt?: string // yyyy-mm-dd when it was marked done
+  blockEventId?: string // a calendar event she reserved for doing it
 }
 
 export type EventKind = 'event' | 'deadline' | 'vacation'
@@ -225,4 +231,25 @@ export interface DropSeen {
   at: string // yyyy-mm-dd
   did: 'skip' | 'save' | 'act'
   mark: string
+}
+
+// An activity she prepares in advance, built from methods (מתודות). Kept on the phone under `activities`.
+export interface Activity {
+  id: string
+  title: string
+  goal: string
+  work?: Work // calendar category it belongs to
+  partnershipId?: string
+  ageFrom?: number
+  ageTo?: number
+  date?: string // yyyy-mm-dd
+  start?: string // HH:mm
+  methods: (ActivityMethod & { id: string })[]
+  status: 'draft' | 'ready' | 'done'
+  fromIdeaId?: string // the shlichut feed item it was built from
+  packed?: string[] // equipment already packed
+  review?: { feel?: string; came?: number; worked?: string; change?: string }
+  calendarEventId?: string
+  createdAt: string
+  updatedAt: string
 }

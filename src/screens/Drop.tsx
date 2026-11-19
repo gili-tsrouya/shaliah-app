@@ -5,14 +5,22 @@ import { allItems, dealTaste, tasteFor, isFree, markOf, newItems, type DropItem 
 import { chatGptUrl } from '../lib/ideas'
 import { todayISO } from '../lib/dates'
 import { Icon } from '../components/Icon'
+import { DiscoverTabs } from '../components/ui'
+import { fromIdea } from '../lib/activities'
 
 type Filter = 'all' | 'saved' | 'shl' | 'deal'
 
 export function Drop() {
   const shl = useFeed('shlichut')
   const deals = useFeed('deals')
-  const { agentSettings, publishAgentSettings, shlichutTaste, publishShlichutTaste, settings, dropSeen, setDropSeen, savedDeals, setSavedDeals, savedIdeas, setSavedIdeas, setEvents, calCategories, partnerships } = useStore()
+  const { agentSettings, publishAgentSettings, shlichutTaste, publishShlichutTaste, settings, dropSeen, setDropSeen, savedDeals, setSavedDeals, savedIdeas, setSavedIdeas, setEvents, calCategories, partnerships, setActivities } = useStore()
   const [mode, setMode] = useState<'drop' | 'all'>(location.hash.includes('all') ? 'all' : 'drop')
+  // the tabs at the top are links: follow the address
+  useEffect(() => {
+    const onHash = () => setMode(location.hash.includes('all') ? 'all' : 'drop')
+    window.addEventListener('hashchange', onHash)
+    return () => window.removeEventListener('hashchange', onHash)
+  }, [])
   const [filter, setFilter] = useState<Filter>('all')
   const [savedNow, setSavedNow] = useState(0)
   const [again, setAgain] = useState<DropItem[] | null>(null)
@@ -70,14 +78,23 @@ export function Drop() {
 
   const act = () => {
     if (!cur) return
-    if (cur.type === 'shl') window.open(gpt(cur), '_blank', 'noopener')
-    else if (cur.item.date) {
+    if (cur.type === 'shl') {
+      // the idea becomes a draft activity (with the agent's methods when it sent them) and opens
+      const p = partnerFor(cur)
+      const a = fromIdea(cur.item, p?.id, ideaFor(cur))
+      setActivities((as) => [...as, a])
+      setDropSeen((s) => ({ ...s, [cur.item.id]: { at: today, did: 'act', mark: markOf(cur.item) } }))
+      setSaved(cur, true)
+      location.hash = `#/activity?id=${a.id}`
+      return
+    }
+    if (cur.item.date) {
       const work = calCategories.find((c) => c.id === 'personal')?.id ?? calCategories[0]?.id ?? 'personal'
       setEvents((ev) => [...ev, { id: newId(), title: cur.item.title, work, kind: 'event', date: cur.item.date! }])
     } else if (cur.item.url) window.open(cur.item.url, '_blank', 'noopener')
     next('act')
   }
-  const actionLabel = (d: DropItem) => (d.type === 'shl' ? 'בנה פעילות' : d.item.date ? 'אני הולכת · ליומן' : d.item.url ? 'לפרטים' : 'שמרי')
+  const actionLabel = (d: DropItem) => (d.type === 'shl' ? 'לבנות פעילות' : d.item.date ? 'להוסיף ליומן' : d.item.url ? 'לפרטים' : 'לשמור')
 
   // Swipe: right keeps, left skips (the same in a right-to-left layout: the card follows the finger)
   const onDown = (e: React.PointerEvent) => { startX.current = e.clientX }
@@ -97,15 +114,7 @@ export function Drop() {
 
   return (
     <main className="screen drop">
-      <div className="row" style={{ gap: 10 }}>
-        <a href="#/home" className="icon-btn" aria-label="חזרה לבית"><Icon name="chevronR" /></a>
-        <div role="tablist" aria-label="תצוגה" className="segmented" style={{ flex: 1 }}>
-          <button role="tab" aria-selected={mode === 'drop'} className={mode === 'drop' ? 'on' : ''} onClick={() => setMode('drop')}>
-            חדש{deck.length - pos > 0 && !again ? ` · ${deck.length - pos}` : ''}
-          </button>
-          <button role="tab" aria-selected={mode === 'all'} className={mode === 'all' ? 'on' : ''} onClick={() => setMode('all')}>כל התוכן</button>
-        </div>
-      </div>
+      <DiscoverTabs active={mode === 'all' ? 'all' : 'new'} newCount={again ? 0 : Math.max(0, deck.length - pos)} />
 
       {failed && <p className="empty">לא הצלחתי לטעון את התוכן. בדקי את החיבור לאינטרנט.</p>}
       {!loaded && !failed && <p className="empty">טוען…</p>}
@@ -123,7 +132,7 @@ export function Drop() {
             style={{ transform: `translateX(${drag}px) rotate(${drag / 30}deg)`, transition: startX.current == null ? 'transform .2s' : 'none' }}>
             <div className={`drop-band ${cur.type}`}>
               <span className="row" style={{ gap: 6 }}>
-                <span className="drop-pill">{cur.type === 'shl' ? 'שליחות' : 'לעצמי'} · {cur.item.category}</span>
+                <span className="drop-pill">{cur.type === 'shl' ? 'לשליחות' : 'בשבילך'}, {cur.item.category}</span>
                 {cur.changed && <span className="drop-pill">עודכן</span>}
               </span>
               <span className="drop-big">{big(cur)}</span>
@@ -158,7 +167,7 @@ export function Drop() {
               ? 'כבר עברת על הכול. הסוכנים מביאים תוכן חדש כל בוקר.'
               : `${savedNow > 0 ? `שמרת ${savedNow === 1 ? 'דבר אחד' : `${savedNow} דברים`}. ` : ''}התוכן הבא יגיע מחר בבוקר.`}
           </p>
-          <button className="btn" onClick={() => setMode('all')}>לכל התוכן</button>
+          <a className="btn" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }} href="#/drop?all">לכל התוכן</a>
           {all.length > 0 && (
             <button className="drop-link" onClick={() => { setAgain(all); setPos(0); setSavedNow(0) }}>לעבור שוב על הכול</button>
           )}
@@ -167,21 +176,22 @@ export function Drop() {
 
       {mode === 'all' && loaded && (
         <>
-          <div className="col" style={{ gap: 2 }}>
-            <h1 style={{ fontSize: 24 }}>כל התוכן במקום אחד</h1>
-            <p className="muted" style={{ fontSize: 14 }}>פעילויות לנוער וגילויים לעצמך</p>
+          <h1>כל התוכן</h1>
+          <div className="group">
+            <a href="#/shlichut" className="group-row"><Icon name="star" size={20} /><span style={{ flex: 1, fontWeight: 600 }}>רעיונות לשליחות, לפי שותפות</span><Icon name="chevronL" size={18} /></a>
+            <a href="#/self/deals" className="group-row"><Icon name="map" size={20} /><span style={{ flex: 1, fontWeight: 600 }}>גילויים בזול: מפה והתאמה לסוכן</span><Icon name="chevronL" size={18} /></a>
           </div>
           <div className="chips">
             {chips.map(([id, label]) => (
               <button key={id} className={`chip ${filter === id ? 'on' : ''}`} aria-pressed={filter === id} onClick={() => setFilter(id)}>{label}</button>
             ))}
           </div>
-          <div className="col" style={{ gap: 8 }}>
+          <div className="group">
             {lib.map((d) => (
               <div key={d.item.id} className="drop-row">
                 <span className={`drop-badge ${d.type}`}>{d.type === 'shl' ? d.item.category.slice(0, 2) : '$'}</span>
                 <span className="col" style={{ gap: 2, flex: 1, minWidth: 0 }}>
-                  <span className="muted small">{[d.item.category, d.item.when].filter(Boolean).join(' · ')}</span>
+                  <span className="muted small">{[d.item.category, d.item.when].filter(Boolean).join(', ')}</span>
                   {d.item.url
                     ? <a className="bold" style={{ fontSize: 14, color: 'inherit', textDecoration: 'none' }} href={d.item.url} target="_blank" rel="noreferrer">{d.item.title}</a>
                     : <span className="bold" style={{ fontSize: 14 }}>{d.item.title}</span>}

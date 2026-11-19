@@ -74,11 +74,29 @@ Exactly this shape (UTF-8, 2-space indent):
       "forPartnerships": [
         { "id": "<partnership id from shlichut-settings.json>", "idea": "<one Hebrew sentence tailored to that group's community and ages>" }
       ],
-      "url": "<source page>"
+      "url": "<source page>",
+      "plan": {
+        "goal": "<one Hebrew sentence: what the chanichim will think, feel or do by the end>",
+        "methods": [
+          {
+            "family": "<exactly one family name from agents/method-families.md>",
+            "name": "<short Hebrew name of this method, e.g. 'מה במזוודה'>",
+            "purpose": "<one Hebrew sentence: why this method is here>",
+            "minutes": 10,
+            "equipment": ["<Hebrew item>", "..."],
+            "content": "<2–4 Hebrew sentences: exactly what the madrich/a says and does, step by step>"
+          }
+        ]
+      }
     }
   ]
 }
 ```
+
+Every item gets a `plan`: the general `idea` broken into 3–5 methods that can be run as they are. Read
+`agents/method-families.md` first and follow its rules (families, order, 45–60 minutes in total, at least three
+different families, equipment listed per method, `[]` when none). Write it for the general audience; the app adapts
+it to a partnership. Keep `minutes` a whole number.
 
 Put the פרשת השבוע item first (the app shows it as the featured card). Then sort by date / relevance.
 Keep the same `id` for items that are still relevant from yesterday.

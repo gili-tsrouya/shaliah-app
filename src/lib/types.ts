@@ -195,6 +195,23 @@ export interface FeedItem {
   idea?: string
   // Shlichut: which partnerships this fits, with an idea tailored to each
   forPartnerships?: { id: string; idea?: string }[]
+  // Shlichut: the idea already broken into methods, ready to become an activity
+  plan?: ActivityPlan
+}
+
+// One method (מתודה) of an activity. `family` is one of METHOD_FAMILIES in lib/methods.ts.
+export interface ActivityMethod {
+  family: string
+  name: string
+  purpose: string
+  minutes: number
+  equipment: string[]
+  content: string
+}
+
+export interface ActivityPlan {
+  goal: string
+  methods: ActivityMethod[]
 }
 
 export interface Feed {

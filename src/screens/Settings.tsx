@@ -1,12 +1,13 @@
 import { useState } from 'react'
 import { useStore } from '../lib/store'
+import { THEMES, themeOf } from '../lib/theme'
 import { exportBackup, lastBackup, readBackup, restoreBackup } from '../lib/backup'
 import { daysBetween, formatDay, todayISO } from '../lib/dates'
 import { Icon } from '../components/Icon'
 import { cloudAvailable } from '../lib/cloud'
 
 export function Settings() {
-  const { settings } = useStore()
+  const { settings, setSettings } = useStore()
   const [last, setLast] = useState(lastBackup)
   const [msg, setMsg] = useState('')
   const [pending, setPending] = useState<Awaited<ReturnType<typeof readBackup>> | null>(null)
@@ -37,6 +38,22 @@ export function Settings() {
         </span>
         <Icon name="chevronL" size={18} />
       </a>
+
+      <section className="card" style={{ gap: 12 }}>
+        <div className="between"><h2>צבע האפליקציה</h2><span className="small muted">{themeOf(settings.theme).name}</span></div>
+        <div className="swatches" role="radiogroup" aria-label="צבע האפליקציה">
+          {THEMES.map((t) => {
+            const on = themeOf(settings.theme).id === t.id
+            return (
+              <button key={t.id} role="radio" aria-checked={on} aria-label={t.name} className={`swatch ${on ? 'on' : ''}`}
+                style={{ background: t.accent }} onClick={() => setSettings((s) => ({ ...s, theme: t.id }))}>
+                {on && <Icon name="check" size={20} stroke={2.6} />}
+              </button>
+            )
+          })}
+        </div>
+        <span className="small muted">כחול, כתום וירוק נשארים לצופים, ל-Young Judaea ולאישי, כדי שתמיד יהיה ברור מה שייך למה.</span>
+      </section>
 
       {cloudAvailable && (
         <a href="#/account" className="card link-card row" style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>

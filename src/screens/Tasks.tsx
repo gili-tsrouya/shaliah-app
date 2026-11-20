@@ -197,7 +197,7 @@ function TaskSheet({ task, isToday, isFirst, categories, block, onClose, onSave,
         </div>
         <label className="field">הערה<textarea name="note" rows={2} defaultValue={task.note} /></label>
         <label className="row" style={{ gap: 10 }}>
-          <input type="checkbox" checked={reserve} onChange={(e) => setReserve(e.target.checked)} style={{ width: 22, height: 22, accentColor: '#000' }} />
+          <input type="checkbox" checked={reserve} onChange={(e) => setReserve(e.target.checked)} style={{ width: 22, height: 22 }} />
           <span className="bold">לשמור לזה זמן ביומן</span>
         </label>
         {reserve && (

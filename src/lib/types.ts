@@ -123,6 +123,7 @@ export interface Settings {
   githubToken?: string // optional, lets the app save agent settings to the repo
   dataRepoToken?: string // optional, token for the private data repo (morning reminder); never in backups
   pushEnabled?: boolean // morning "who to call" notification is on
+  theme?: string // id from THEMES in lib/theme.ts; black when not set
 }
 
 // Read by the daily deals agent from public/agent-settings.json

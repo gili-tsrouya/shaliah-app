@@ -22,6 +22,8 @@ Code updates must keep it readable:
 The approved design is a Claude Design canvas: https://claude.ai/artifact/RQ2ygpVUiZ8viiNRd7VEsP
 The app follows its third row ("גרסה 3 — כמו אפליקציה אמיתית"): Assistant font (bundled via @fontsource), black / grey / white,
 color only for the workplaces, grouped lists (`.group`, `.group-row`), large titles, segmented switchers.
+Accent color (buttons, active tab, selected chips, progress) is `--accent`, chosen in Settings from `THEMES` in `src/lib/theme.ts`
+(`settings.theme`; black when unset). Never use an accent close to the workplace blue/orange/green.
 Tabs: היום (#/home), יומן (#/calendar), משימות (#/tasks), גילויים (#/drop, #/drop?all, #/activities), לעצמי
 (#/self/contacts, #/self/budget, #/journal). `tabOf` in `src/components/Nav.tsx` says which tab a screen belongs to.
 

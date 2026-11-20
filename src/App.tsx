@@ -18,6 +18,8 @@ import { Wrapped } from './screens/Wrapped'
 import { Activities } from './screens/Activities'
 import { Activity, ActivityPrint } from './screens/Activity'
 import { backupIfNeeded, maybeSignedIn } from './lib/cloud'
+import { applyTheme } from './lib/theme'
+import { useStore } from './lib/store'
 import { ErrorBoundary } from './components/ErrorBoundary'
 
 const routes: Record<string, () => React.JSX.Element> = {
@@ -83,10 +85,18 @@ export default function App() {
   const Screen = routes[route]
   return (
     <StoreProvider>
+      <ThemeSync />
       <div className="app">
         <ErrorBoundary key={route} where={route}><Screen /></ErrorBoundary>
       </div>
       {route !== 'activity-print' && <Nav route={route} />}
     </StoreProvider>
   )
+}
+
+// The chosen accent color, applied to the whole page
+function ThemeSync() {
+  const { settings } = useStore()
+  useEffect(() => applyTheme(settings.theme), [settings.theme])
+  return null
 }

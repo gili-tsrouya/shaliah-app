@@ -217,7 +217,7 @@ export function Activity() {
           <div className="group">
             {gear.map((g) => (
               <label key={g.name} className="group-row" style={{ cursor: 'pointer' }}>
-                <input type="checkbox" checked={packed.has(g.name)} style={{ width: 22, height: 22, accentColor: '#000' }}
+                <input type="checkbox" checked={packed.has(g.name)} style={{ width: 22, height: 22 }}
                   onChange={() => update({ packed: packed.has(g.name) ? [...packed].filter((x) => x !== g.name) : [...packed, g.name] })} />
                 <span style={{ flex: 1, fontWeight: 600, color: packed.has(g.name) ? 'var(--muted)' : undefined, textDecoration: packed.has(g.name) ? 'line-through' : undefined }}>{g.name}</span>
                 {g.count > 1 && <span className="small muted">ב-{g.count} מתודות</span>}

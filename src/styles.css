@@ -156,7 +156,7 @@ button.group-row { border-top-width: 0; }
 
 .nav {
   position: fixed; bottom: 0; inset-inline: 0; z-index: 10;
-  background: rgba(255, 255, 255, 0.96); border-top: 1px solid var(--border);
+  background: color-mix(in srgb, var(--ground) 55%, #fff); border-top: 1px solid var(--border);
   padding: 6px 4px calc(env(safe-area-inset-bottom) + 6px);
   -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
 }

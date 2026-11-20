@@ -15,8 +15,27 @@ export const THEMES = [
 
 export const themeOf = (id?: string) => THEMES.find((t) => t.id === id) ?? THEMES[0]
 
-export function applyTheme(id?: string) {
+// Mix the accent into a neutral grey: the share is how much of the color shows
+function tint(hex: string, share: number, base = [244, 245, 247]) {
+  const c = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16))
+  return '#' + c.map((v, i) => Math.round(base[i] + (v - base[i]) * share).toString(16).padStart(2, '0')).join('')
+}
+
+// The background of every screen, the dividers and the empty part of progress bars follow the chosen color.
+// Black keeps the original greys. Cards stay white so text keeps its contrast.
+export function themeColors(id?: string) {
   const t = themeOf(id)
-  document.documentElement.style.setProperty('--accent', t.accent)
-  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', '#F1F2F4')
+  if (t.id === 'black') return { accent: t.accent, ground: '#F1F2F4', hair: '#ECEDF0', track: '#E2E4E8', border: '#E2E4E8' }
+  return { accent: t.accent, ground: tint(t.accent, 0.13), hair: tint(t.accent, 0.08, [255, 255, 255]), track: tint(t.accent, 0.2), border: tint(t.accent, 0.16, [255, 255, 255]) }
+}
+
+export function applyTheme(id?: string) {
+  const c = themeColors(id)
+  const root = document.documentElement.style
+  root.setProperty('--accent', c.accent)
+  root.setProperty('--ground', c.ground)
+  root.setProperty('--hair', c.hair)
+  root.setProperty('--track', c.track)
+  root.setProperty('--border', c.border)
+  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', c.ground)
 }

@@ -52,7 +52,7 @@ export function Settings() {
             )
           })}
         </div>
-        <span className="small muted">כחול, כתום וירוק נשארים לצופים, ל-Young Judaea ולאישי, כדי שתמיד יהיה ברור מה שייך למה.</span>
+        <span className="small muted">הצבע משנה את הרקע, הכפתורים, הלשונית הפעילה וההתקדמות. כחול, כתום וירוק נשארים לצופים, ל-Young Judaea ולאישי.</span>
       </section>
 
       {cloudAvailable && (

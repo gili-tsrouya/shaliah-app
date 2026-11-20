@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-11-19T11:16:12.950Z",
+  "updatedAt": "2026-11-20T11:17:01.733Z",
   "items": [
     {
       "id": "bergen-edu-2026-11-20-public-viewing-night",
@@ -139,6 +139,17 @@
       "price": "$35",
       "priceValue": 35,
       "url": "https://www.fox5ny.com/news/thanksgiving-meal-deals-2026-where-get-dinner-what-costs-when-order"
+    },
+    {
+      "id": "hip2save-2026-11-27-academy-black-friday",
+      "title": "Academy Sports: שמיכות ב-$2.99 וכוסות ב-$15",
+      "summary": "מבצע Black Friday אונליין ב-Academy: שמיכות ב-$2.99, כלי שתייה ב-$15; שווה לדירה חדשה.",
+      "category": "מבצעים",
+      "when": "סביב Black Friday",
+      "where": "Academy Sports · אונליין",
+      "price": "$2.99",
+      "priceValue": 3,
+      "url": "https://hip2save.com/deals/academy-black-friday/"
     }
   ]
 }

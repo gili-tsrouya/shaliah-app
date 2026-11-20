@@ -1,5 +1,5 @@
 // Activities built from methods: totals, equipment, timing, building from an agent idea, and export.
-import type { Activity, ActivityMethod, FeedItem } from './types'
+import type { Activity, ActivityMethod, ActivityRun, FeedItem } from './types'
 import { newId } from './ids'
 
 export const totalMinutes = (a: Activity) => a.methods.reduce((s, m) => s + (Number(m.minutes) || 0), 0)
@@ -112,3 +112,21 @@ export async function shareFile(name: string, content: string, type: string) {
 }
 
 export const fileSafe = (s: string) => (s || 'פעילות').replace(/[\\/:*?"<>|]/g, '').slice(0, 60)
+
+// ---------- runs ----------
+// The times it was run, newest first. An activity saved before runs existed, that was marked "הועברה" or
+// had a review, counts as one run (on its date, or on the day it was last changed).
+export function runsOf(a: Activity): ActivityRun[] {
+  if (a.runs) return [...a.runs].sort((x, y) => y.date.localeCompare(x.date))
+  if (a.status === 'done' || a.review) {
+    return [{ id: 'legacy', date: a.date ?? a.updatedAt.slice(0, 10), partnershipId: a.partnershipId, ...a.review }]
+  }
+  return []
+}
+
+// "ready" and the old "done" both mean the plan itself is ready to use
+export const isReady = (a: Activity) => a.status !== 'draft'
+
+// It was planned for a day that has come, and no run was logged for that day yet
+export const awaitingRun = (a: Activity, today: string) =>
+  !!a.date && a.date <= today && !runsOf(a).some((r) => r.date === a.date)

@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react'
 import { useStore, newId } from '../lib/store'
-import { activityHtml, duplicate, endTime, equipmentOf, equipmentText, fileSafe, shareFile, slots, totalMinutes, withId } from '../lib/activities'
+import { activityHtml, awaitingRun, duplicate, endTime, isReady, runsOf, equipmentOf, equipmentText, fileSafe, shareFile, slots, totalMinutes, withId } from '../lib/activities'
 import { METHOD_FAMILIES } from '../lib/methods'
 import { formatDay } from '../lib/dates'
-import type { Activity as ActivityT, ActivityMethod } from '../lib/types'
+import type { Activity as ActivityT, ActivityMethod, ActivityRun } from '../lib/types'
 import { BackLink, Sheet } from '../components/ui'
 import { Icon } from '../components/Icon'
 
@@ -27,6 +27,7 @@ export function Activity() {
   const [exporting, setExporting] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [note, setNote] = useState('')
+  const [openRun, setOpenRun] = useState<string | null>(null)
 
   if (!a) {
     return (
@@ -64,9 +65,22 @@ export function Activity() {
     setTimeout(() => setNote(''), 3000)
   }
 
+  const runs = runsOf(a)
+  // any change to the runs saves the full list (an old single review becomes the first run)
+  const saveRuns = (next: ActivityRun[]) => update({ runs: next.map((x) => (x.id === 'legacy' ? { ...x, id: newId() } : x)) })
+  const setRun = (rid: string, patch: Partial<ActivityRun>) => saveRuns(runs.map((x) => (x.id === rid ? { ...x, ...patch } : x)))
+  const logRun = (date: string, clearPlan: boolean) => {
+    const run: ActivityRun = { id: newId(), date, partnershipId: a.partnershipId }
+    const next = [run, ...runs].map((x) => (x.id === 'legacy' ? { ...x, id: newId() } : x))
+    update({ runs: next, status: 'ready', ...(clearPlan ? { date: undefined, start: undefined } : {}) })
+    setOpenRun(run.id)
+  }
+  const today = new Date().toLocaleDateString('en-CA')
+  const partnerName = (pid?: string) => partnerships.find((p) => p.id === pid)?.name
+
   const toCalendar = () => {
-    if (!a.date) return flash('קודם בחרי תאריך')
-    const ev = { id: a.calendarEventId ?? newId(), title: a.title || 'פעילות', work: a.work ?? calCategories[0]?.id ?? 'personal', kind: 'event' as const, date: a.date, start: a.start, end: endTime(a) }
+    if (!a.date) return
+    const ev = { id: a.calendarEventId ?? newId(), title: a.title || 'פעילות', work: a.work ?? calCategories[0]?.id ?? 'personal', kind: 'event' as const, date: a.date as string, start: a.start, end: endTime(a) }
     setEvents((es) => (es.some((e) => e.id === ev.id) ? es.map((e) => (e.id === ev.id ? { ...e, ...ev } : e)) : [...es, ev]))
     update({ calendarEventId: ev.id })
     flash(a.calendarEventId ? 'היומן עודכן' : 'נוסף ליומן')
@@ -80,11 +94,14 @@ export function Activity() {
       </div>
 
       <div className="segmented" aria-label="מצב הפעילות">
-        {(['draft', 'ready', 'done'] as const).map((s) => (
-          <button key={s} className={a.status === s ? 'on' : ''} aria-pressed={a.status === s} onClick={() => update({ status: s })}>
-            {{ draft: 'טיוטה', ready: 'מוכנה', done: 'הועברה' }[s]}
-          </button>
-        ))}
+        {(['draft', 'ready'] as const).map((st) => {
+          const on = st === 'ready' ? isReady(a) : !isReady(a)
+          return (
+            <button key={st} className={on ? 'on' : ''} aria-pressed={on} onClick={() => update({ status: st })}>
+              {st === 'draft' ? 'טיוטה' : 'מוכנה לשימוש'}
+            </button>
+          )
+        })}
       </div>
 
       <header className="col" style={{ gap: 4 }}>
@@ -93,6 +110,16 @@ export function Activity() {
           placeholder="שם הפעילות" value={a.title} onChange={(e) => update({ title: e.target.value.replace(/\n/g, ' ') })} />
         {a.fromIdeaId && <span className="muted small">נבנתה מרעיון של הסוכן</span>}
       </header>
+
+      {awaitingRun(a, today) && (
+        <div className="card hero" style={{ gap: 10 }}>
+          <span className="bold">הפעילות הייתה מתוכננת ל{formatDay(a.date!)}. העברת אותה?</span>
+          <div className="row">
+            <button className="btn white" style={{ flex: 1 }} onClick={() => logRun(a.date!, true)}>כן, העברתי</button>
+            <button className="btn" style={{ background: 'transparent', border: '1px solid #55595F' }} onClick={() => update({ date: undefined, start: undefined })}>לא, להוריד את התאריך</button>
+          </div>
+        </div>
+      )}
 
       <label className="card" style={{ gap: 4 }}>
         <span className="small bold" style={{ color: 'var(--muted)' }}>מטרה</span>
@@ -124,10 +151,13 @@ export function Activity() {
           <span style={{ fontSize: 16, fontWeight: 700 }}>{totalMinutes(a)} דקות</span>
           <span className="small muted">מחושב מהמתודות</span>
         </div>
-        <label><span className="small muted bold">תאריך</span>
-          <input type="date" value={a.date ?? ''} onChange={(e) => update({ date: e.target.value || undefined })} />
+        <label><span className="small muted bold">מתוכננת ל (לא חובה)</span>
+          <span className="row" style={{ gap: 4 }}>
+            <input type="date" value={a.date ?? ''} onChange={(e) => update({ date: e.target.value || undefined })} />
+            {a.date && <button type="button" className="text-btn small" aria-label="בלי תאריך" onClick={() => update({ date: undefined, start: undefined })}><Icon name="x" size={16} /></button>}
+          </span>
         </label>
-        <label><span className="small muted bold">שעה</span>
+        <label><span className="small muted bold">שעה (לא חובה)</span>
           <input type="time" value={a.start ?? ''} onChange={(e) => update({ start: e.target.value || undefined })} />
         </label>
       </div>
@@ -198,32 +228,67 @@ export function Activity() {
       )}
 
       <section className="col" style={{ gap: 8 }}>
-        <div className="section-head" style={{ padding: '0 4px' }}><h2>איך היה?</h2><span className="small bold" style={{ color: 'var(--muted)' }}>אחרי הפעולה</span></div>
-        <div className="card" style={{ gap: 14 }}>
-          <div className="col" style={{ gap: 6 }}>
-            <span className="bold">איך הרגשת שזה עבר?</span>
-            <div className="grid4">
-              {FEELS.map((f) => (
-                <button key={f} className={`chip ${a.review?.feel === f ? 'on' : ''}`} style={{ justifyContent: 'center' }} aria-pressed={a.review?.feel === f}
-                  onClick={() => update({ review: { ...a.review, feel: a.review?.feel === f ? undefined : f }, status: 'done' })}>{f}</button>
-              ))}
-            </div>
-          </div>
-          <label className="between bold">כמה חניכים הגיעו
-            <input type="number" inputMode="numeric" value={a.review?.came ?? ''} style={{ width: 80, height: 44, borderRadius: 10, border: '1px solid #D5D8DD', textAlign: 'center', fontSize: 17 }}
-              onChange={(e) => update({ review: { ...a.review, came: Number(e.target.value) || undefined } })} />
-          </label>
-          <label className="field">מה עבד
-            <textarea rows={2} value={a.review?.worked ?? ''} placeholder="למשל: הפתיחה הכניסה אותם מהר" onChange={(e) => update({ review: { ...a.review, worked: e.target.value } })} />
-          </label>
-          <label className="field">מה לשנות בפעם הבאה
-            <textarea rows={2} value={a.review?.change ?? ''} placeholder="למשל: הדיון היה ארוך מדי" onChange={(e) => update({ review: { ...a.review, change: e.target.value } })} />
-          </label>
+        <div className="section-head" style={{ padding: '0 4px' }}>
+          <h2>העברות</h2>
+          <span className="small bold" style={{ color: 'var(--muted)' }}>{runs.length === 0 ? 'עוד לא הועברה' : runs.length === 1 ? 'הועברה פעם אחת' : `הועברה ${runs.length} פעמים`}</span>
         </div>
+        <button className="btn light block" onClick={() => logRun(today, a.date === today)}>העברתי את הפעילות היום</button>
+        {runs.length > 0 && (
+          <div className="group">
+            {runs.map((run) => (
+              <div key={run.id}>
+                <button className="group-row" style={{ border: 0 }} aria-expanded={openRun === run.id} onClick={() => setOpenRun(openRun === run.id ? null : run.id)}>
+                  <span className="col" style={{ gap: 1, flex: 1 }}>
+                    <span className="bold">{formatDay(run.date)}{partnerName(run.partnershipId) ? `, ${partnerName(run.partnershipId)}` : ''}</span>
+                    <span className="small muted">{[run.feel, run.came ? `${run.came} חניכים` : '', run.change ? 'יש מה לשנות' : ''].filter(Boolean).join(', ') || 'לחצי כדי לכתוב איך היה'}</span>
+                  </span>
+                  <Icon name={openRun === run.id ? 'up' : 'down'} size={18} />
+                </button>
+                {openRun === run.id && (
+                  <div className="col" style={{ padding: '0 16px 16px', gap: 14 }}>
+                    <div className="grid2">
+                      <label className="field">מתי<input type="date" value={run.date} onChange={(e) => e.target.value && setRun(run.id, { date: e.target.value })} /></label>
+                      <label className="field">עם מי
+                        <select value={run.partnershipId ?? ''} onChange={(e) => setRun(run.id, { partnershipId: e.target.value || undefined })}>
+                          <option value="">בלי</option>{partnerships.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
+                        </select>
+                      </label>
+                    </div>
+                    <div className="col" style={{ gap: 6 }}>
+                      <span className="bold">איך הרגשת שזה עבר?</span>
+                      <div className="grid4">
+                        {FEELS.map((f) => (
+                          <button key={f} className={`chip ${run.feel === f ? 'on' : ''}`} style={{ justifyContent: 'center' }} aria-pressed={run.feel === f}
+                            onClick={() => setRun(run.id, { feel: run.feel === f ? undefined : f })}>{f}</button>
+                        ))}
+                      </div>
+                    </div>
+                    <label className="between bold">כמה חניכים הגיעו
+                      <input type="number" inputMode="numeric" value={run.came ?? ''} style={{ width: 80, height: 44, borderRadius: 10, border: '1px solid #D5D8DD', textAlign: 'center', fontSize: 17 }}
+                        onChange={(e) => setRun(run.id, { came: Number(e.target.value) || undefined })} />
+                    </label>
+                    <label className="field">מה עבד
+                      <textarea rows={2} value={run.worked ?? ''} placeholder="למשל: הפתיחה הכניסה אותם מהר" onChange={(e) => setRun(run.id, { worked: e.target.value })} />
+                    </label>
+                    <label className="field">מה לשנות בפעם הבאה
+                      <textarea rows={2} value={run.change ?? ''} placeholder="למשל: הדיון היה ארוך מדי" onChange={(e) => setRun(run.id, { change: e.target.value })} />
+                    </label>
+                    <button className="text-btn" style={{ color: 'var(--danger)', alignSelf: 'flex-start' }} onClick={() => saveRuns(runs.filter((x) => x.id !== run.id))}>למחוק את ההעברה הזאת</button>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+        {runs.find((x) => x.change) && (
+          <p className="small" style={{ color: 'var(--ink2)', padding: '0 4px' }}>בפעם הקודמת כתבת לשנות: {runs.find((x) => x.change)!.change}</p>
+        )}
       </section>
 
       <div className="col no-print" style={{ gap: 8 }}>
-        <button className="btn block" onClick={toCalendar}>{a.calendarEventId ? 'לעדכן ביומן' : 'להוסיף ליומן'}</button>
+        {a.date
+          ? <button className="btn block" onClick={toCalendar}>{a.calendarEventId ? 'לעדכן ביומן' : 'להוסיף ליומן'}</button>
+          : <span className="small muted" style={{ textAlign: 'center' }}>אין תאריך, אז הפעילות שמורה לשימוש מתי שתרצי. כדי להוסיף ליומן, בוחרים תאריך למעלה.</span>}
         <button className="btn light block" onClick={() => {
           const copy = duplicate(a)
           setActivities((as) => [...as, copy])

@@ -248,8 +248,20 @@ export interface Activity {
   status: 'draft' | 'ready' | 'done'
   fromIdeaId?: string // the shlichut feed item it was built from
   packed?: string[] // equipment already packed
-  review?: { feel?: string; came?: number; worked?: string; change?: string }
+  review?: { feel?: string; came?: number; worked?: string; change?: string } // before Nov 2026: one review per activity (read through runsOf)
+  runs?: ActivityRun[] // each time she ran it, with its own review
   calendarEventId?: string
   createdAt: string
   updatedAt: string
+}
+
+// One time an activity was run. An activity is a reusable plan; it can be run many times, for different groups.
+export interface ActivityRun {
+  id: string
+  date: string // yyyy-mm-dd
+  partnershipId?: string
+  feel?: string
+  came?: number
+  worked?: string
+  change?: string
 }

@@ -43,7 +43,9 @@ Tabs: היום (#/home), יומן (#/calendar), משימות (#/tasks), גילו
   calendar (`blockEventId`). The first run moved the old board's "בתהליך" tasks into today (`tasksModel` flag).
 - Activities (`#/activities`, `#/activity?id=`, `src/lib/activities.ts`): activities built from methods (מתודות) of the
   families in `src/lib/methods.ts`; total length and merged equipment are computed; method bank `methodBank`; built from a
-  shlichut idea (with the agent's `plan`) from the deck or the shlichut screen; "איך היה?" review; export as PDF (print view
+  shlichut idea (with the agent's `plan`) from the deck or the shlichut screen. An activity is a reusable plan: status is only
+  draft/ready (the old `done` reads as ready), the date is optional, and every time she runs it is a `runs` entry with its own
+  review (`runsOf` reads an old single `review` as one run). A planned day that passed asks "העברת אותה?"; export as PDF (print view
   `#/activity-print`), Word (.doc HTML) and an equipment list, through the share sheet.
 - Daily deck (`#/drop`, `src/screens/Drop.tsx`, `src/lib/drop.ts`): items from both feeds that are new or changed since they were last gone through, one card at a time (swipe right or bookmark keeps, left skips), and a "כל התוכן" tab listing everything with filters. `dropSeen` records what was seen and the item's date/time/place/price then, so a changed item comes back marked "עודכן"; `savedIdeas` holds kept shlichut items (deals keep using `savedDeals`). Home shows the count. The Deals and Shlichut screens stay as they are.
 - Profile (`#/profile`): name, age, home town, budget + saving goal, interests. Age/home/interests go to `public/agent-settings.json` (`age`, `interests`, `homeBase`); the התאמה panel can set a temporary place with `awayUntil`.

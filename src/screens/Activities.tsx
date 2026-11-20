@@ -3,13 +3,13 @@ import { useStore } from '../lib/store'
 import { useFeed } from '../lib/feeds'
 import { colorOf } from '../lib/derive'
 import { formatDay, todayISO } from '../lib/dates'
-import { blankActivity, fromIdea, totalMinutes } from '../lib/activities'
+import { blankActivity, fromIdea, isReady, runsOf, totalMinutes } from '../lib/activities'
 import { allItems, newItems } from '../lib/drop'
 import type { Activity } from '../lib/types'
 import { DiscoverTabs } from '../components/ui'
 import { Icon } from '../components/Icon'
 
-const STATUS = { draft: 'טיוטה', ready: 'מוכנה', done: 'הועברה' } as const
+
 
 export const openActivity = (id: string) => { location.hash = `#/activity?id=${id}` }
 
@@ -25,12 +25,14 @@ export function Activities() {
   const partner = (id?: string) => partnerships.find((p) => p.id === id)
   const catOf = (a: Activity) => calCategories.find((c) => c.id === a.work)
   const shown = activities.filter((a) => filter === 'all' || (filter === 'draft' ? a.status === 'draft' : a.partnershipId === filter))
+  // A date is optional: an activity without one is simply ready (or a draft) to use whenever she likes
   const groups = useMemo(() => {
-    const isPast = (a: Activity) => a.status === 'done' || (!!a.date && a.date < today)
+    const planned = (a: Activity) => !!a.date && a.date >= today
+    const recent = (a: Activity) => runsOf(a)[0]?.date ?? a.updatedAt
     return [
-      { label: 'בקרוב', items: shown.filter((a) => a.date && !isPast(a)).sort((x, y) => x.date!.localeCompare(y.date!)) },
-      { label: 'מוכנות לשימוש', items: shown.filter((a) => !a.date && !isPast(a)).sort((x, y) => y.updatedAt.localeCompare(x.updatedAt)) },
-      { label: 'כבר העברת', items: shown.filter(isPast).sort((x, y) => (y.date ?? '').localeCompare(x.date ?? '')) },
+      { label: 'מתוכננות', items: shown.filter(planned).sort((x, y) => x.date!.localeCompare(y.date!)) },
+      { label: 'מוכנות לשימוש', items: shown.filter((a) => !planned(a) && isReady(a)).sort((x, y) => recent(y).localeCompare(recent(x))) },
+      { label: 'טיוטות', items: shown.filter((a) => !planned(a) && !isReady(a)).sort((x, y) => y.updatedAt.localeCompare(x.updatedAt)) },
     ].filter((g) => g.items.length)
   }, [shown, today])
   const builtFrom = new Set(activities.map((a) => a.fromIdeaId).filter(Boolean))
@@ -83,10 +85,13 @@ export function Activities() {
                   <span className="dot8" style={{ marginTop: 8, background: c ? colorOf(c.color).dot : '#B8BCC3' }} />
                   <span className="col" style={{ gap: 2, flex: 1, minWidth: 0 }}>
                     <span style={{ fontSize: 17, fontWeight: 700 }}>{a.title || 'פעילות בלי שם'}</span>
-                    <span className="small muted">{[p?.name, a.date ? formatDay(a.date) : 'בלי תאריך'].filter(Boolean).join(', ')}</span>
+                    <span className="small muted">{[p?.name, a.date && a.date >= today ? formatDay(a.date) : ''].filter(Boolean).join(', ')}</span>
                     <span className="small bold" style={{ color: 'var(--ink2)' }}>{totalMinutes(a)} דקות, {a.methods.length === 1 ? 'מתודה אחת' : `${a.methods.length} מתודות`}</span>
+                    {runsOf(a).length > 0 && (
+                      <span className="small muted">{runsOf(a).length === 1 ? 'הועברה פעם אחת' : `הועברה ${runsOf(a).length} פעמים`}, לאחרונה {formatDay(runsOf(a)[0].date)}</span>
+                    )}
                   </span>
-                  <span className={`status-badge ${a.status}`}>{STATUS[a.status]}</span>
+                  {!isReady(a) && <span className="status-badge draft">טיוטה</span>}
                 </a>
               )
             })}

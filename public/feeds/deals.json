@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-11-21T11:15:44.363Z",
+  "updatedAt": "2026-11-22T11:15:29.850Z",
   "items": [
     {
       "id": "today-2026-11-24-target-holiday-price-match",
@@ -25,6 +25,20 @@
       "lat": 40.9276,
       "lng": -74.0697,
       "url": "https://jfnnj.org/calendar"
+    },
+    {
+      "id": "bryantpark-2026-11-22-winter-village",
+      "title": "Winter Village ב-Bryant Park: החלקה בחינם",
+      "summary": "המסלול להחלקה על קרח ללא תשלום כניסה (משכירים נעליים בתשלום, או מביאים משלך), ובנוסף דוכני חג ובילוי ערב בעיר.",
+      "category": "יציאות",
+      "when": "כל יום 8:00-24:00",
+      "date": "2026-11-22",
+      "where": "Bryant Park, Midtown Manhattan · רכבת B/D/F/M ל-42 St",
+      "price": "חינם",
+      "priceValue": 0,
+      "lat": 40.7536,
+      "lng": -73.9832,
+      "url": "https://bryantpark.org/amenities/bank-of-america-winter-village-at-bryant-park"
     },
     {
       "id": "today-2026-11-23-walmart-black-friday",
@@ -61,6 +75,20 @@
       "price": "$39",
       "priceValue": 39,
       "url": "https://www.fox5ny.com/news/thanksgiving-meal-deals-2026-where-get-dinner-what-costs-when-order"
+    },
+    {
+      "id": "nycforfree-2026-11-25-macys-balloon-inflation",
+      "title": "Macy’s Parade: ניפוח הבלונים ערב המצעד",
+      "summary": "ערב מצעד חג ההודיה ה-100 מנפחים את הבלונים ענק ליד מוזיאון ה-AMNH – אפשר לראות מקרוב, בדרך כלל בחינם (כדאי להגיע מוקדם).",
+      "category": "יציאות",
+      "when": "רביעי 13:00-18:00",
+      "date": "2026-11-25",
+      "where": "American Museum of Natural History, Upper West Side, Manhattan · אוטובוס/רכבת מ-NJ",
+      "price": "חינם",
+      "priceValue": 0,
+      "lat": 40.7813,
+      "lng": -73.974,
+      "url": "https://www.nycforfree.co/events/macys-parade-balloon-inflation-2026"
     },
     {
       "id": "thelocalgirl-2026-11-27-record-store-day-black-friday",
@@ -153,6 +181,17 @@
       "price": "$35",
       "priceValue": 35,
       "url": "https://www.fox5ny.com/news/thanksgiving-meal-deals-2026-where-get-dinner-what-costs-when-order"
+    },
+    {
+      "id": "target-2026-11-27-home-kitchen",
+      "title": "Target: ציוד מטבח לדירה במבצע",
+      "summary": "עד 50% הנחה על כלי מטבח, למשל סט אחסון Rubbermaid 30 חלקים ב-$9.99 (במקום $19.99) וסט סירים T-Fal ב-$49.99.",
+      "category": "מבצעים",
+      "when": "עד 24 בדצמבר",
+      "where": "Target · אונליין ובסניפים (למשל Paramus)",
+      "price": "$9.99",
+      "priceValue": 10,
+      "url": "https://www.target.com/BlackFriday"
     }
   ]
 }

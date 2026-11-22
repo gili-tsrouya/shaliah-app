@@ -1,20 +1,6 @@
 {
-  "updatedAt": "2026-11-20T11:17:01.733Z",
+  "updatedAt": "2026-11-21T11:15:44.363Z",
   "items": [
-    {
-      "id": "bergen-edu-2026-11-20-public-viewing-night",
-      "title": "ערב צפייה בכוכבים במצפה של Bergen CC",
-      "summary": "צפייה בכוכבים בטלסקופים במצפה של המכללה; חינם (מתבטל בגשם או בעננים).",
-      "category": "תרבות",
-      "when": "שישי 19:00-22:00",
-      "date": "2026-11-20",
-      "where": "Bergen Community College, 400 Paramus Rd, Paramus · כ-10 דק׳ נסיעה",
-      "price": "חינם",
-      "priceValue": 0,
-      "lat": 40.9361,
-      "lng": -74.0689,
-      "url": "https://bergen.edu/event/public-viewing-night-fall-2026-12/"
-    },
     {
       "id": "today-2026-11-24-target-holiday-price-match",
       "title": "Target: התאמת מחיר לחגים",
@@ -117,6 +103,34 @@
       "url": "https://www.fox5ny.com/news/thanksgiving-meal-deals-2026-where-get-dinner-what-costs-when-order"
     },
     {
+      "id": "mybergen-2026-12-04-ridgewood-downtown-holidays",
+      "title": "Downtown for the Holidays בריג׳ווד",
+      "summary": "חגיגת חג בטבעת הרחוב הראשי של Ridgewood עם הדלקת עץ ומוזיקה, ברחבי הדאונטאון, בחינם ואפשר להגיע לבד.",
+      "category": "יציאות",
+      "when": "שישי 18:00-21:00",
+      "date": "2026-12-04",
+      "where": "Downtown Ridgewood, E Ridgewood Ave · כ-10 דק׳ נסיעה",
+      "price": "חינם",
+      "priceValue": 0,
+      "lat": 40.9793,
+      "lng": -74.1166,
+      "url": "https://www.mybergen.com/bergen-county-nj-holiday-events/"
+    },
+    {
+      "id": "mybergen-2026-12-05-englewood-library-guaraldi",
+      "title": "קונצרט Vince Guaraldi (Peanuts) בספריית Englewood",
+      "summary": "קונצרט ג׳אז חינמי של Patrick Kerssen Trio; נדרשת הרשמה מראש.",
+      "category": "תרבות",
+      "when": "שבת 14:00",
+      "date": "2026-12-05",
+      "where": "Englewood Library, 31 Engle St, Englewood · כ-20 דק׳ נסיעה",
+      "price": "חינם",
+      "priceValue": 0,
+      "lat": 40.8929,
+      "lng": -73.9726,
+      "url": "https://www.mybergen.com/bergen-county-nj-holiday-events/"
+    },
+    {
       "id": "ikea-2026-12-24-billy-bookcase",
       "title": "ספרייה BILLY ב-IKEA במחיר מבצע",
       "summary": "ספריית BILLY לבנה ב-$65 במקום $79 (מחיר IKEA Family), פריט בסיס זול לדירה חדשה.",
@@ -139,17 +153,6 @@
       "price": "$35",
       "priceValue": 35,
       "url": "https://www.fox5ny.com/news/thanksgiving-meal-deals-2026-where-get-dinner-what-costs-when-order"
-    },
-    {
-      "id": "hip2save-2026-11-27-academy-black-friday",
-      "title": "Academy Sports: שמיכות ב-$2.99 וכוסות ב-$15",
-      "summary": "מבצע Black Friday אונליין ב-Academy: שמיכות ב-$2.99, כלי שתייה ב-$15; שווה לדירה חדשה.",
-      "category": "מבצעים",
-      "when": "סביב Black Friday",
-      "where": "Academy Sports · אונליין",
-      "price": "$2.99",
-      "priceValue": 3,
-      "url": "https://hip2save.com/deals/academy-black-friday/"
     }
   ]
 }

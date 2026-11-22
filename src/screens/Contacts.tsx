@@ -7,7 +7,7 @@ import { Icon } from '../components/Icon'
 import { Celebrate } from '../components/Celebrate'
 import { weekStreak, withTalk } from '../lib/talks'
 import type { Person } from '../lib/types'
-import { disablePush, enablePush, pushSupport, updatePushTime } from '../lib/push'
+import { canUseServer, disablePush, enablePush, onServer, pushSupport, sendTestPush, updatePushTime } from '../lib/push'
 import { DEFAULT_CALL_TIME, WEEKDAYS, WEEKDAY_NAMES, callDaysLabel } from '../lib/calls'
 import { parseVCards, pickContacts, pickerSupported, type ImportedContact } from '../lib/contacts'
 
@@ -338,6 +338,7 @@ const pushError = (e: unknown) => {
   const m = (e as Error).message
   if (m === 'denied') return 'לא ניתנה הרשאה להתראות. אפשר לשנות בהגדרות האייפון ← התראות ← השליח.'
   if (m === 'token') return 'הטוקן לא עובד. צריך טוקן fine-grained לריפו shaliah-data, עם הרשאת Contents: read and write.'
+  if (m === 'gone') return 'הטלפון כבר לא מקבל את ההתראות האלה. כבי את התזכורת והדליקי אותה שוב.'
   return 'משהו השתבש, נסו שוב בעוד רגע.'
 }
 
@@ -348,32 +349,40 @@ function ReminderCard({ due }: { due: string[] }) {
   const [askToken, setAskToken] = useState(false)
   const [busy, setBusy] = useState(false)
   const [msg, setMsg] = useState('')
+  const [note, setNote] = useState('')
+  const [signedIn, setSignedIn] = useState(false)
+  const [server, setServer] = useState(onServer())
   const support = pushSupport()
   const on = !!settings.pushEnabled
   const lastTime = useRef(settings.reminderTime)
+  useEffect(() => { canUseServer().then(setSignedIn) }, [])
+  // turned on before the account's server sent reminders: GitHub ran that job too rarely
+  const needsMove = on && signedIn && !server
 
   // A new reminder time goes to the daily job too (after the picker settles)
   useEffect(() => {
-    if (!on || !settings.dataRepoToken || settings.reminderTime === lastTime.current) return
+    if (!on || (!server && !settings.dataRepoToken) || settings.reminderTime === lastTime.current) return
     const t = setTimeout(() => {
       lastTime.current = settings.reminderTime
-      updatePushTime(settings.dataRepoToken!, settings.reminderTime)
+      updatePushTime(settings.dataRepoToken ?? '', settings.reminderTime)
         .then(() => setMsg(''))
         .catch((e) => setMsg(pushError(e)))
     }, 1500)
     return () => clearTimeout(t)
-  }, [on, settings.dataRepoToken, settings.reminderTime])
+  }, [on, server, settings.dataRepoToken, settings.reminderTime])
 
   // Called from a tap, which iPhone needs before it asks for permission
   const turnOn = async (t: string) => {
-    if (!t.trim()) return setAskToken(true)
+    if (!t.trim() && !signedIn) return setAskToken(true)
     setBusy(true)
     try {
       await enablePush(t.trim(), settings.reminderTime)
       lastTime.current = settings.reminderTime
-      setSettings((s) => ({ ...s, dataRepoToken: t.trim(), pushEnabled: true }))
+      setSettings((s) => ({ ...s, dataRepoToken: t.trim() || s.dataRepoToken, pushEnabled: true }))
+      setServer(onServer())
       setAskToken(false)
       setMsg('')
+      setNote(onServer() ? 'התזכורת פועלת. אפשר לשלוח בדיקה כדי לראות שהיא מגיעה.' : '')
     } catch (e) {
       setMsg(pushError(e))
       if ((e as Error).message === 'token') setAskToken(true)
@@ -386,7 +395,9 @@ function ReminderCard({ due }: { due: string[] }) {
     try {
       await disablePush(settings.dataRepoToken ?? '')
       setSettings((s) => ({ ...s, pushEnabled: false }))
+      setServer(onServer())
       setMsg('')
+      setNote('')
     } catch (e) {
       setMsg(pushError(e))
     }
@@ -450,6 +461,28 @@ function ReminderCard({ due }: { due: string[] }) {
         </div>
       )}
 
+      {needsMove && support === 'ok' && (
+        <div className="col" style={{ gap: 8, background: 'rgba(255,255,255,.08)', borderRadius: 12, padding: 12 }}>
+          <span className="small" style={{ color: '#E5E7EB' }}>התזכורת לא הגיעה בזמן. היא עוברת עכשיו לחשבון שלך, ומשם תגיע כל בוקר בשעה שבחרת.</span>
+          <button className="btn white" style={{ minHeight: 40 }} disabled={busy} onClick={() => turnOn(settings.dataRepoToken ?? '')}>
+            {busy ? 'מעביר…' : 'תיקון התזכורת'}
+          </button>
+        </div>
+      )}
+
+      {on && server && (
+        <button className="btn white" style={{ minHeight: 40 }} disabled={busy}
+          onClick={async () => {
+            setBusy(true)
+            try { await sendTestPush(); setMsg(''); setNote('נשלחה התראת בדיקה. היא אמורה להגיע תוך כמה שניות.') }
+            catch (e) { setNote(''); setMsg(pushError(e)) }
+            setBusy(false)
+          }}>
+          שליחת התראת בדיקה
+        </button>
+      )}
+
+      {note && !msg && <span className="small" style={{ color: '#E5E7EB' }}>{note}</span>}
       {msg && <span className="small" style={{ color: '#FCA5A5' }}>{msg}</span>}
     </section>
   )

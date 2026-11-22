@@ -1,8 +1,11 @@
 // Morning "who to call" notifications.
-// A daily job in the private data repo sends a wake-up push at the reminder time; the service worker
-// (public/push-sw.js) then works out who is due from the copy of the list kept here in IndexedDB.
-// The data repo only gets the push subscription, the reminder time and the time zone, never contacts.
+// At the reminder time a wake-up push arrives; the service worker (public/push-sw.js) then works out who
+// is due from the copy of the list kept here in IndexedDB. Whoever sends it only gets the push
+// subscription, the reminder time and the time zone, never contacts.
+// Signed in: the account's server sends it (function push-reminder, checked every five minutes).
+// Not signed in: the older daily job in the private data repo, which GitHub runs late or not at all.
 import type { Person } from './types'
+import { cloud, cloudAvailable, currentSession } from './cloud'
 
 // Public half of the key the daily job signs pushes with; public by design
 export const VAPID_PUBLIC_KEY = 'BPMojbeX8jFqAj8uTqb2UOeHHCjS9oVd8un7HlHbucf21BP_5BcVoqZZ9ktqYyVFoAG4VTLJLmnEWQV1JZCrHZM'
@@ -58,10 +61,49 @@ async function saveConfig(token: string, config: object | null) {
   if (!r.ok) throw new Error(r.status === 401 || r.status === 403 || r.status === 404 ? 'token' : `GitHub ${r.status}`)
 }
 
-async function subscription() {
+// A subscription made with this key; one made with another key is replaced
+async function subscription(publicKey = VAPID_PUBLIC_KEY) {
   const reg = await navigator.serviceWorker.ready
-  return (await reg.pushManager.getSubscription())
-    ?? reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: keyBytes(VAPID_PUBLIC_KEY) })
+  const want = keyBytes(publicKey)
+  const current = await reg.pushManager.getSubscription()
+  const has = current?.options.applicationServerKey
+  if (current && has && sameBytes(new Uint8Array(has), want)) return current
+  await current?.unsubscribe()
+  return reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: want })
+}
+
+const sameBytes = (a: Uint8Array, b: Uint8Array) => a.length === b.length && a.every((v, i) => v === b[i])
+
+// ---------- the account's server ----------
+
+const SERVER_FLAG = 'shaliach-push-server' // per device, never in a backup
+export const onServer = () => localStorage.getItem(SERVER_FLAG) === '1'
+
+export async function canUseServer() {
+  return cloudAvailable && !!(await currentSession().catch(() => null))
+}
+
+async function callServer(body: object) {
+  const { data, error } = await (await cloud()).functions.invoke('push-reminder', { body })
+  if (error) throw new Error('server')
+  return data as Record<string, unknown>
+}
+
+async function saveOnServer(reminderTime: string) {
+  const { publicKey } = await callServer({ action: 'key' }) as { publicKey: string }
+  const sub = (await subscription(publicKey)).toJSON()
+  const { error } = await (await cloud()).rpc('set_push_reminder', {
+    p_subscription: sub, p_time: reminderTime, p_time_zone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+  })
+  if (error) throw new Error('server')
+  localStorage.setItem(SERVER_FLAG, '1')
+}
+
+// Sends a real push through the server, to check the whole way to the phone
+export async function sendTestPush() {
+  const r = await callServer({ action: 'test' }) as { sent?: boolean; gone?: boolean }
+  if (r.gone) throw new Error('gone')
+  if (!r.sent) throw new Error('server')
 }
 
 const configFor = async (reminderTime: string) => ({
@@ -74,16 +116,31 @@ const configFor = async (reminderTime: string) => ({
 // Must be called from a tap: iPhone only shows the permission question then
 export async function enablePush(token: string, reminderTime: string) {
   if ((await Notification.requestPermission()) !== 'granted') throw new Error('denied')
+  if (await canUseServer()) {
+    await saveOnServer(reminderTime)
+    // the old daily job stops, so it can never send a second one
+    if (token) await saveConfig(token, null).catch(() => {})
+    return
+  }
+  if (!token) throw new Error('token')
   await saveConfig(token, await configFor(reminderTime))
 }
 
 export async function updatePushTime(token: string, reminderTime: string) {
+  if (onServer()) return saveOnServer(reminderTime)
   await saveConfig(token, await configFor(reminderTime))
 }
 
 export async function disablePush(token: string) {
   const reg = await navigator.serviceWorker.ready
   await (await reg.pushManager.getSubscription())?.unsubscribe()
+  if (onServer()) {
+    const { error } = await (await cloud()).rpc('clear_push_reminder')
+    if (error) throw new Error('server')
+    localStorage.removeItem(SERVER_FLAG)
+    if (token) await saveConfig(token, null).catch(() => {})
+    return
+  }
   await saveConfig(token, null)
 }
 

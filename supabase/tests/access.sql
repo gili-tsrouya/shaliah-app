@@ -212,6 +212,32 @@ select test_helpers.must_touch($$ delete from public.events where id = 'a4000000
 select test_helpers.must_equal($$ select (event_id is null)::text from public.memories where id = 'a6000000-0000-4000-8000-000000000001' $$,
   'true', 'the memory survives the event and is only unlinked');
 
+-- ---------- morning reminder ----------
+
+select test_helpers.must_touch($$ select public.set_push_reminder('{"endpoint":"https://push.example.test/a"}'::jsonb,
+  to_char((now() at time zone 'America/New_York') - interval '10 minutes', 'HH24:MI'), 'America/New_York') $$, 1, 'A turns the reminder on');
+select test_helpers.must_fail($$ select public.set_push_reminder('{"endpoint":"https://push.example.test/a"}'::jsonb, '09:00', 'Not/AZone') $$,
+  'an unknown time zone is refused');
+select test_helpers.must_fail($$ select public.set_push_reminder('{"endpoint":"http://push.example.test/a"}'::jsonb, '09:00', 'UTC') $$,
+  'a subscription that is not https is refused');
+select test_helpers.must_equal('select count(*)::text from public.push_reminder_status()', '1', 'A sees their reminder');
+select test_helpers.must_fail('select * from public.push_reminders', 'A cannot read the reminder table directly');
+select test_helpers.must_fail('select * from public.claim_push_reminders()', 'a user cannot claim reminders');
+select test_helpers.must_fail('select * from public.server_keys', 'a user cannot read server keys');
+select set_config('request.jwt.claims', '{"sub":"bbbbbbbb-0000-4000-8000-000000000002","role":"authenticated"}', true);
+select test_helpers.must_equal('select count(*)::text from public.push_reminder_status()', '0', 'B does not see A''s reminder');
+reset role;
+select test_helpers.must_equal('select count(*)::text from public.claim_push_reminders()', '1', 'a due reminder is claimed once');
+select test_helpers.must_equal('select count(*)::text from public.claim_push_reminders()', '0', 'a claimed reminder is not claimed again');
+select test_helpers.must_touch($$ select public.finish_push_reminder('aaaaaaaa-0000-4000-8000-000000000001', false, 'status 500', true) $$, 1, 'a failed send');
+select test_helpers.must_equal('select count(*)::text from public.push_reminders_due()', '1', 'a failed send is tried again');
+update public.push_reminders set reminder_time = ((now() at time zone 'America/New_York') + interval '1 hour')::time;
+select test_helpers.must_equal('select count(*)::text from public.push_reminders_due()', '0', 'nothing is sent before the reminder time');
+set local role authenticated;
+select set_config('request.jwt.claims', '{"sub":"aaaaaaaa-0000-4000-8000-000000000001","role":"authenticated"}', true);
+select test_helpers.must_touch('select public.clear_push_reminder()', 1, 'A turns the reminder off');
+select test_helpers.must_equal('select count(*)::text from public.push_reminder_status()', '0', 'the reminder is gone');
+
 -- ---------- the anonymous role gets nothing ----------
 
 reset role;

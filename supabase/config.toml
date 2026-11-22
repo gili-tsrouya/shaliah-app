@@ -19,3 +19,6 @@ verify_jwt = false
 
 [functions.google-token]
 verify_jwt = false
+
+[functions.push-reminder]
+verify_jwt = false

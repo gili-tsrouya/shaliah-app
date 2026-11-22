@@ -7,7 +7,7 @@ import { Icon } from '../components/Icon'
 import { Celebrate } from '../components/Celebrate'
 import { weekStreak, withTalk } from '../lib/talks'
 import type { Person } from '../lib/types'
-import { canUseServer, disablePush, enablePush, onServer, pushSupport, sendTestPush, updatePushTime } from '../lib/push'
+import { canUseServer, disablePush, enablePush, onServer, pushSupport, updatePushTime } from '../lib/push'
 import { DEFAULT_CALL_TIME, WEEKDAYS, WEEKDAY_NAMES, callDaysLabel } from '../lib/calls'
 import { parseVCards, pickContacts, pickerSupported, type ImportedContact } from '../lib/contacts'
 
@@ -382,7 +382,7 @@ function ReminderCard({ due }: { due: string[] }) {
       setServer(onServer())
       setAskToken(false)
       setMsg('')
-      setNote(onServer() ? 'התזכורת פועלת. אפשר לשלוח בדיקה כדי לראות שהיא מגיעה.' : '')
+      setNote(onServer() ? 'התזכורת פועלת ותגיע כל בוקר בשעה שבחרת.' : '')
     } catch (e) {
       setMsg(pushError(e))
       if ((e as Error).message === 'token') setAskToken(true)
@@ -468,18 +468,6 @@ function ReminderCard({ due }: { due: string[] }) {
             {busy ? 'מעביר…' : 'תיקון התזכורת'}
           </button>
         </div>
-      )}
-
-      {on && server && (
-        <button className="btn white" style={{ minHeight: 40 }} disabled={busy}
-          onClick={async () => {
-            setBusy(true)
-            try { await sendTestPush(); setMsg(''); setNote('נשלחה התראת בדיקה. היא אמורה להגיע תוך כמה שניות.') }
-            catch (e) { setNote(''); setMsg(pushError(e)) }
-            setBusy(false)
-          }}>
-          שליחת התראת בדיקה
-        </button>
       )}
 
       {note && !msg && <span className="small" style={{ color: '#E5E7EB' }}>{note}</span>}

@@ -5,11 +5,12 @@
 export interface ImportedContact {
   name: string
   phone?: string
+  email?: string
   photo?: Blob
 }
 
 interface ContactsManager {
-  select(props: string[], opts: { multiple: boolean }): Promise<{ name?: string[]; tel?: string[]; icon?: Blob[] }[]>
+  select(props: string[], opts: { multiple: boolean }): Promise<{ name?: string[]; tel?: string[]; email?: string[]; icon?: Blob[] }[]>
   getProperties?(): Promise<string[]>
 }
 
@@ -20,11 +21,11 @@ export const pickerSupported = () => !!manager() && 'ContactsManager' in window
 export async function pickContacts(): Promise<ImportedContact[]> {
   const m = manager()!
   const available = (await m.getProperties?.()) ?? ['name', 'tel']
-  const props = ['name', 'tel', 'icon'].filter((p) => available.includes(p))
+  const props = ['name', 'tel', 'email', 'icon'].filter((p) => available.includes(p))
   // One at a time: on iPhone the single-choice list is the one more likely to offer search
   const picked = await m.select(props, { multiple: false })
   return picked
-    .map((c) => ({ name: c.name?.[0]?.trim() ?? '', phone: c.tel?.[0] ? normalizePhone(c.tel[0]) : undefined, photo: c.icon?.[0] }))
+    .map((c) => ({ name: c.name?.[0]?.trim() ?? '', phone: c.tel?.[0] ? normalizePhone(c.tel[0]) : undefined, email: c.email?.[0]?.trim() || undefined, photo: c.icon?.[0] }))
     .filter((c) => c.name || c.phone)
     .map((c) => ({ ...c, name: c.name || c.phone! }))
 }
@@ -67,7 +68,7 @@ export function parseVCards(text: string): ImportedContact[] {
   // Long lines are folded onto continuation lines that start with a space or tab
   const lines = text.replace(/\r\n?/g, '\n').replace(/\n[ \t]/g, '').split('\n')
   const out: ImportedContact[] = []
-  let cur: { fn?: string; n?: string; tels: { value: string; cell: boolean }[]; photo?: Blob } | null = null
+  let cur: { fn?: string; n?: string; tels: { value: string; cell: boolean }[]; email?: string; photo?: Blob } | null = null
 
   for (const line of lines) {
     const colon = line.indexOf(':')
@@ -83,6 +84,7 @@ export function parseVCards(text: string): ImportedContact[] {
     else if (!cur) continue
     else if (key === 'FN') cur.fn = unescape(value)
     else if (key === 'N') cur.n = unescape(value.split(';').slice(0, 2).reverse().filter(Boolean).join(' '))
+    else if (key === 'EMAIL' && !cur.email) cur.email = unescape(value.replace(/^mailto:/i, '')) || undefined
     else if (key === 'TEL') cur.tels.push({ value: value.replace(/^tel:/i, ''), cell: /CELL|IPHONE|MOBILE/.test(paramText) })
     else if (key === 'PHOTO' && !cur.photo) {
       try {
@@ -96,7 +98,7 @@ export function parseVCards(text: string): ImportedContact[] {
       const tel = (cur.tels.find((t) => t.cell) ?? cur.tels[0])?.value
       const phone = tel ? normalizePhone(tel) : undefined
       const name = cur.fn || cur.n || phone
-      if (name) out.push({ name, phone, photo: cur.photo })
+      if (name) out.push({ name, phone, email: cur.email, photo: cur.photo })
       cur = null
     }
   }

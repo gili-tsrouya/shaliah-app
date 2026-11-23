@@ -32,6 +32,7 @@ const paths = {
   jacket: <><path d="M9 3 4 6v15h6V11M15 3l5 3v15h-6V11" /><path d="M9 3l3 4 3-4M12 7v14M4 14h3M20 14h-3" /></>,
   coat: <><path d="M9 2 4 5v17h16V5l-5-3" /><path d="M9 2l3 5 3-5M12 7v15M4 13h16M9.5 16h.01M14.5 16h.01" /></>,
   umbrella: <><path d="M3 12a9 9 0 0 1 18 0z" /><path d="M12 12v7a2 2 0 0 1-4 0M12 3V2" /></>,
+  mail: <><rect x="3" y="5.5" width="18" height="13" rx="2" /><path d="m3.5 7 8.5 6 8.5-6" /></>,
   phone: <path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2" />,
   video: <><rect x="3" y="6" width="13" height="12" rx="2" /><path d="m16 10 5-3v10l-5-3" /></>,
   camera: <><path d="M4 8h3l2-3h6l2 3h3v11H4z" /><circle cx="12" cy="13" r="3.5" /></>,

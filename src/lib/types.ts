@@ -266,3 +266,14 @@ export interface ActivityRun {
   worked?: string
   change?: string
 }
+
+// Work and emergency numbers (supervisor, safety officer, HR). No reminders or streaks.
+export interface ImportantContact {
+  id: string
+  role: string
+  name?: string
+  phone?: string
+  email?: string
+  place: 'tzofim' | 'yj' | 'general'
+  note?: string
+}

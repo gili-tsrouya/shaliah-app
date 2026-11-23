@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from 'react'
-import type { Activity, ActivityMethod, AgentSettings, CalCategory, CalEvent, Category, DropSeen, Expense, Owed, Partnership, Person, Profile, Settings, Task } from './types'
+import type { Activity, ActivityMethod, AgentSettings, ImportantContact, CalCategory, CalEvent, Category, DropSeen, Expense, Owed, Partnership, Person, Profile, Settings, Task } from './types'
 import { DEFAULT_CATEGORIES } from './types'
 import { addDays, todayISO } from './dates'
 import { mirrorPeople } from './push'
@@ -79,6 +79,7 @@ function useAppState() {
   const [expenses, setExpenses] = usePersistent<Expense[]>('expenses', () => [])
   const [owed, setOwed] = usePersistent<Owed[]>('owed', () => [])
   const [people, setPeople] = usePersistent<Person[]>('people', defaultPeople)
+  const [importantContacts, setImportantContacts] = usePersistent<ImportantContact[]>('importantContacts', () => [])
   // The morning notification is put together by the service worker, which cannot read localStorage
   useEffect(() => mirrorPeople(people), [people])
   // Which Google Calendar event holds each person's repeating call
@@ -176,6 +177,7 @@ function useAppState() {
     expenses, setExpenses,
     owed, setOwed,
     people, setPeople,
+    importantContacts, setImportantContacts,
     callEvents, syncCalls,
     savedDeals, setSavedDeals,
     savedIdeas, setSavedIdeas,

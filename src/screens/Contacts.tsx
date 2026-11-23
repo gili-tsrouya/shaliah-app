@@ -32,7 +32,7 @@ function resizePhoto(file: Blob) {
 const digits = (phone: string) => phone.replace(/[^\d+]/g, '')
 
 export function Contacts() {
-  const { people, setPeople } = useStore()
+  const { people, setPeople, importantContacts } = useStore()
   const [editing, setEditing] = useState<Person | null>(null)
   const [imported, setImported] = useState<ImportedContact[] | null>(null)
   const [importError, setImportError] = useState('')
@@ -84,6 +84,15 @@ export function Contacts() {
     <main className="screen">
       <SelfTabs active="contacts" />
       <h1>שומרים קשר</h1>
+
+      <div className="group">
+        <a href="#/self/important" className="group-row">
+          <span className="round-icon"><Icon name="phone" size={18} /></span>
+          <span style={{ flex: 1, fontSize: 17, fontWeight: 600 }}>טלפונים חשובים</span>
+          {importantContacts.length > 0 && <span className="muted">{importantContacts.length}</span>}
+          <Icon name="chevronL" size={18} stroke={2.2} />
+        </a>
+      </div>
 
       <ReminderCard due={due.map((p) => p.name)} />
       {streak >= 2 && (

@@ -338,3 +338,12 @@ input[type=checkbox], input[type=radio] { accent-color: var(--accent); }
 .swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(44px, 1fr)); gap: 10px; }
 .swatch { width: 44px; height: 44px; border-radius: 22px; border: 0; color: #fff; display: flex; align-items: center; justify-content: center; justify-self: center; }
 .swatch.on { box-shadow: 0 0 0 3px var(--surface), 0 0 0 5px var(--ink); }
+
+/* Important phones */
+.round-icon { width: 34px; height: 34px; border-radius: 17px; background: var(--ground); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.round-btn { width: 40px; height: 40px; border-radius: 20px; background: var(--ground); color: var(--ink); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.round-btn.solid { background: var(--accent); color: #fff; }
+.plain-row { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; align-items: flex-start; text-align: start; border: 0; background: transparent; padding: 4px 0; color: inherit; font: inherit; }
+.emergency-call { min-width: 76px; height: 40px; padding: 0 14px; border-radius: 20px; background: var(--danger); color: #fff; display: flex; align-items: center; justify-content: center; gap: 6px; text-decoration: none; font-size: 15px; font-weight: 700; }
+.two-fields { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 10px; }
+.two-fields input { min-width: 0; }

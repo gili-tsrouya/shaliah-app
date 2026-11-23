@@ -10,7 +10,7 @@ const TAB_OF: Record<string, string> = {
   calendar: 'calendar',
   tasks: 'tasks',
   drop: 'discover', shlichut: 'discover', 'self/deals': 'discover', activities: 'discover', activity: 'discover',
-  'self/contacts': 'self', 'self/budget': 'self', journal: 'self',
+  'self/contacts': 'self', 'self/important': 'self', 'self/budget': 'self', journal: 'self',
 }
 
 const items: { href: string; tab: string; label: string; icon: IconName }[] = [

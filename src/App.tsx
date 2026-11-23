@@ -5,6 +5,7 @@ import { Home } from './screens/Home'
 import { Deals } from './screens/Deals'
 import { Budget } from './screens/Budget'
 import { Contacts } from './screens/Contacts'
+import { ImportantContacts } from './screens/ImportantContacts'
 import { Shlichut } from './screens/Shlichut'
 import { Calendar } from './screens/Calendar'
 import { Tasks } from './screens/Tasks'
@@ -27,6 +28,7 @@ const routes: Record<string, () => React.JSX.Element> = {
   'self/deals': Deals,
   'self/budget': Budget,
   'self/contacts': Contacts,
+  'self/important': ImportantContacts,
   shlichut: Shlichut,
   calendar: Calendar,
   tasks: Tasks,

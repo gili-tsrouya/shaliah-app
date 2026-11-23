@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-11-22T11:15:29.850Z",
+  "updatedAt": "2026-11-23T11:15:47.122Z",
   "items": [
     {
       "id": "today-2026-11-24-target-holiday-price-match",
@@ -11,28 +11,15 @@
       "price": "עד -50%",
       "url": "https://www.today.com/shop/target-early-black-friday-sale-2026-rcna607288",
       "priceValue": 20,
-      "date": "2026-11-22"
+      "date": "2026-11-23"
     },
     {
-      "id": "jfnnj-2026-11-22-mitzvah-day",
-      "title": "Mitzvah Day בפדרציה היהודית של צפון ג׳רזי",
-      "summary": "פרויקטי התנדבות קהילתיים משותפים - דרך נעימה להכיר אנשים בקהילה היהודית (ההרשמה מראש).",
-      "category": "קהילה",
-      "when": "ראשון 12:30-15:00",
-      "date": "2026-11-22",
-      "where": "Jewish Federation of Northern NJ, 50 Eisenhower Dr, Paramus · כ-10 דק׳ נסיעה",
-      "price": "הרשמה מראש",
-      "lat": 40.9276,
-      "lng": -74.0697,
-      "url": "https://jfnnj.org/calendar"
-    },
-    {
-      "id": "bryantpark-2026-11-22-winter-village",
+      "id": "bryantpark-2026-11-23-winter-village",
       "title": "Winter Village ב-Bryant Park: החלקה בחינם",
-      "summary": "המסלול להחלקה על קרח ללא תשלום כניסה (משכירים נעליים בתשלום, או מביאים משלך), ובנוסף דוכני חג ובילוי ערב בעיר.",
+      "summary": "החלקה על הקרח בחינם (כשמביאים מחליקיים; השכרה בתשלום) בכפר החורף של Bryant Park, פתוח עד 1 במרץ - יציאה זולה במנהטן.",
       "category": "יציאות",
       "when": "כל יום 8:00-24:00",
-      "date": "2026-11-22",
+      "date": "2026-11-23",
       "where": "Bryant Park, Midtown Manhattan · רכבת B/D/F/M ל-42 St",
       "price": "חינם",
       "priceValue": 0,
@@ -89,6 +76,18 @@
       "lat": 40.7813,
       "lng": -73.974,
       "url": "https://www.nycforfree.co/events/macys-parade-balloon-inflation-2026"
+    },
+    {
+      "id": "jfnnj-2026-11-26-yad-leah-packing",
+      "title": "התנדבות: אריזת מזון לחג ההודיה (Yad Leah)",
+      "summary": "אירוע אריזה קהילתי של הפדרציה היהודית בצפון ג׳רזי בבוקר חג ההודיה - דרך להכיר אנשים (פרטי מחיר והרשמה באתר).",
+      "category": "קהילה",
+      "when": "חמישי 10:00-11:30",
+      "date": "2026-11-26",
+      "where": "Jewish Federation of Northern NJ · אזור Paramus",
+      "price": "התנדבות",
+      "priceValue": 0,
+      "url": "https://jfnnj.org/calendar"
     },
     {
       "id": "thelocalgirl-2026-11-27-record-store-day-black-friday",

@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-11-23T11:15:47.122Z",
+  "updatedAt": "2026-11-24T11:16:06.502Z",
   "items": [
     {
       "id": "today-2026-11-24-target-holiday-price-match",
@@ -37,19 +37,6 @@
       "where": "Walmart · אונליין ובסניפים",
       "price": "עד -50%",
       "url": "https://www.today.com/shop/black-friday-sales-2026-rcna605702"
-    },
-    {
-      "id": "ikea-2026-11-24-sofas-dinnerware",
-      "title": "IKEA: הנחות לחברי IKEA Family על ספות ואוכל",
-      "summary": "עד 30% על ספות, 20% על שולחנות אוכל, כלים וווילונות לחברי IKEA Family (חינם להצטרפות) - טוב לריהוט הדירה.",
-      "category": "מבצעים",
-      "when": "עד 24 בנובמבר",
-      "date": "2026-11-24",
-      "where": "IKEA Paramus ואונליין · כ-15 דק׳ נסיעה",
-      "price": "עד -30%",
-      "lat": 40.9137,
-      "lng": -74.0745,
-      "url": "https://www.ikea.com/us/en/offers/black-friday"
     },
     {
       "id": "fox5ny-2026-11-25-aldi-thanksgiving-meal",
@@ -96,7 +83,7 @@
       "category": "יציאות",
       "when": "שישי 27 בנובמבר",
       "date": "2026-11-27",
-      "where": "BB's Records, Bergenfield · כ-15 דק׳ נסיעה",
+      "where": "BB's Records, Bergenfield · 15 דק׳ נסיעה",
       "price": "חינם",
       "priceValue": 0,
       "lat": 40.9276,
@@ -110,11 +97,11 @@
       "category": "יציאות",
       "when": "ראשון 10:00-17:00",
       "date": "2026-11-29",
-      "where": "Paramus High School, 99 E Century Rd · כ-10 דק׳ נסיעה",
+      "where": "Paramus High School, 99 E Century Rd, Paramus · 15 דק׳ נסיעה",
       "price": "$3",
       "priceValue": 3,
-      "lat": 40.9488,
-      "lng": -74.0587,
+      "lat": 40.9445,
+      "lng": -74.07,
       "url": "https://www.fairsandfestivals.net/events/details/2026-paramus-thanksgiving-craft-fair"
     },
     {
@@ -128,6 +115,34 @@
       "price": "$30",
       "priceValue": 30,
       "url": "https://www.fox5ny.com/news/thanksgiving-meal-deals-2026-where-get-dinner-what-costs-when-order"
+    },
+    {
+      "id": "nycforfree-2026-11-29-holiday-nostalgia-train",
+      "title": "רכבת הנוסטלגיה של החגים (קרונות ישנים)",
+      "summary": "נסיעות ברכבת תחתית וינטג׳ בימי ראשון עד 27 בדצמבר, רק במחיר נסיעה רגיל בסאבוויי - יציאה זולה במנהטן.",
+      "category": "יציאות",
+      "when": "ראשון 10:00-17:00",
+      "date": "2026-11-29",
+      "where": "2nd Ave-Houston St (קו F) / 96th St (קו Q), מנהטן · רכבת/אוטובוס",
+      "price": "$3",
+      "priceValue": 3,
+      "lat": 40.7236,
+      "lng": -73.9899,
+      "url": "https://www.nycforfree.co/"
+    },
+    {
+      "id": "nycforfree-2026-12-03-nyse-tree-lighting",
+      "title": "הדלקת העץ ב-NYSE",
+      "summary": "טקס הדלקת העץ השנתי ה-103 מול הבורסה בוול סטריט, באווירת חג ובחינם.",
+      "category": "יציאות",
+      "when": "חמישי 15:30-18:30",
+      "date": "2026-12-03",
+      "where": "11 Wall Street, מנהטן · אוטובוס/רכבת",
+      "price": "חינם",
+      "priceValue": 0,
+      "lat": 40.7069,
+      "lng": -74.0113,
+      "url": "https://www.nycforfree.co/"
     },
     {
       "id": "mybergen-2026-12-04-ridgewood-downtown-holidays",
@@ -155,6 +170,48 @@
       "priceValue": 0,
       "lat": 40.8929,
       "lng": -73.9726,
+      "url": "https://www.mybergen.com/bergen-county-nj-holiday-events/"
+    },
+    {
+      "id": "mybergen-2026-12-05-garretson-dutch-christmas",
+      "title": "חג המולד ההולנדי ב-Garretson Forge & Farm",
+      "summary": "יום פתוח עם סיורים והווי חגיגי בחווה ההיסטורית ממש ב-Fair Lawn, כניסה חופשית (תרומה מתקבלת בברכה).",
+      "category": "יציאות",
+      "when": "שבת 10:00-15:00",
+      "date": "2026-12-05",
+      "where": "Garretson Forge & Farm, Fair Lawn · 5 דק׳ נסיעה",
+      "price": "חינם",
+      "priceValue": 0,
+      "lat": 40.9446,
+      "lng": -74.1211,
+      "url": "https://www.mybergen.com/bergen-county-nj-holiday-events/"
+    },
+    {
+      "id": "mybergen-2026-12-06-fairlawn-winter-wonderland",
+      "title": "Winter Wonderland ב-Fair Lawn",
+      "summary": "חגיגת חורף של העיר ב-Borough Hall עם שקיות מתנה בחינם (כל עוד יש במלאי).",
+      "category": "יציאות",
+      "when": "ראשון 18:30",
+      "date": "2026-12-06",
+      "where": "Fair Lawn Borough Hall · 5 דק׳ נסיעה",
+      "price": "חינם",
+      "priceValue": 0,
+      "lat": 40.9358,
+      "lng": -74.119,
+      "url": "https://www.mybergen.com/bergen-county-nj-holiday-events/"
+    },
+    {
+      "id": "mybergen-2026-12-07-fairlawn-menorah-lighting",
+      "title": "הדלקת נרות חנוכה בקהילה ב-Fair Lawn",
+      "summary": "הדלקת חנוכייה וחגיגה קהילתית בחינם, כמה דקות מהבית - דרך קלה להכיר את הקהילה היהודית באזור.",
+      "category": "קהילה",
+      "when": "שני 19:00-20:00",
+      "date": "2026-12-07",
+      "where": "Fair Lawn Borough Hall · 5 דק׳ נסיעה",
+      "price": "חינם",
+      "priceValue": 0,
+      "lat": 40.9358,
+      "lng": -74.119,
       "url": "https://www.mybergen.com/bergen-county-nj-holiday-events/"
     },
     {

@@ -1,6 +1,17 @@
 {
-  "updatedAt": "2026-11-24T11:16:06.502Z",
+  "updatedAt": "2026-11-25T11:15:20.497Z",
   "items": [
+    {
+      "id": "target-2026-11-27-home-kitchen",
+      "title": "Target: ציוד מטבח לדירה במבצע",
+      "summary": "עד 50% הנחה על כלי מטבח, למשל סט אחסון Rubbermaid 30 חלקים ב-$9.99 (במקום $19.99) וסט סירים T-Fal ב-$49.99.",
+      "category": "מבצעים",
+      "when": "עד 24 בדצמבר",
+      "where": "Target · אונליין ובסניפים (למשל Paramus)",
+      "price": "$9.99",
+      "priceValue": 10,
+      "url": "https://www.target.com/BlackFriday"
+    },
     {
       "id": "today-2026-11-24-target-holiday-price-match",
       "title": "Target: התאמת מחיר לחגים",
@@ -91,6 +102,48 @@
       "url": "https://thelocalgirl.com/bergen/event/record-store-day-black-friday/"
     },
     {
+      "id": "whitney-2026-11-27-free-friday-nights",
+      "title": "Whitney Museum: ערבי שישי בחינם",
+      "summary": "כניסה חופשית לכל המוזיאון בכל יום שישי בין 17:00 ל-22:00 - תרבות במנהטן בלי לשלם (רגיל $30).",
+      "category": "תרבות",
+      "when": "שישי 17:00-22:00",
+      "date": "2026-11-27",
+      "where": "Whitney Museum, Meatpacking District, מנהטן · אוטובוס/רכבת מ-NJ",
+      "price": "חינם",
+      "priceValue": 0,
+      "lat": 40.7396,
+      "lng": -74.0089,
+      "url": "https://www.whitney.org/visit"
+    },
+    {
+      "id": "hobokengirl-2026-11-27-pier-one-tree",
+      "title": "Pier One Tree: שוק עצי חג בהובוקן",
+      "summary": "שוק פופ-אפ של עצי חג על המזח בהובוקן עד 20 בדצמבר, עם נוף למנהטן; מחיר הכניסה לא פורסם (כנראה חינם לביקור).",
+      "category": "יציאות",
+      "when": "27 בנובמבר - 20 בדצמבר",
+      "date": "2026-11-27",
+      "where": "Pier 13, 1301 Sinatra Dr, Hoboken · כ-25 דק׳ נסיעה",
+      "price": "חינם",
+      "priceValue": 0,
+      "lat": 40.739,
+      "lng": -74.026,
+      "url": "https://www.hobokengirl.com/pier-one-tree-christmas-pop-up-hoboken-2026/"
+    },
+    {
+      "id": "thelocalgirl-2026-11-28-hoboken-farmers-market",
+      "title": "שוק איכרים בהובוקן (שבת)",
+      "summary": "שוק איכרים שבועי מתחת לגשר 14th Street - נעים לשוטט, לטעום ולהכיר את העיר בלי לשלם.",
+      "category": "אוכל",
+      "when": "שבת 28 בנובמבר",
+      "date": "2026-11-28",
+      "where": "14th Street Viaduct, Hoboken · כ-25 דק׳ נסיעה",
+      "price": "חינם",
+      "priceValue": 0,
+      "lat": 40.7529,
+      "lng": -74.0243,
+      "url": "https://thelocalgirl.com/calendar/event/hoboken-farmers-market-saturdays-under-the-14th-st-viaduct/"
+    },
+    {
       "id": "fairsandfestivals-2026-11-29-paramus-thanksgiving-craft-fair",
       "title": "Paramus Thanksgiving Craft Fair",
       "summary": "יריד מלאכה עם כ-125 דוכנים בבית הספר התיכון של Paramus - כניסה ב-$3 בלבד, טוב למתנות וליציאה קטנה.",
@@ -131,6 +184,32 @@
       "url": "https://www.nycforfree.co/"
     },
     {
+      "id": "thelocalgirl-2026-11-29-landeta-902-brewing",
+      "title": "פגישה עם אגדת הג׳איינטס Sean Landeta",
+      "summary": "מפגש חינם בבר-מבשלה בג׳רזי סיטי ביום ראשון של משחקי NFL - מקום להכיר אנשים.",
+      "category": "יציאות",
+      "when": "ראשון 29 בנובמבר",
+      "date": "2026-11-29",
+      "where": "902 Brewing, 101 Pacific Ave, Jersey City · כ-25 דק׳ נסיעה",
+      "price": "חינם",
+      "priceValue": 0,
+      "lat": 40.7229,
+      "lng": -74.0742,
+      "url": "https://thelocalgirl.com/calendar/event/meet-greet-giants-legend-sean-landeta/"
+    },
+    {
+      "id": "ikea-2026-11-30-family-10-per-100",
+      "title": "IKEA Family: $10 הנחה על כל $100",
+      "summary": "חברי IKEA Family (הצטרפות חינם) חוסכים $10 על כל $100, עד $100 הנחה, עד 30 בנובמבר - טוב לציוד לדירה.",
+      "category": "מבצעים",
+      "when": "עד 30 בנובמבר",
+      "date": "2026-11-30",
+      "where": "IKEA · אונליין או בחנות (Elizabeth)",
+      "price": "-10%",
+      "priceValue": 10,
+      "url": "https://www.ikea.com/us/en/campaigns/black-friday/"
+    },
+    {
       "id": "nycforfree-2026-12-03-nyse-tree-lighting",
       "title": "הדלקת העץ ב-NYSE",
       "summary": "טקס הדלקת העץ השנתי ה-103 מול הבורסה בוול סטריט, באווירת חג ובחינם.",
@@ -157,6 +236,20 @@
       "lat": 40.9793,
       "lng": -74.1166,
       "url": "https://www.mybergen.com/bergen-county-nj-holiday-events/"
+    },
+    {
+      "id": "frick-2026-12-04-first-friday",
+      "title": "Frick Collection: ערב שישי ראשון בחינם",
+      "summary": "כניסה חינם אחרי שעות העבודה בשישי הראשון של החודש (דצמבר לא מוחרג) - כדאי לבדוק באתר אם צריך להירשם.",
+      "category": "תרבות",
+      "when": "שישי 4 בדצמבר, ערב",
+      "date": "2026-12-04",
+      "where": "Frick Collection, Upper East Side, מנהטן · אוטובוס/רכבת מ-NJ",
+      "price": "חינם",
+      "priceValue": 0,
+      "lat": 40.7712,
+      "lng": -73.9673,
+      "url": "https://www.frick.org/tickets/discounted_free"
     },
     {
       "id": "mybergen-2026-12-05-englewood-library-guaraldi",
@@ -201,6 +294,20 @@
       "url": "https://www.mybergen.com/bergen-county-nj-holiday-events/"
     },
     {
+      "id": "thelocalgirl-2026-12-06-hoboken-menorah-gelt",
+      "title": "הדלקת חנוכייה גדולה והפלת גלט בהובוקן",
+      "summary": "הדלקת נר ראשונה בחגיגה קהילתית חינם בעיריית הובוקן, עם הפלת גלט - מפגש יהודי קל.",
+      "category": "קהילה",
+      "when": "ראשון 6 בדצמבר 17:00-18:00",
+      "date": "2026-12-06",
+      "where": "Hoboken City Hall, 94 Washington St · כ-25 דק׳ נסיעה",
+      "price": "חינם",
+      "priceValue": 0,
+      "lat": 40.744,
+      "lng": -74.0324,
+      "url": "https://thelocalgirl.com/newjersey/hanukkah-festivals-events-new-jersey-2026/"
+    },
+    {
       "id": "mybergen-2026-12-07-fairlawn-menorah-lighting",
       "title": "הדלקת נרות חנוכה בקהילה ב-Fair Lawn",
       "summary": "הדלקת חנוכייה וחגיגה קהילתית בחינם, כמה דקות מהבית - דרך קלה להכיר את הקהילה היהודית באזור.",
@@ -237,17 +344,6 @@
       "price": "$35",
       "priceValue": 35,
       "url": "https://www.fox5ny.com/news/thanksgiving-meal-deals-2026-where-get-dinner-what-costs-when-order"
-    },
-    {
-      "id": "target-2026-11-27-home-kitchen",
-      "title": "Target: ציוד מטבח לדירה במבצע",
-      "summary": "עד 50% הנחה על כלי מטבח, למשל סט אחסון Rubbermaid 30 חלקים ב-$9.99 (במקום $19.99) וסט סירים T-Fal ב-$49.99.",
-      "category": "מבצעים",
-      "when": "עד 24 בדצמבר",
-      "where": "Target · אונליין ובסניפים (למשל Paramus)",
-      "price": "$9.99",
-      "priceValue": 10,
-      "url": "https://www.target.com/BlackFriday"
     }
   ]
 }

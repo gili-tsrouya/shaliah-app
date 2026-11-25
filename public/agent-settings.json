@@ -11,7 +11,7 @@
     "jewish"
   ],
   "extra": "",
-  "updatedAt": "2026-11-24T16:33:20.064Z",
+  "updatedAt": "2026-11-25T13:11:42.893Z",
   "interests": [],
   "homeBase": {
     "name": "Fair Lawn, New Jersey",
@@ -20,7 +20,9 @@
   },
   "includeNyc": true,
   "taste": {
-    "more": [],
+    "more": [
+      "תרבות"
+    ],
     "less": []
   }
 }

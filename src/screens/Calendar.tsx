@@ -323,6 +323,15 @@ function EventSheet({ event, categories, known, onRsvp, onClose, onSave, onDelet
   onClose: () => void; onSave: (e: CalEvent) => void; onDelete: () => void
 }) {
   const [kind, setKind] = useState<EventKind>(event.kind)
+  // The end time follows the start (one hour later) until she sets the end herself
+  const endInput = useRef<HTMLInputElement>(null)
+  const endIsAuto = useRef(!event.end)
+  const startChanged = (start: string) => {
+    if (kind !== 'event' || !endIsAuto.current || !endInput.current || !/^\d\d:\d\d$/.test(start)) return
+    const [h, m] = start.split(':').map(Number)
+    const mins = Math.min(h * 60 + m + 60, 23 * 60 + 59)
+    endInput.current.value = `${String(Math.floor(mins / 60)).padStart(2, '0')}:${String(mins % 60).padStart(2, '0')}`
+  }
   const [work, setWork] = useState(event.work)
   const [guests, setGuests] = useState<Guest[]>(event.guests ?? [])
   const [typed, setTyped] = useState('')
@@ -393,11 +402,11 @@ function EventSheet({ event, categories, known, onRsvp, onClose, onSave, onDelet
           <label className="field">{kind === 'vacation' ? 'מתאריך' : 'תאריך'}<input name="date" type="date" defaultValue={event.date} required /></label>
           {kind === 'vacation'
             ? <label className="field">עד תאריך<input name="endDate" type="date" defaultValue={event.endDate ?? event.date} /></label>
-            : <label className="field">{kind === 'deadline' ? 'עד שעה' : 'משעה'}<input name="start" type="time" defaultValue={event.start} /></label>}
+            : <label className="field">{kind === 'deadline' ? 'עד שעה' : 'משעה'}<input name="start" type="time" defaultValue={event.start} onChange={(ev) => startChanged(ev.target.value)} /></label>}
         </div>
         {kind === 'event' && (
           <div className="grid2">
-            <label className="field">עד שעה<input name="end" type="time" defaultValue={event.end} /></label>
+            <label className="field">עד שעה<input ref={endInput} name="end" type="time" defaultValue={event.end} onChange={(ev) => { endIsAuto.current = !ev.target.value }} /></label>
             <label className="field">עד תאריך (כמה ימים)<input name="endDate" type="date" defaultValue={event.endDate} /></label>
           </div>
         )}

@@ -259,7 +259,7 @@ export function Calendar() {
             <button key={e.id} className={`event ${e.kind === 'deadline' ? 'deadline' : ''}`}
               style={{ background: col.bg, color: col.fg, border: e.kind === 'deadline' ? undefined : 'none', textAlign: 'start' }}
               onClick={() => (e.id.startsWith('call_') ? (location.hash = '#/self/contacts') : setEditing(e))}>
-              <span className="time ltr">{e.kind === 'vacation' ? '—' : e.start ?? 'כל היום'}</span>
+              <span className="time ltr">{e.kind === 'vacation' ? '—' : e.endDate ? 'כל היום' : e.start ?? 'כל היום'}</span>
               <span className="col" style={{ gap: 2, flex: 1 }}>
                 <span className="title">{e.title}</span>
                 <span className="small bold">{cat(e.work).label}{e.kind === 'deadline' ? ' · דדליין' : e.kind === 'vacation' ? ' · חופשה' : ''}{e.googleId ? ' · Google' : ''}</span>
@@ -354,12 +354,15 @@ function EventSheet({ event, categories, known, onRsvp, onClose, onSave, onDelet
         const pending = toGoogle && !readOnly ? typed.split(/[\s,;]+/).map((x) => x.trim().toLowerCase()).filter(validEmail) : []
         const all = [...guests, ...pending.filter((x) => !guests.some((g) => g.email === x)).map((email) => ({ email }))]
         const s = (k: string) => String(f.get(k) || '') || undefined
+        const date = String(f.get('date'))
+        // an event can span days (a seminar, a camp): then it is all-day
+        const multiDay = kind === 'event' && !!s('endDate') && s('endDate')! > date
         onSave({
           ...event, id: event.id || newId(), title: String(f.get('title')), work: String(f.get('work')), kind,
-          date: String(f.get('date')),
-          endDate: kind === 'vacation' ? s('endDate') : undefined,
-          start: kind === 'vacation' ? undefined : s('start'),
-          end: kind === 'event' ? s('end') : undefined,
+          date,
+          endDate: kind === 'vacation' || multiDay ? s('endDate') : undefined,
+          start: kind === 'vacation' || multiDay ? undefined : s('start'),
+          end: kind === 'event' && !multiDay ? s('end') : undefined,
           guests: toGoogle ? (readOnly ? event.guests : all) : event.guests,
           meet: toGoogle && kind === 'event' && meet ? true : undefined,
         })
@@ -392,7 +395,12 @@ function EventSheet({ event, categories, known, onRsvp, onClose, onSave, onDelet
             ? <label className="field">עד תאריך<input name="endDate" type="date" defaultValue={event.endDate ?? event.date} /></label>
             : <label className="field">{kind === 'deadline' ? 'עד שעה' : 'משעה'}<input name="start" type="time" defaultValue={event.start} /></label>}
         </div>
-        {kind === 'event' && <label className="field">עד שעה<input name="end" type="time" defaultValue={event.end} /></label>}
+        {kind === 'event' && (
+          <div className="grid2">
+            <label className="field">עד שעה<input name="end" type="time" defaultValue={event.end} /></label>
+            <label className="field">עד תאריך (כמה ימים)<input name="endDate" type="date" defaultValue={event.endDate} /></label>
+          </div>
+        )}
 
         {kind !== 'vacation' && (
           <div className="field">

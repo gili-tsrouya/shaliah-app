@@ -159,11 +159,12 @@ const localDate = (dt: string) => {
 function fromGoogle(g: GEvent, calendarId: string, work: Work): CalEvent {
   const kind = g.extendedProperties?.private?.shaliachKind
   if (g.start.date) {
-    // All-day: Google's end date is exclusive
+    // All-day: Google's end date is exclusive. Several days long: in the personal calendar a vacation,
+    // in a work calendar (צופים, Young Judaea) a seminar or camp, so an event that spans days.
     const endDate = addDays(g.end.date ?? g.start.date, -1)
     return {
       id: `g_${calendarId}_${g.id}`, googleId: g.id, googleCalendarId: calendarId, work, title: g.summary || '(ללא כותרת)',
-      kind: kind ?? (endDate > g.start.date ? 'vacation' : 'event'), date: g.start.date,
+      kind: kind ?? (endDate > g.start.date && work === 'personal' ? 'vacation' : 'event'), date: g.start.date,
       endDate: endDate > g.start.date ? endDate : undefined, ...peopleOf(g),
     }
   }

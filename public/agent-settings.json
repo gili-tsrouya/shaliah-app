@@ -1,7 +1,7 @@
 {
-  "home": "Fair Lawn, New Jersey",
-  "lat": 40.94,
-  "lng": -74.13,
+  "home": "Fair Lawn, NJ",
+  "lat": 40.9404,
+  "lng": -74.1318,
   "rangeMiles": 10,
   "maxPrice": 10,
   "topics": [
@@ -11,12 +11,23 @@
     "jewish"
   ],
   "extra": "",
-  "updatedAt": "2026-11-25T13:11:42.893Z",
-  "interests": [],
+  "updatedAt": "2026-11-26T19:24:56.610Z",
+  "interests": [
+    "יוגה",
+    "טבע וטיולים",
+    "מפגשי ישראלים",
+    "הרצאות וסדנאות",
+    "ספורט וכושר",
+    "מוזיקה חיה",
+    "מסיבות וברים",
+    "אוכל ומסעדות",
+    "תיאטרון וקומדיה",
+    "קולנוע"
+  ],
   "homeBase": {
-    "name": "Fair Lawn, New Jersey",
-    "lat": 40.94,
-    "lng": -74.13
+    "name": "Fair Lawn, NJ",
+    "lat": 40.9404,
+    "lng": -74.1318
   },
   "includeNyc": true,
   "taste": {

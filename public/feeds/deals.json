@@ -1,17 +1,6 @@
 {
-  "updatedAt": "2026-11-25T11:15:20.497Z",
+  "updatedAt": "2026-11-26T11:15:31.798Z",
   "items": [
-    {
-      "id": "target-2026-11-27-home-kitchen",
-      "title": "Target: ציוד מטבח לדירה במבצע",
-      "summary": "עד 50% הנחה על כלי מטבח, למשל סט אחסון Rubbermaid 30 חלקים ב-$9.99 (במקום $19.99) וסט סירים T-Fal ב-$49.99.",
-      "category": "מבצעים",
-      "when": "עד 24 בדצמבר",
-      "where": "Target · אונליין ובסניפים (למשל Paramus)",
-      "price": "$9.99",
-      "priceValue": 10,
-      "url": "https://www.target.com/BlackFriday"
-    },
     {
       "id": "today-2026-11-24-target-holiday-price-match",
       "title": "Target: התאמת מחיר לחגים",
@@ -48,44 +37,6 @@
       "where": "Walmart · אונליין ובסניפים",
       "price": "עד -50%",
       "url": "https://www.today.com/shop/black-friday-sales-2026-rcna605702"
-    },
-    {
-      "id": "fox5ny-2026-11-25-aldi-thanksgiving-meal",
-      "title": "ארוחת חג ההודיה ב-Aldi לעשרה אנשים",
-      "summary": "סל ארוחת חג שלם (כולל הודו 16 פאונד) בפחות מ-$39, בלי קופונים או מועדון - זול גם לארוחה עם חברים.",
-      "category": "אוכל",
-      "when": "עד 25 בנובמבר",
-      "date": "2026-11-25",
-      "where": "Aldi · סניפים באזור",
-      "price": "$39",
-      "priceValue": 39,
-      "url": "https://www.fox5ny.com/news/thanksgiving-meal-deals-2026-where-get-dinner-what-costs-when-order"
-    },
-    {
-      "id": "nycforfree-2026-11-25-macys-balloon-inflation",
-      "title": "Macy’s Parade: ניפוח הבלונים ערב המצעד",
-      "summary": "ערב מצעד חג ההודיה ה-100 מנפחים את הבלונים ענק ליד מוזיאון ה-AMNH – אפשר לראות מקרוב, בדרך כלל בחינם (כדאי להגיע מוקדם).",
-      "category": "יציאות",
-      "when": "רביעי 13:00-18:00",
-      "date": "2026-11-25",
-      "where": "American Museum of Natural History, Upper West Side, Manhattan · אוטובוס/רכבת מ-NJ",
-      "price": "חינם",
-      "priceValue": 0,
-      "lat": 40.7813,
-      "lng": -73.974,
-      "url": "https://www.nycforfree.co/events/macys-parade-balloon-inflation-2026"
-    },
-    {
-      "id": "jfnnj-2026-11-26-yad-leah-packing",
-      "title": "התנדבות: אריזת מזון לחג ההודיה (Yad Leah)",
-      "summary": "אירוע אריזה קהילתי של הפדרציה היהודית בצפון ג׳רזי בבוקר חג ההודיה - דרך להכיר אנשים (פרטי מחיר והרשמה באתר).",
-      "category": "קהילה",
-      "when": "חמישי 10:00-11:30",
-      "date": "2026-11-26",
-      "where": "Jewish Federation of Northern NJ · אזור Paramus",
-      "price": "התנדבות",
-      "priceValue": 0,
-      "url": "https://jfnnj.org/calendar"
     },
     {
       "id": "thelocalgirl-2026-11-27-record-store-day-black-friday",
@@ -142,6 +93,32 @@
       "lat": 40.7529,
       "lng": -74.0243,
       "url": "https://thelocalgirl.com/calendar/event/hoboken-farmers-market-saturdays-under-the-14th-st-viaduct/"
+    },
+    {
+      "id": "timeout-2026-11-28-caribbean-holiday-market",
+      "title": "Caribbean Holiday Market בברוקלין",
+      "summary": "שוק חג קריבי עם דוכנים ואוכל, פתוח בשבתות וראשונים 11:00-18:00, כניסה חופשית.",
+      "category": "יציאות",
+      "when": "שבת 28 בנובמבר 11:00-18:00",
+      "date": "2026-11-28",
+      "where": "CARIBBEING HQ, 1399 Nostrand Ave, Brooklyn · כשעה וחצי נסיעה",
+      "price": "חינם",
+      "priceValue": 0,
+      "lat": 40.6494,
+      "lng": -73.9506,
+      "url": "https://www.timeout.com/newyork/things-to-do/things-to-do-in-nyc-this-weekend"
+    },
+    {
+      "id": "target-2026-11-27-home-kitchen",
+      "title": "Target: ציוד מטבח לדירה במבצע",
+      "summary": "עד 50% הנחה על פריטי בית ואחסון (Brightroom), 40% על מצעים, ומנורת לילה אלחוטית ב-$7.49 (במקום $14.99). המבצע עד יום ראשון 29.11.",
+      "category": "מבצעים",
+      "when": "עד ראשון 29 בנובמבר",
+      "where": "Target · אונליין ובסניפים (למשל Paramus)",
+      "price": "$7.49",
+      "priceValue": 7.49,
+      "url": "https://www.target.com/BlackFriday",
+      "date": "2026-11-29"
     },
     {
       "id": "fairsandfestivals-2026-11-29-paramus-thanksgiving-craft-fair",
@@ -250,6 +227,20 @@
       "lat": 40.7712,
       "lng": -73.9673,
       "url": "https://www.frick.org/tickets/discounted_free"
+    },
+    {
+      "id": "neuegalerie-2026-12-04-first-friday",
+      "title": "Neue Galerie: כניסה חופשית בשישי הראשון",
+      "summary": "מוזיאון לאמנות גרמנית ואוסטרית באפר איסט סייד, כניסה חינם 17:00-20:00, כניסה לפי תור (לא לבני פחות מ-12).",
+      "category": "תרבות",
+      "when": "שישי 4 בדצמבר 17:00-20:00",
+      "date": "2026-12-04",
+      "where": "Neue Galerie, 1048 Fifth Ave, Manhattan · כ-45 דק׳ באוטובוס/רכבת",
+      "price": "חינם",
+      "priceValue": 0,
+      "lat": 40.7814,
+      "lng": -73.9601,
+      "url": "https://www.neuegalerie.org/programs/first-fridays-dec-2026"
     },
     {
       "id": "mybergen-2026-12-05-englewood-library-guaraldi",

@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-11-26T11:15:31.798Z",
+  "updatedAt": "2026-11-27T11:16:37.357Z",
   "items": [
     {
       "id": "today-2026-11-24-target-holiday-price-match",
@@ -109,6 +109,20 @@
       "url": "https://www.timeout.com/newyork/things-to-do/things-to-do-in-nyc-this-weekend"
     },
     {
+      "id": "thejewishmuseum-2026-11-28-free-saturdays",
+      "title": "The Jewish Museum: כניסה חינם בשבתות",
+      "summary": "המוזיאון היהודי בניו יורק פתוח חינם בימי שבת (11:00-18:00) - תרבות יהודית בלי לשלם.",
+      "category": "תרבות",
+      "when": "שבת 11:00-18:00",
+      "date": "2026-11-28",
+      "where": "1109 Fifth Ave, Upper East Side · אוטובוס/רכבת למנהטן",
+      "price": "חינם",
+      "priceValue": 0,
+      "lat": 40.7853,
+      "lng": -73.957,
+      "url": "https://thejewishmuseum.org/visit"
+    },
+    {
       "id": "target-2026-11-27-home-kitchen",
       "title": "Target: ציוד מטבח לדירה במבצע",
       "summary": "עד 50% הנחה על פריטי בית ואחסון (Brightroom), 40% על מצעים, ומנורת לילה אלחוטית ב-$7.49 (במקום $14.99). המבצע עד יום ראשון 29.11.",
@@ -187,6 +201,34 @@
       "url": "https://www.ikea.com/us/en/campaigns/black-friday/"
     },
     {
+      "id": "nycforfree-2026-12-01-bryant-park-tree-lighting",
+      "title": "הדלקת עץ ב-Bryant Park Winter Village",
+      "summary": "טקס הדלקת עץ חינם בכפר החורף, אפשר להמשיך להחלקה או לשוק החגים.",
+      "category": "יציאות",
+      "when": "שלישי 17:30-19:30",
+      "date": "2026-12-01",
+      "where": "Bryant Park, Midtown Manhattan · רכבת B/D/F/M ל-42 St",
+      "price": "חינם",
+      "priceValue": 0,
+      "lat": 40.7536,
+      "lng": -73.9832,
+      "url": "https://nycforfree.co/events"
+    },
+    {
+      "id": "nycforfree-2026-12-01-seaport-tree-lighting",
+      "title": "הדלקת עץ ב-South Street Seaport",
+      "summary": "הדלקת עץ חינם על שפת המים בדרום מנהטן.",
+      "category": "יציאות",
+      "when": "שלישי 19:00-20:00",
+      "date": "2026-12-01",
+      "where": "19 Fulton St, South Street Seaport · רכבת 2/3/4/5 ל-Fulton",
+      "price": "חינם",
+      "priceValue": 0,
+      "lat": 40.7066,
+      "lng": -74.0036,
+      "url": "https://nycforfree.co/events"
+    },
+    {
       "id": "nycforfree-2026-12-03-nyse-tree-lighting",
       "title": "הדלקת העץ ב-NYSE",
       "summary": "טקס הדלקת העץ השנתי ה-103 מול הבורסה בוול סטריט, באווירת חג ובחינם.",
@@ -199,6 +241,34 @@
       "lat": 40.7069,
       "lng": -74.0113,
       "url": "https://www.nycforfree.co/"
+    },
+    {
+      "id": "nycforfree-2026-12-03-broadway-under-the-stars",
+      "title": "Broadway Under The Stars",
+      "summary": "הופעות חיות של שירי ברודווי בחינם בימי חמישי אחר הצהריים ב-Columbus Circle.",
+      "category": "תרבות",
+      "when": "חמישי 17:00-18:00 (גם 10 בדצמבר)",
+      "date": "2026-12-03",
+      "where": "Shops at Columbus Circle, Manhattan · רכבת A/B/C/D/1 ל-59 St",
+      "price": "חינם",
+      "priceValue": 0,
+      "lat": 40.7681,
+      "lng": -73.9819,
+      "url": "https://nycforfree.co/events"
+    },
+    {
+      "id": "nycforfree-2026-12-03-harlem-meer-tree-lighting",
+      "title": "הדלקת עץ ושיט אורות ב-Central Park",
+      "summary": "הדלקת עץ שנתית ליד Harlem Meer בסנטרל פארק, אירוע שכונתי חינם.",
+      "category": "יציאות",
+      "when": "חמישי 17:30-19:30",
+      "date": "2026-12-03",
+      "where": "Dana Center, Harlem Meer, Central Park · רכבת 2/3 ל-110 St",
+      "price": "חינם",
+      "priceValue": 0,
+      "lat": 40.7954,
+      "lng": -73.9515,
+      "url": "https://nycforfree.co/events"
     },
     {
       "id": "mybergen-2026-12-04-ridgewood-downtown-holidays",
@@ -299,6 +369,20 @@
       "url": "https://thelocalgirl.com/newjersey/hanukkah-festivals-events-new-jersey-2026/"
     },
     {
+      "id": "mommypoppins-2026-12-06-seaport-menorah",
+      "title": "הדלקת חנוכייה בסיפורט עם Chanukah Balloon Bash",
+      "summary": "הדלקת נרות חנוכה בסאות' סטריט סיפורט, חינם, הזדמנות לפגוש קהילה יהודית.",
+      "category": "קהילה",
+      "when": "ראשון 15:00-17:00",
+      "date": "2026-12-06",
+      "where": "South Street Seaport, Manhattan · רכבת 2/3/4/5 ל-Fulton",
+      "price": "חינם",
+      "priceValue": 0,
+      "lat": 40.7066,
+      "lng": -74.0036,
+      "url": "https://mommypoppins.com/new-york-city-kids/fairs-festivals/30-free-holiday-events-for-families-and-kids-in-nyc"
+    },
+    {
       "id": "mybergen-2026-12-07-fairlawn-menorah-lighting",
       "title": "הדלקת נרות חנוכה בקהילה ב-Fair Lawn",
       "summary": "הדלקת חנוכייה וחגיגה קהילתית בחינם, כמה דקות מהבית - דרך קלה להכיר את הקהילה היהודית באזור.",
@@ -311,6 +395,20 @@
       "lat": 40.9358,
       "lng": -74.119,
       "url": "https://www.mybergen.com/bergen-county-nj-holiday-events/"
+    },
+    {
+      "id": "mommypoppins-2026-12-09-hudson-yards-menorah",
+      "title": "הדלקת חנוכייה ב-Hudson Yards",
+      "summary": "הדלקת נרות חנוכה חינם בכיכר של Hudson Yards.",
+      "category": "קהילה",
+      "when": "רביעי 17:00-18:00",
+      "date": "2026-12-09",
+      "where": "Hudson Yards Public Square, Manhattan · רכבת 7 ל-34 St Hudson Yards",
+      "price": "חינם",
+      "priceValue": 0,
+      "lat": 40.7536,
+      "lng": -74.0014,
+      "url": "https://mommypoppins.com/new-york-city-kids/fairs-festivals/30-free-holiday-events-for-families-and-kids-in-nyc"
     },
     {
       "id": "ikea-2026-12-24-billy-bookcase",

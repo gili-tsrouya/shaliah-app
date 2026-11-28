@@ -11,7 +11,7 @@
     "jewish"
   ],
   "extra": "",
-  "updatedAt": "2026-11-27T16:40:43.097Z",
+  "updatedAt": "2026-11-28T12:46:51.459Z",
   "interests": [
     "יוגה",
     "טבע וטיולים",
@@ -31,11 +31,7 @@
   },
   "includeNyc": true,
   "taste": {
-    "more": [
-      "תרבות"
-    ],
-    "less": [
-      "יציאות"
-    ]
+    "more": [],
+    "less": []
   }
 }
